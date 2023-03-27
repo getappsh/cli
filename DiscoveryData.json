@@ -1,0 +1,63 @@
+{  
+  "general":{
+     "personalDevice":{
+        "name":"tank",
+        "idNumber":"idNumber-123",
+        "personalNumber":"personalNumber-123"
+     },
+     "situationalDevice":{
+        "weather":23.2,
+        "bandwidth":0,
+        "time":"2023-03-13T15:20:51.785Z",
+        "operativeState":true,
+        "power":38,
+        "location":{
+           "lat":"-8.5612",
+           "long":"-62.2928",
+           "alt":"500"
+        }
+     },
+     "physicalDevice":{
+        "MAC":"ee:e0:b0:bf:8b:38",
+        "ID":"51490b1c-3a44-4c11-aa96-66dda33d89c9",
+        "IP":"169.227.199.206",
+        "OS":"windows",
+        "serialNumber":"serialNumber-123",
+        "possibleBandwidth":"yes",
+        "availableStorage":"50mb"
+     }
+  },
+  "discoveryType":"get-app",
+  "data":{
+     "formation":"yaat",
+     "baseVersion":{
+        "name":"yatush",
+        "versionNumber":"5.0.6",
+        "releaseNotes":"Bugfix with the editor",
+        "virtualSize":12024,
+        "components":[
+           {
+              "name":"yaat",
+              "versionNumber":"1.2.0",
+              "releaseNotes":"Mulit color pointer",
+              "subComponents":[
+                 {
+                    "name":"hqtactic",
+                    "versionNumber":"7.3.4",
+                    "releaseNotes":"New feature"
+                 }
+              ]
+           }
+        ]
+     },
+     "previousVersion":{
+        "name":"word",
+        "versionNumber":"5.0.5",
+        "releaseNotes":"Performance improvements",
+        "virtualSize":8054,
+        "components":[
+           
+        ]
+     }
+  }
+}
