@@ -1,0 +1,19 @@
+{
+  "product": "Merkava",
+  "name": "RADAR",
+  "version": "2.3.5",
+  "agentTags": "Tags of possible agent",
+  "prevVersion": "1.4.2",
+  "formation": "yatush",
+  "baseVersion": "1.4.2",
+  "installType": "custom",
+  "size": "2MB",
+  "properties": {
+    "items": [
+      {
+        "key": "",
+        "value": ""
+      }
+    ]
+  }
+}
