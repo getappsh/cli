@@ -8,7 +8,7 @@ import { sendDiscoveryMessage } from './apis/discovery.api.js';
 program
   .option('-l, --login <user>', 'login with user and password')
   .option('-u, --upload <token,version>', 'upload new version message')
-  .option('-d,--discovery<token,discoveryMessage>', 'send discovery message by device')
+  .option('-d, --discovery<token,discoveryMessage>', 'send discovery message by device')
   .command('getappcli')
   .action(() => {
     let args = process.argv;
@@ -22,19 +22,19 @@ program
         // args[4] need to be the path of upload's details file;
         // args[6] need to be the upload's token of manifest upload;
         // args[5] need to be the path of zip file of manifest upload;
-        sendUploadMessage(args[4],args[5], args[6])
+        sendUploadMessage(args[4], args[5], args[6])
         break;
       case "-d":
         // args[4] need to be the path of upload's details file;
         sendDiscoveryMessage(args[4]);
-        break;      
+        break;
 
       default:
         break;
     }
   });
 
- program.parse(process.argv)
+program.parse(process.argv)
 // console.log( program.parse(process.argv))
 // // function SendUploadMessage(filePath, accessToken) {
 // //   let jsonData

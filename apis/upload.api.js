@@ -26,7 +26,7 @@ const manifestUpload = async (path, data, config) => {
   try {
     const res = await axios.post(path, body, config)
     console.log(res.data);
-    // await axios.put(res.data.uploadUrl, zipBody)
+    await axios.put(res.data.uploadUrl, zipBody)
     console.log("Uploaded successfully");
   } catch (error) {
     errorHandler(error, () => manifestUpload(path, data, config));
