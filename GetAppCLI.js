@@ -6,8 +6,8 @@ import { sendDiscoveryMessage } from './apis/discovery.api.js';
 
 
 program
-  .option('-l, --login <user>', 'login with user and password')
-  .option('-u, --upload <token,version>', 'upload new version message')
+  .option('-l, --login <username, password>', 'login with user and password')
+  .option('-u, --upload <details, zip file, upload token>', 'upload new version message')
   .option('-d, --discovery<token,discoveryMessage>', 'send discovery message by device')
   .command('getappcli')
   .action(() => {
@@ -20,8 +20,8 @@ program
         break;
       case "-u":
         // args[4] need to be the path of upload's details file;
-        // args[6] need to be the upload's token of manifest upload;
         // args[5] need to be the path of zip file of manifest upload;
+        // args[6] need to be the upload's token of manifest upload;
         sendUploadMessage(args[4], args[5], args[6])
         break;
       case "-d":
