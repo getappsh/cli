@@ -8,5 +8,6 @@ export const REFRESH = 'login/refresh';
 
 export const UPLOAD_ARTIFACT = "upload/artifact"
 export const UPLOAD_MANIFEST = "upload/manifest"
+export const STATUS_UPDATE = "upload/updateUploadStatus"
 
 export const DISCOVERY = "discovery"
