@@ -28,8 +28,8 @@ const manifestUpload = async (path, data, config) => {
 
   try {
     const res = await axios.post(path, body, config)
-    updateStatus.versionId = res.data.versionId
-    console.log("start file upload");
+    updateStatus.catalogId = res.data.catalogId
+    console.log("Start file upload...");
     try {
       await axios.put(res.data.uploadUrl, zipBody)
       console.log("Uploaded successfully");
@@ -56,7 +56,6 @@ export const sendUploadMessage = async (filePath, zipFolder, uploadToken) => {
 
   if (!uploadToken) {
     const data = JSON.parse(await readFromFile(filePath))
-    console.log(data);
     const path = BASE_PATH + UPLOAD_ARTIFACT
     artifactUpload(path, data, config)
   } else {
