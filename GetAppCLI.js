@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { program } from 'commander';
 
 import { loginHandler } from './handlers/login.handler.js';
