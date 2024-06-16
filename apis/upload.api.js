@@ -48,11 +48,7 @@ const manifestUpload = async (path, data, config) => {
 
 export const sendUploadMessage = async (filePath, zipFolder, uploadToken) => {
 
-  const config = {
-    headers: {
-      'Authorization': `Bearer ${(await getTokens()).accessToken}`
-    }
-  };
+  const config = {};
 
   if (!uploadToken) {
     const data = JSON.parse(await readFromFile(filePath))
