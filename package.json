@@ -2,15 +2,8 @@
   "name": "getapp-cli",
   "version": "1.1.0",
   "type": "module",
-  "exports": {
-    "import": "./index.js",
-    "require": "./index.cjs"
-  },
   "description": "cli for getApp",
   "main": "./GetAppCLi.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "bin": {
     "getapp": "./GetAppCLi.js"
   },
