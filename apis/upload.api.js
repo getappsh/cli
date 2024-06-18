@@ -1,6 +1,6 @@
 import axios from 'axios';
 import FormData from 'form-data';
-import { createReadStream } from 'fs'
+import { createReadStream, statSync } from 'fs'
 
 import { getTokens, readFromFile } from '../utils/files.js';
 import { BASE_PATH, STATUS_UPDATE, UPLOAD_ARTIFACT, UPLOAD_MANIFEST } from './paths.js';
@@ -17,11 +17,8 @@ const artifactUpload = async (path, data, config) => {
 
 const manifestUpload = async (path, data, config) => {
   const body = new FormData();
-  body.append('file', createReadStream(data.filePath));
+  body.append('file', createReadStream(data.manifestPath));
   body.append('uploadToken', data.uploadToken)
-
-  const zipBody = new FormData();
-  zipBody.append('file', createReadStream(data.zipFolder))
 
   const updateStatus = {}
   updateStatus.uploadToken = data.uploadToken
@@ -30,8 +27,11 @@ const manifestUpload = async (path, data, config) => {
     const res = await axios.post(path, body, config)
     updateStatus.catalogId = res.data.catalogId
     console.log("Start file upload...");
+
+    const fileData = createReadStream(data.filePath);
+    const fileStat = statSync(data.filePath);
     try {
-      await axios.put(res.data.uploadUrl, zipBody)
+      await axios.put(res.data.uploadUrl, fileData, {headers: {'Content-Length': fileStat.size}});
       console.log("Uploaded successfully");
       updateStatus.status = "ready";
       const _statusRes = await axios.post(BASE_PATH + STATUS_UPDATE, updateStatus, config)
@@ -46,19 +46,19 @@ const manifestUpload = async (path, data, config) => {
   }
 }
 
-export const sendUploadMessage = async (filePath, zipFolder, uploadToken) => {
+export const sendUploadMessage = async (detailsPath, filePath, uploadToken) => {
 
   const config = {};
 
   if (!uploadToken) {
-    const data = JSON.parse(await readFromFile(filePath))
+    const data = JSON.parse(await readFromFile(detailsPath))
     const path = BASE_PATH + UPLOAD_ARTIFACT
     artifactUpload(path, data, config)
   } else {
     const path = BASE_PATH + UPLOAD_MANIFEST
     manifestUpload(
       path,
-      { filePath, zipFolder, uploadToken },
+      { manifestPath: detailsPath, filePath, uploadToken },
       config
     )
   }

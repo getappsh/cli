@@ -20,11 +20,11 @@ program
 program
   .command('upload')
   .description('Upload new version message')
-  .argument('<details>', 'path of upload details file')
-  .argument('<zipFile>', 'path of zip file of manifest upload')
-  .argument('<uploadToken>', 'upload token of manifest upload')
-  .action((details, zipFile, uploadToken) => {
-    sendUploadMessage(details, zipFile, uploadToken);
+  .argument('<detailsPath>', 'path of upload details/manifest file')
+  .argument('<filePath>', 'path of file on manifest upload')
+  .argument('<uploadToken>', 'upload token on manifest upload')
+  .action((detailsPath, filePath, uploadToken) => {
+    sendUploadMessage(detailsPath, filePath, uploadToken);
   });
 
 program
