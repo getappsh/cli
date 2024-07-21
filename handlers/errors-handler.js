@@ -3,7 +3,8 @@ import { refreshHandler } from "./login.handler.js";
 
 export const errorHandler = async (error, callback) => {
   if (error && !error.response) {
-    return console.error(error)
+    console.error(error)
+    process.exit(1)
   }
 
   if (error && error.response) {
@@ -11,7 +12,8 @@ export const errorHandler = async (error, callback) => {
     const res = error.response
 
     if (res.status !== 401) {
-      return console.error(res.data)
+      console.error(res.data)
+      process.exit(1)
     }
 
     if (res.status === 401) {
@@ -24,8 +26,10 @@ export const errorHandler = async (error, callback) => {
       }
     }
     console.error(error.response.data);
+    process.exit(1)
   }
   else if (error) {
     console.error(error)
+    process.exit(1)
   }
 }
