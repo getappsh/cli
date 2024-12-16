@@ -1,6 +1,6 @@
 import axios from 'axios';
 import FormData from 'form-data';
-import { createReadStream, statSync } from 'fs'
+import { createReadStream, statSync, readFileSync } from 'fs'
 
 import { getTokens, readFromFile } from '../utils/files.js';
 import { BASE_PATH, STATUS_UPDATE, UPLOAD_ARTIFACT, UPLOAD_MANIFEST } from './paths.js';
@@ -15,6 +15,20 @@ const artifactUpload = async (path, data, config) => {
   }
 }
 
+function getAssetType(path){
+  let assetType = "artifact"
+  try{
+    const manifestContent = fs.readFileSync(path, 'utf-8');
+    const manifestJson = JSON.parse(manifestContent);
+
+    assetType = manifestJson.assetType ?? assetType;
+  }catch(e){
+    console.log('Failed to read manifest file, ' + e)
+  }
+  return assetType
+
+}
+
 const manifestUpload = async (path, data, config) => {
   const body = new FormData();
   body.append('file', createReadStream(data.manifestPath));
@@ -24,10 +38,17 @@ const manifestUpload = async (path, data, config) => {
   updateStatus.uploadToken = data.uploadToken
 
   try {
+    const assetType = getAssetType(data.manifestPath);
+    console.log("Asset type: " +  assetType);
+
     const res = await axios.post(path, body, config)
     updateStatus.catalogId = res.data.catalogId
     console.log("Start file upload...");
-
+    
+    if (assetType == 'docker_image'){
+      console.log("Uploaded successfully");
+      return
+    }
     const fileData = createReadStream(data.filePath);
     const fileStat = statSync(data.filePath);
     try {
