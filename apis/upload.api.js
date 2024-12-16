@@ -18,7 +18,7 @@ const artifactUpload = async (path, data, config) => {
 function getAssetType(path){
   let assetType = "artifact"
   try{
-    const manifestContent = fs.readFileSync(path, 'utf-8');
+    const manifestContent = readFileSync(path, 'utf-8');
     const manifestJson = JSON.parse(manifestContent);
 
     assetType = manifestJson.assetType ?? assetType;

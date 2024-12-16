@@ -6,7 +6,7 @@ import { sendDiscoveryMessage } from './apis/discovery.api.js';
 
 const program = new Command();
 
-program.name('getapp-cli').description('CLI for app management').version('1.1.2');
+program.name('getapp-cli').description('CLI for app management').version('1.1.3');
 
 program
   .command('login')
