@@ -33,7 +33,7 @@ program
   .argument('<token>', 'discovery token')
   .argument('<discoveryMessage>', 'discovery message')
   .action((token, discoveryMessage) => {
-    sendDiscoveryMessage(token, discoveryMessage);
+    sendDiscoveryMessage(token);
   });
 
 program.parse(process.argv);

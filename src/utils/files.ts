@@ -1,11 +1,11 @@
 import {writeFile, existsSync, mkdirSync, promises as fs } from 'fs';
 import { errorHandler } from '../handlers/errors-handler.js';
 
-const getDirPath = (path) =>{
-  const filePath = process.cwd() + "\\data";
+const getDirPath = (path: string) =>{
+  const filePath = process.cwd() + "\\src\\data";
   
-  let fileName = path.split("/");
-  fileName = fileName[fileName.length - 1];
+  const pathParts = path.split("/");
+  let fileName = pathParts[pathParts.length - 1];
 
   fileName = filePath + "\\" + fileName;
 
@@ -17,7 +17,7 @@ const getDirPath = (path) =>{
 
 
 
-export const writeToFile = (path, data) => {
+export const writeToFile = (path: string, data: string) => {
   try {
     writeFile(getDirPath(path), data, (err) => {
       errorHandler(err)
@@ -28,7 +28,7 @@ export const writeToFile = (path, data) => {
   }
 }
 
-export const readFromFile = async (filePath) => {
+export const readFromFile = async (filePath: string) => {
   try {
     return await fs.readFile(filePath, "utf-8")
   } catch (error) {
@@ -38,8 +38,8 @@ export const readFromFile = async (filePath) => {
 
 export const getTokens = async () => {
   try {
-    const tokens = await readFromFile(getDirPath("data/login.json"))
-    return JSON.parse(tokens)
+    const tokens = await readFromFile(getDirPath("src/data/login.json"))
+    return JSON.parse(tokens || "")
   } catch (error) {
     errorHandler(error)
   }

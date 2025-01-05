@@ -2,15 +2,15 @@ import { sendLogin, sendRefresh } from "../apis/login.api.js";
 import { getTokens, writeToFile } from "../utils/files.js";
 import { errorHandler } from './errors-handler.js';
 
-export const loginHandler = async (username, password) => {
+export const loginHandler = async (username: string, password: string): Promise<void> => {
   const data = {
     username,
     password
   };
   try {
     const res = await sendLogin(data);
-    let tokens = JSON.stringify(res.data)
-    writeToFile("data/login.json", tokens)
+    let tokens = JSON.stringify(res)    
+    writeToFile("src/data/login.json", tokens)
     console.log("logged in");
   } catch (error) {
     errorHandler(error)
@@ -18,12 +18,12 @@ export const loginHandler = async (username, password) => {
 }
 
 
-export const refreshHandler = async () => {
- const refreshToken = (await getTokens()).refreshToken
+export const refreshHandler = async (): Promise<void> => {
+  const refreshToken = (await getTokens()).refreshToken
   try {
-    const res = await sendRefresh({refreshToken});
-    let tokens = JSON.stringify(res.data)
-    writeToFile("data/login.json", tokens)
+    const res = await sendRefresh({ refreshToken });
+    let tokens = JSON.stringify(res)
+    writeToFile("src/data/login.json", tokens)
     console.log("token refreshed");
   } catch (error) {
     errorHandler(error)
