@@ -1,3 +1,4 @@
+import axios from 'axios';
 
 import { BASE_PATH, DISCOVERY } from "./paths.js";
 import { getTokens, readFromFile } from "../utils/files.js";
@@ -8,22 +9,15 @@ export const sendDiscoveryMessage = async (filePath: string) => {
 
   const data = JSON.parse(await readFromFile(filePath) || "")
 
-  try {
-    const res = await fetch(path, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(await getTokens()).accessToken}`
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+  const config = {
+    headers: {
+      'Authorization': `Bearer ${(await getTokens()).accessToken}`
     }
+  };
 
-    const resData = await res.json();
-    console.log(resData);
+  try {
+    const res = await axios.post(path, data, config)
+    console.log(res.data);
   } catch (error) {
     errorHandler(error, () => sendDiscoveryMessage(filePath));
   }
