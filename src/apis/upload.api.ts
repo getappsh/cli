@@ -31,7 +31,6 @@ function getAssetType(path: string) {
 
 const manifestUpload = async (path: string, data: any, config: any) => {
   const form = new FormData();
-  console.log(data);
 
 
   form.append('file', createReadStream(data.manifestPath));

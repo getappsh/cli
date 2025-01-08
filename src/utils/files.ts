@@ -28,8 +28,8 @@ export const writeToFile = (path: string, data: string): Promise<void> => {
   });
 };
 
-export const readFromFile = async (filePath: string) => {
-  return await fs.readFile(getDirPath(filePath), "utf-8")
+export const readFromFile = async (filePath: string, internal = false) => {
+  return await fs.readFile(internal ? getDirPath(filePath) : filePath, "utf-8")
 }
 
 export const getTokens = async () => {

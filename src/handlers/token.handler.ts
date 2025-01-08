@@ -14,7 +14,7 @@ export class ProjToken {
   }
 
   static async getToken(exit = true) {
-    return await readFromFile(this.FILE_NAME).catch((err: any) => {
+    return await readFromFile(this.FILE_NAME, true).catch((err: any) => {
       console.log("Failed to get project token: Err:", err.toString());
       if (exit) {
         process.exit(1)
@@ -25,7 +25,7 @@ export class ProjToken {
 
   static async getTokenOrExit(token?: string) {
     if (token) return token
-    if (token = await readFromFile(this.FILE_NAME)) return token
+    if (token = await readFromFile(this.FILE_NAME, true)) return token
     console.error('Error: Token is required but not provided.');
     process.exit(1)
   }
