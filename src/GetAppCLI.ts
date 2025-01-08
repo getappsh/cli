@@ -11,6 +11,22 @@ const program = new Command();
 
 program.name('getapp-cli').description('CLI for app management').version('1.1.3');
 
+const relCmd = program
+  .command('releases')
+  .description('Manage releases, including creation, uploading artifacts, sending regulation statuses, and other release-related operations.');
+
+relCmd
+  .command('set')
+  .description('Create or set a release version, including associated artifacts and statuses.')
+  .argument('<version>', 'The version number for the release (e.g., "1.0.0")')
+  .option('-t, --token <token>', 'Token to authenticate the release process')
+  .option('-n, --notes <notes>', 'Comma-separated list of release notes describing changes or updates in the release')
+  .option('-m, --metadata <json-string>', 'Additional metadata for the release, in JSON string format (e.g., \'{"key": "value"}\')')
+  .option('-M, --metadata-file <file>', 'Path to a metadata file containing JSON data')
+  .option('-N, --name <name>', 'Name of the release')
+  .action((version: string, options: ReleaseSetOptions) => {
+    handleSetRelease(version, options)
+  })
 
 const tknCmd = program.command('token').description("")
 
