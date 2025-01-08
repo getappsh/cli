@@ -1,15 +1,15 @@
-import {writeFile, existsSync, mkdirSync, promises as fs } from 'fs';
+import { writeFile, existsSync, mkdirSync, promises as fs } from 'fs';
 import { errorHandler } from '../handlers/errors-handler.js';
 
-const getDirPath = (path: string) =>{
+const getDirPath = (path: string) => {
   const filePath = process.cwd() + "\\src\\data";
-  
+
   const pathParts = path.split("/");
   let fileName = pathParts[pathParts.length - 1];
 
   fileName = filePath + "\\" + fileName;
 
-  if (existsSync(filePath)) {
+  if (!existsSync(filePath)) {
     mkdirSync(filePath, { recursive: true });
   }
   return fileName;
@@ -17,23 +17,19 @@ const getDirPath = (path: string) =>{
 
 
 
-export const writeToFile = (path: string, data: string) => {
-  try {
+export const writeToFile = (path: string, data: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
     writeFile(getDirPath(path), data, (err) => {
-      errorHandler(err)
+      if (err) {
+        return reject(err);
+      }
+      resolve();
     });
-  } catch (error) {
-    console.log("err: ", error);
-
-  }
-}
+  });
+};
 
 export const readFromFile = async (filePath: string) => {
-  try {
-    return await fs.readFile(filePath, "utf-8")
-  } catch (error) {
-    errorHandler(error)
-  }
+  return await fs.readFile(getDirPath(filePath), "utf-8")
 }
 
 export const getTokens = async () => {

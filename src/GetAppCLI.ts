@@ -5,8 +5,7 @@ import { sendUploadMessage } from './apis/upload.api.js';
 import { sendDiscoveryMessage } from './apis/discovery.api.js';
 import { handleSetRelease } from './handlers/releases/set-release.js';
 import { ReleaseSetOptions } from './types/release.js';
-
-let projectToken: any
+import { ProjToken } from './handlers/token.handler.js';
 
 const program = new Command();
 
@@ -15,31 +14,29 @@ program.name('getapp-cli').description('CLI for app management').version('1.1.3'
 
 const tknCmd = program.command('token').description("")
 
-// 'set' command: Set the project token
 tknCmd.command('set')
   .description('Set the project token')
   .argument('<token>', 'The token to set for the project') // Detailed argument description
   .action((token) => {
-    projectToken = token;
-    console.log(`Project token has been set to: ${projectToken}`);
+    ProjToken.setToken(token)
+    console.log(`Project token has been set to: ${token}`);
   });
 
-// 'get' command: Retrieve the project token
 tknCmd.command('get')
   .description('Get the current project token')
-  .action(() => {
-    if (projectToken) {
-      console.log(`Current project token: ${projectToken}`);
+  .action(async () => {
+    const token = await ProjToken.getToken()
+    if (token) {
+      console.log(`Current project token: ${token}`);
     } else {
       console.log('No project token has been set.');
     }
   });
 
-// 'clear' command: Clear the project token
 tknCmd.command('clear')
   .description('Clear the project token')
   .action(() => {
-    projectToken = null; // Reset the token
+    ProjToken.clearToken()
     console.log('Project token has been cleared.');
   });
 
