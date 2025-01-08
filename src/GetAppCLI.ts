@@ -4,8 +4,9 @@ import { loginHandler } from './handlers/login.handler.js';
 import { sendUploadMessage } from './apis/upload.api.js';
 import { sendDiscoveryMessage } from './apis/discovery.api.js';
 import { handleSetRelease } from './handlers/releases/set-release.js';
-import { ReleaseSetOptions } from './types/release.js';
+import { FileType, ReleaseSetOptions, UploadArtOptions } from './types/release.js';
 import { ProjToken } from './handlers/token.handler.js';
+import { handleUploadArt } from './handlers/releases/upload-art.js';
 
 const program = new Command();
 
@@ -20,13 +21,29 @@ relCmd
   .description('Create or set a release version, including associated artifacts and statuses.')
   .argument('<version>', 'The version number for the release (e.g., "1.0.0")')
   .option('-t, --token <token>', 'Token to authenticate the release process')
-  .option('-n, --notes <notes>', 'Comma-separated list of release notes describing changes or updates in the release')
+  .option('-nt, --notes <notes>', 'Comma-separated list of release notes describing changes or updates in the release')
   .option('-m, --metadata <json-string>', 'Additional metadata for the release, in JSON string format (e.g., \'{"key": "value"}\')')
-  .option('-M, --metadata-file <file>', 'Path to a metadata file containing JSON data')
-  .option('-N, --name <name>', 'Name of the release')
+  .option('-mf, --metadata-file <file>', 'Path to a metadata file containing JSON data')
+  .option('-n, --name <name>', 'Name of the release')
   .action((version: string, options: ReleaseSetOptions) => {
     handleSetRelease(version, options)
   })
+
+program
+  .command('upload-art')
+  .description('Upload artifacts')
+  .argument('<version>', 'The version number for the release (e.g., "1.0.0")')
+  .argument('<type>', `The file type to upload, can be ${Object.values(FileType).map(t => `'${t}'`).join(', ')}`)
+  .option('-t, --token <token>', 'Token to authenticate the release process')
+  .option('-m, --metadata <json-string>', 'Additional metadata for the release, in JSON string format (e.g., \'{"key": "value"}\')')
+  .option('-mf, --metadata-file <file>', 'Path to a metadata file containing JSON data')
+  .option('-n, --name <name>', 'Name of the artifact, this name affects the file name')
+  .option('-d, --deployable', 'Indicates that the artifact is a deployable installation file')
+  .option('-f, --file <path>', 'Specify the file path to the artifact to be uploaded (required for file type artifacts)')
+  .option('-u, --docker-image-url <url>', 'URL of the Docker image for the deployable artifact (required for Docker type artifacts)')
+  .action((version: string, type: FileType, options: UploadArtOptions) => {
+    handleUploadArt(version, type, options);
+  });
 
 const tknCmd = program.command('token').description("")
 

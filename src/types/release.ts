@@ -1,7 +1,22 @@
 export interface ReleaseSetOptions {
-  token?: string; // Authentication token for the release process
-  notes?: string; // Optional comma-separated list of release notes
-  metadata?: string; // Additional metadata as a JSON string 
-  metadataFile?: string; // Path to a file containing JSON metadata
+  token?: string;
+  notes?: string;
+  metadata?: string;
+  metadataFile?: string;
+  name?: string;
+}
+
+export interface UploadArtOptions {
+  token?: string;
+  metadata?: string;
+  metadataFile?: string;
   name?: string
+  deployable: boolean
+  dockerImageUrl: string
+  file?: string
+}
+
+export enum FileType {
+  FILE = "file",
+  DOCKER = "docker_image"
 }

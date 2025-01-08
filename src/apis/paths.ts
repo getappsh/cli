@@ -8,6 +8,8 @@ export const REFRESH = 'login/refresh';
 
 export const RELEASES = "releases/"
 export const PROJECT = "project/"
+export const VERSION = "version/"
+export const ARTIFACT = "artifact/"
 
 export const UPLOAD_ARTIFACT = "upload/artifact"
 export const UPLOAD_MANIFEST = "upload/manifest"
