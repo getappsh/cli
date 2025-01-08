@@ -72,6 +72,16 @@ const parseMetadata = (data: string) => {
   }
 };
 
+const extractDockerImageName = (dockerImageUrl: string): string | undefined => {
+  const regex = /(?:[a-zA-Z0-9.-]+\/)?([a-zA-Z0-9.-]+(?:\/[a-zA-Z0-9.-]+)*)(?::([a-zA-Z0-9.-]+))?/;
+  const match = dockerImageUrl.match(regex);
+
+  if (match) {
+    const imageName = match[1].split('/').pop();
+    return match[2] ? `${imageName}:${match[2]}` : imageName;
+  }
+};
+
 export const handleUploadArt = async (version: string, type: FileType, options?: UploadArtOptions) => {
 
   validateUploadOptions(type, options)
@@ -97,8 +107,13 @@ export const handleUploadArt = async (version: string, type: FileType, options?:
     name = options.name
   } else if (options?.file) {
     name = path.basename(options.file)
-  } else {
-    name = "docker image"  // ????????///////
+  } else if (options?.dockerImageUrl) {
+    name = extractDockerImageName(options.dockerImageUrl)
+  };
+
+  if (!name) {
+    console.error("not valid url and name in not provided, need to set in -n or --name")
+    process.exit(1)
   }
 
   const data = {
