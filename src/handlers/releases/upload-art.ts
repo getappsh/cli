@@ -4,6 +4,7 @@ import { FileType, UploadArtOptions } from "../../types/release";
 import { readFromFile } from "../../utils/files";
 import { ProjToken } from "../token.handler";
 import path from "path";
+import { SetReleaseArtifactDto } from "../../../client-api/src";
 
 const fileValidator = async (path: string) => {
   try {
@@ -116,7 +117,7 @@ export const handleUploadArt = async (version: string, type: FileType, options?:
     process.exit(1)
   }
 
-  const data = {
+  const data: SetReleaseArtifactDto = {
     artifactName: name,
     type,
     isInstallationFile: options?.deployable,

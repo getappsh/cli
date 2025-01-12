@@ -1,3 +1,4 @@
+import { SetReleaseDto } from "../../../client-api/src";
 import { sendRelSet } from "../../apis/releases";
 import { ReleaseSetOptions } from "../../types/release";
 import { readFromFile } from "../../utils/files";
@@ -35,7 +36,7 @@ export const handleSetRelease = async (version: string, options?: ReleaseSetOpti
     metadata = parseMetadata(fileContent);
   }
 
-  const data = {
+  const data: SetReleaseDto = {
     version,
     name: options?.name,
     releaseNotes: options?.notes,

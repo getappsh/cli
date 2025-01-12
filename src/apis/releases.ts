@@ -1,32 +1,24 @@
 import axios from "axios"
-import { ARTIFACT, BASE_PATH, PROJECT, RELEASES, VERSION } from "./paths"
+import { conf } from "./paths"
 import { createReadStream } from "fs";
 import { stat } from "fs/promises";
+import { ReleasesApiFp, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
 
-export const sendRelSet = async (data: any, projToken: string, projId: number) => {
-  const config = {
-    headers: {
-      'X-Project-Token': `${projToken}`
-    }
-  };
+export const sendRelSet = async (data: SetReleaseDto, projToken: string, projId: number) => {
   try {
-    const res = await axios.post(BASE_PATH + RELEASES + PROJECT + projId, data, config)
-    return res
+
+    const setRelFn = await ReleasesApiFp(conf).releasesControllerSetRelease(projId, data, projToken)
+    return await setRelFn()
   } catch (err: any) {
     console.log(`Failed to set release, Err: ${err.toString()}`);
     process.exit(1)
   }
 }
 
-export const sendUploadArt = async (data: any, projToken: string, projId: number, version: string) => {
-  const config = {
-    headers: {
-      'X-Project-Token': `${projToken}`
-    }
-  };
+export const sendUploadArt = async (data: SetReleaseArtifactDto, projToken: string, projId: number, version: string) => {
   try {
-    const res = await axios.post(BASE_PATH + RELEASES + PROJECT + projId + "/" + VERSION + version + "/" + ARTIFACT, data, config)
-    return res
+    const uploadFn = await ReleasesApiFp(conf).releasesControllerSetReleaseArtifact(projId, version, data, projToken)
+    return await uploadFn()
   } catch (err: any) {
     console.log(`Failed to upload artifact, Err: ${err.toString()}`);
     process.exit(1)
