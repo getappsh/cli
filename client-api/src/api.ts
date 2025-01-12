@@ -9810,7 +9810,7 @@ export const ReleasesApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async releasesControllerSetReleaseArtifact(projectId: number, version: string, setReleaseArtifactDto: SetReleaseArtifactDto, xProjectToken?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async releasesControllerSetReleaseArtifact(projectId: number, version: string, setReleaseArtifactDto: SetReleaseArtifactDto, xProjectToken?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SetReleaseArtifactResDto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.releasesControllerSetReleaseArtifact(projectId, version, setReleaseArtifactDto, xProjectToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ReleasesApi.releasesControllerSetReleaseArtifact']?.[localVarOperationServerIndex]?.url;
@@ -9961,7 +9961,7 @@ export const ReleasesApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        releasesControllerSetReleaseArtifact(projectId: number, version: string, setReleaseArtifactDto: SetReleaseArtifactDto, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        releasesControllerSetReleaseArtifact(projectId: number, version: string, setReleaseArtifactDto: SetReleaseArtifactDto, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<SetReleaseArtifactResDto> {
             return localVarFp.releasesControllerSetReleaseArtifact(projectId, version, setReleaseArtifactDto, xProjectToken, options).then((request) => request(axios, basePath));
         },
     };
