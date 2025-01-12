@@ -9,7 +9,7 @@ export const loginHandler = async (username: string, password: string): Promise<
   };
   try {
     const res = await sendLogin(data);
-    let tokens = JSON.stringify(res)    
+    let tokens = JSON.stringify(res.data)    
     writeToFile("src/data/login.json", tokens)
     console.log("logged in");
   } catch (error) {

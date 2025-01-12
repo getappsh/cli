@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv'
+import { Configuration } from '../../client-api/src/configuration';
 dotenv.config();
 
 export const BASE_PATH = process.env.BASE_PATH;
@@ -16,3 +17,5 @@ export const UPLOAD_MANIFEST = "upload/manifest"
 export const STATUS_UPDATE = "upload/updateUploadStatus"
 
 export const DISCOVERY = "discovery"
+
+export const conf = new Configuration({ basePath: BASE_PATH })
