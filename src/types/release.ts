@@ -20,3 +20,9 @@ export enum FileType {
   FILE = "file",
   DOCKER = "docker_image"
 }
+
+export interface SetRegOptions {
+  token?: string;
+  value: string;
+  file?: string;
+}

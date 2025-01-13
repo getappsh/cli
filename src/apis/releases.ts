@@ -2,7 +2,7 @@ import axios from "axios"
 import { conf } from "./paths"
 import { createReadStream } from "fs";
 import { stat } from "fs/promises";
-import { ReleasesApiFp, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
+import { ReleasesApiFp, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
 
 export const sendRelSet = async (data: SetReleaseDto, projToken: string, projId: number) => {
   try {
@@ -34,6 +34,17 @@ export const uploadFileArt = async (url: string, path: string) => {
     console.log('File uploaded successfully');
   } catch (error: any) {
     console.error(`Upload artifact failed: Error: ${error.toString()}`);
+    process.exit(1)
+  }
+}
+
+export const updateReg = async (data: SetRegulationStatusDto, projToken: string, projectId: number, version: string, name: string) => {
+  try {
+    const setRegFn = await ReleasesApiFp(conf).releasesControllerSetRegulationStatus(projectId, version, name, data, projToken)
+    return await setRegFn()
+  } catch (error: any) {
+    // TODO if the regulation name is incorrect
+    console.error(`Set regulation status failed: Error: ${error.toString()}`)
     process.exit(1)
   }
 }

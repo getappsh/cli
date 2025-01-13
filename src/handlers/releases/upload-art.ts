@@ -120,7 +120,8 @@ export const handleUploadArt = async (version: string, type: FileType, options?:
   const data: SetReleaseArtifactDto = {
     artifactName: name,
     type,
-    isInstallationFile: options?.deployable,
+    isInstallationFile: true,
+    // isInstallationFile: options?.deployable,
     dockerImageUrl: options?.dockerImageUrl,
     metadata
   }
