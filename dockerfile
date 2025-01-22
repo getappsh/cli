@@ -2,7 +2,7 @@
 FROM node:18-alpine
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /src
 
 # Copy package.json and package-lock.json (if present)
 COPY package.json package-lock.json ./
@@ -13,5 +13,9 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+RUN npm link
+
+WORKDIR /local
+
 # Set the default command to your CLI
-ENTRYPOINT ["node", "./GetAppCLI.js"]
+ENTRYPOINT ["gac"]
