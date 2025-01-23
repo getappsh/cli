@@ -4,6 +4,7 @@ export interface ReleaseSetOptions {
   metadata?: string;
   metadataFile?: string;
   name?: string;
+  draft?: boolean;
 }
 
 export interface UploadArtOptions {

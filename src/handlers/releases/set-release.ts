@@ -41,6 +41,7 @@ export const handleSetRelease = async (version: string, options?: ReleaseSetOpti
     name: options?.name,
     releaseNotes: options?.notes,
     metadata,
+    isDraft: options?.draft ?? false
   }
 
   await sendRelSet(data, projToken, projectId)
