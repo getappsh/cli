@@ -5,6 +5,7 @@ import { readFromFile } from "../../utils/files";
 import { ProjToken } from "../token.handler";
 import path from "path";
 import { SetReleaseArtifactDto } from "../../../client-api/src";
+import { setRelIfNotExist } from "./set-release";
 
 const fileValidator = async (path: string) => {
   try {
@@ -90,6 +91,8 @@ export const handleUploadArt = async (version: string, type: FileType, options?:
   const projToken = await ProjToken.getTokenOrExit(options?.token) ?? ""
 
   const { projectId } = ProjToken.extractProjId(projToken ?? "")
+
+  await setRelIfNotExist(projectId, projToken, version)
 
   let metadata: Record<string, any> | undefined;
 

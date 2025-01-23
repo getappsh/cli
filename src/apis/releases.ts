@@ -2,11 +2,15 @@ import axios from "axios"
 import { conf } from "./paths"
 import { createReadStream } from "fs";
 import { stat } from "fs/promises";
-import { ReleasesApiFp, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
+import { ReleaseDto, ReleasesApiFp, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
+
+export const sendRelGet = async (projId: number, projToken: string, version: string): Promise<ReleaseDto> => {
+  const setRelFn = await ReleasesApiFp(conf).releasesControllerGetRelease(projId, version, projToken)
+  return (await setRelFn()).data
+}
 
 export const sendRelSet = async (data: SetReleaseDto, projToken: string, projId: number) => {
   try {
-
     const setRelFn = await ReleasesApiFp(conf).releasesControllerSetRelease(projId, data, projToken)
     return await setRelFn()
   } catch (err: any) {

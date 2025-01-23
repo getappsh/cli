@@ -4,6 +4,7 @@ import { FileType, SetRegOptions } from "../../types/release";
 import { ProjToken } from "../token.handler";
 import { SetRegulationStatusDto, SetReleaseArtifactDto } from "../../../client-api/src";
 import path from "path";
+import { setRelIfNotExist } from "./set-release";
 
 const fileValidator = async (path: string) => {
   try {
@@ -49,6 +50,9 @@ export const handleSetReg = async (version: string, name: string, options?: SetR
     const projToken = await ProjToken.getTokenOrExit(options?.token) ?? ""
 
     const { projectId } = ProjToken.extractProjId(projToken ?? "")
+
+    await setRelIfNotExist(projectId, projToken, version)
+
 
     if (options?.value) {
       const data: SetRegulationStatusDto = {
