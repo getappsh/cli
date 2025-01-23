@@ -114,7 +114,7 @@ paths:
       tags: *ref_1
       security:
         - bearer: []
-  /api/v1/releases/project/{projectId}:
+  /api/v1/releases/project/{projectIdentifier}:
     post:
       operationId: ReleasesController_setRelease
       summary: Set a Release
@@ -126,11 +126,12 @@ paths:
           required: false
           schema:
             type: string
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
       requestBody:
         required: true
         content:
@@ -154,11 +155,12 @@ paths:
       description: This service message allows retrieval of releases.
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
       responses:
         '200':
           description: ''
@@ -170,18 +172,19 @@ paths:
                   $ref: '#/components/schemas/ReleaseDto'
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectId}/version/{version}:
+  /api/v1/releases/project/{projectIdentifier}/version/{version}:
     get:
       operationId: ReleasesController_getRelease
       summary: Get Release
       description: This service message allows retrieval of a release.
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
@@ -202,11 +205,12 @@ paths:
       description: This service message allows deletion of a release.
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
@@ -214,25 +218,22 @@ paths:
             type: string
       responses:
         '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SetReleaseArtifactResDto'
+          description: Release deleted.
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectId}/version/{version}/artifact:
+  /api/v1/releases/project/{projectIdentifier}/version/{version}/artifact:
     post:
       operationId: ReleasesController_setReleaseArtifact
       summary: Set Release Artifact
       description: This service message allows creation of a release artifact.
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
@@ -253,46 +254,49 @@ paths:
                 $ref: '#/components/schemas/SetReleaseArtifactResDto'
       tags: *ref_3
       security: *ref_4
+  /api/v1/releases/project/{projectIdentifier}/version/{version}/artifact/{artifactId}:
     delete:
       operationId: ReleasesController_deleteReleaseArtifact
       summary: Delete Release Artifact
+      description: This service message allows deletion of a release artifact.
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
           schema:
             type: string
+        - name: artifactId
+          required: true
+          in: path
+          schema:
+            type: number
       responses:
         '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SetReleaseArtifactResDto'
+          description: Release artifact deleted.
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectId}/version/{version}/regulation-status:
+  /api/v1/releases/project/{projectIdentifier}/version/{version}/regulation-status:
     get:
       operationId: ReleasesController_getVersionRegulationStatuses
       summary: Get Version Regulation Statuses by Regulation ID
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the Project
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
-          description: Component Version of the regulation
           schema:
             type: string
       responses:
@@ -306,18 +310,18 @@ paths:
                   $ref: '#/components/schemas/RegulationStatusDto'
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectId}/version/{version}/regulation-status/{regulation}:
+  /api/v1/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}:
     get:
       operationId: ReleasesController_getRegulationStatus
       summary: Get Regulation Status by Regulation ID and Version ID
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the Project
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
@@ -344,12 +348,12 @@ paths:
       summary: Set Regulation Status
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the Project
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
@@ -382,12 +386,12 @@ paths:
       summary: Delete Regulation Status
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the Project
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
@@ -405,18 +409,18 @@ paths:
           description: Regulation status deleted
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectId}/version/{version}/regulation-status/{regulation}/compliancy:
+  /api/v1/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}/compliancy:
     post:
       operationId: ReleasesController_setRegulationCompliancy
       summary: Set Regulation Compliancy
       parameters:
         - *ref_2
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the Project
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: version
           required: true
           in: path
@@ -619,7 +623,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectDto'
+                $ref: '#/components/schemas/BaseProjectDto'
       tags: &ref_9
         - Project
       security: &ref_10
@@ -637,16 +641,259 @@ paths:
                 $ref: '#/components/schemas/MemberProjectsResDto'
       tags: *ref_9
       security: *ref_10
-  /api/v1/project/{projectId}/member:
+  /api/v2/project:
+    get:
+      operationId: ProjectManagementController_getProjects
+      summary: Get all projects
+      parameters:
+        - name: pinned
+          required: false
+          in: query
+          description: If true, include only pinned projects
+          example: false
+          schema:
+            type: boolean
+        - name: includePinned
+          required: false
+          in: query
+          description: Include pinned projects along with regular projects
+          example: false
+          schema:
+            type: boolean
+        - name: page
+          required: false
+          in: query
+          description: 'The page number to fetch (default: 1)'
+          example: 1
+          schema:
+            type: number
+        - name: perPage
+          required: false
+          in: query
+          description: 'Number of projects per page (default: 10)'
+          example: 10
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: PaginatedProjectDto
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResultDto'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ProjectDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/search:
+    get:
+      operationId: ProjectManagementController_searchProjects
+      summary: Search projects
+      parameters:
+        - name: query
+          required: true
+          in: query
+          description: The search term (matches project name or partial match)
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: Filter by project status (active, completed, on-hold)
+          example: active
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: 'The page number to fetch (default: 1)'
+          example: 1
+          schema:
+            type: number
+        - name: perPage
+          required: false
+          in: query
+          description: 'Number of projects per page (default: 10)'
+          example: 10
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: PaginatedBaseProjectDto
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResultDto'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BaseProjectDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}:
+    get:
+      operationId: ProjectManagementController_getProject
+      summary: Get Project details
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedProjectDto'
+      tags: *ref_9
+      security: *ref_10
+    put:
+      operationId: ProjectManagementController_editProject
+      summary: Edit Project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditProjectDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseProjectDto'
+      tags: *ref_9
+      security: *ref_10
+    delete:
+      operationId: ProjectManagementController_deleteProject
+      summary: Delete Project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/createToken:
+    post:
+      operationId: ProjectManagementController_createToken
+      summary: Create Upload token for a Project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTokenDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/confirm:
+    post:
+      operationId: ProjectManagementController_confirmMemberToProject
+      summary: Confirm invitation for project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/member/preferences:
+    get:
+      operationId: ProjectManagementController_getMemberProjectPreferences
+      summary: Get member project preferences
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMemberPreferencesDto'
+      tags: *ref_9
+      security: *ref_10
+    put:
+      operationId: ProjectManagementController_updateMemberProjectPreferences
+      summary: Update member project preferences
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectMemberPreferencesDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMemberPreferencesDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/member:
     post:
       operationId: ProjectManagementController_addMemberToProject
       summary: Add member to Project
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
       requestBody:
         required: true
         content:
@@ -659,57 +906,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MemberProjectResDto'
+                $ref: '#/components/schemas/MemberResDto'
       tags: *ref_9
       security: *ref_10
-  /api/v1/project/{projectId}/createToken:
-    post:
-      operationId: ProjectManagementController_createToken
-      summary: Create Upload token for a Project
-      parameters:
-        - name: projectId
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        '201':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectTokenDto'
-      tags: *ref_9
-      security: *ref_10
-  /api/v1/project/{projectId}/confirm:
-    post:
-      operationId: ProjectManagementController_ConfirmMemberToProject
-      summary: Confirm invitation for project
-      parameters:
-        - name: projectId
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectDto'
-      tags: *ref_9
-      security: *ref_10
-  /api/v1/project/{projectId}/member/{memberId}:
+  /api/v1/project/{projectIdentifier}/member/{memberId}:
     delete:
       operationId: ProjectManagementController_removeMemberFromProject
       summary: Remove member from Project
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: memberId
           required: true
           in: path
@@ -724,11 +934,12 @@ paths:
       operationId: ProjectManagementController_editMember
       summary: Edit member details
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
         - name: memberId
           required: true
           in: path
@@ -749,16 +960,17 @@ paths:
                 $ref: '#/components/schemas/MemberResDto'
       tags: *ref_9
       security: *ref_10
-  /api/v1/project/{projectId}/projectReleases:
+  /api/v1/project/{projectIdentifier}/projectReleases:
     get:
       operationId: ProjectManagementController_getProjectReleases
       summary: Get project release
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
       responses:
         '200':
           description: ''
@@ -849,16 +1061,22 @@ paths:
                   $ref: '#/components/schemas/RegulationTypeDto'
       tags: *ref_9
       security: *ref_10
-  /api/v1/project/{projectId}/regulation:
+  /api/v1/project/{projectIdentifier}/regulation:
     get:
       operationId: ProjectManagementController_getProjectRegulations
       summary: Get all Project Regulations
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
+        - name: X-Project-Token
+          in: header
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: ''
@@ -874,11 +1092,12 @@ paths:
       operationId: ProjectManagementController_createProjectRegulation
       summary: Create Regulation
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
+          description: Project identifier (ID or name)
           schema:
-            type: number
+            type: string
       requestBody:
         required: true
         content:
@@ -894,23 +1113,28 @@ paths:
                 $ref: '#/components/schemas/RegulationDto'
       tags: *ref_9
       security: *ref_10
-  /api/v1/project/{projectId}/regulation/{regulationId}:
+  /api/v1/project/{projectIdentifier}/regulation/{regulation}:
     get:
-      operationId: ProjectManagementController_getProjectRegulationById
+      operationId: ProjectManagementController_getProjectRegulationByName
       summary: Get Regulation by ID
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the project
+          description: Project identifier (ID or name)
           schema:
-            type: number
-        - name: regulationId
+            type: string
+        - name: regulation
           required: true
           in: path
-          description: ID of the regulation
+          description: Name of the regulation
           schema:
-            type: number
+            type: string
+        - name: X-Project-Token
+          in: header
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: ''
@@ -924,18 +1148,18 @@ paths:
       operationId: ProjectManagementController_editProjectRegulation
       summary: Edit Regulation
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the project
+          description: Project identifier (ID or name)
           schema:
-            type: number
-        - name: regulationId
+            type: string
+        - name: regulation
           required: true
           in: path
-          description: ID of the regulation
+          description: Name of the regulation
           schema:
-            type: number
+            type: string
       requestBody:
         required: true
         content:
@@ -955,16 +1179,138 @@ paths:
       operationId: ProjectManagementController_deleteProjectRegulation
       summary: Delete Regulation by ID
       parameters:
-        - name: projectId
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the project
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: regulation
+          required: true
+          in: path
+          description: Name of the regulation
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/token:
+    get:
+      operationId: ProjectManagementController_getProjectTokens
+      summary: Get all tokens for a project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectTokenDto'
+      tags: *ref_9
+      security: *ref_10
+    post:
+      operationId: ProjectManagementController_createProjectToken
+      summary: Create a token for a project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectTokenDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTokenDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/token/{tokenId}:
+    get:
+      operationId: ProjectManagementController_getProjectTokenById
+      summary: Get a token by ID
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: tokenId
+          required: true
+          in: path
           schema:
             type: number
-        - name: regulationId
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTokenDto'
+      tags: *ref_9
+      security: *ref_10
+    put:
+      operationId: ProjectManagementController_updateProjectToken
+      summary: Update a token
+      parameters:
+        - name: projectIdentifier
           required: true
           in: path
-          description: ID of the regulation
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: tokenId
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectTokenDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTokenDto'
+      tags: *ref_9
+      security: *ref_10
+    delete:
+      operationId: ProjectManagementController_deleteProjectToken
+      summary: Delete a token by ID
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: tokenId
+          required: true
+          in: path
           schema:
             type: number
       responses:
@@ -1616,6 +1962,7 @@ paths:
           content:
             application/json:
               schema:
+                title: ConfigDto
                 oneOf:
                   - $ref: '#/components/schemas/AndroidConfigDto'
                   - $ref: '#/components/schemas/WindowsConfigDto'
@@ -1632,6 +1979,7 @@ paths:
         content:
           application/json:
             schema:
+              title: ConfigDto
               oneOf:
                 - $ref: '#/components/schemas/AndroidConfigDto'
                 - $ref: '#/components/schemas/WindowsConfigDto'
@@ -1641,6 +1989,7 @@ paths:
           content:
             application/json:
               schema:
+                title: ConfigDto
                 oneOf:
                   - $ref: '#/components/schemas/AndroidConfigDto'
                   - $ref: '#/components/schemas/WindowsConfigDto'
@@ -1966,7 +2315,13 @@ components:
         metadata:
           type: object
         status:
-          type: object
+          type: string
+          enum:
+            - draft
+            - in_review
+            - approved
+            - released
+            - archived
         artifacts:
           type: array
           items:
@@ -1977,6 +2332,12 @@ components:
         updatedAt:
           format: date-time
           type: string
+        requiredRegulationsCount:
+          type: number
+          description: Total number of required regulations
+        compliantRegulationsCount:
+          type: number
+          description: Total number of compliant regulations
       required:
         - id
         - version
@@ -1986,16 +2347,8 @@ components:
         - status
         - createdAt
         - updatedAt
-    SetReleaseArtifactResDto:
-      type: object
-      properties:
-        artifactId:
-          type: number
-        uploadUrl:
-          type: string
-          description: Only present for FILE artifact type
-      required:
-        - artifactId
+        - requiredRegulationsCount
+        - compliantRegulationsCount
     SetReleaseArtifactDto:
       type: object
       properties:
@@ -2015,12 +2368,40 @@ components:
           type: object
       required:
         - artifactName
+    SetReleaseArtifactResDto:
+      type: object
+      properties:
+        artifactId:
+          type: number
+        uploadUrl:
+          type: string
+          description: Only present for FILE artifact type
+      required:
+        - artifactId
+    RegulationSnapshotDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the regulation
+        description:
+          type: string
+          description: Description of the regulation
+        config:
+          type: string
+          description: Configuration of the regulation
+        typeId:
+          type: number
+          description: Type Id of the regulation
+      required:
+        - name
+        - typeId
     RegulationStatusDto:
       type: object
       properties:
-        projectId:
-          type: number
-          description: ID of the Project
+        projectIdentifier:
+          type: string
+          description: Project identifier (ID or name)
         version:
           type: string
           description: Component Version of the regulation
@@ -2044,8 +2425,12 @@ components:
           format: date-time
           type: string
           description: Update date of the regulation status
+        regulationSnapshot:
+          description: Regulation snapshot
+          allOf:
+            - $ref: '#/components/schemas/RegulationSnapshotDto'
       required:
-        - projectId
+        - projectIdentifier
         - version
         - regulation
         - value
@@ -2325,58 +2710,23 @@ components:
           type: string
         description:
           type: string
-    RegulationTypeDto:
+    BaseProjectDto:
       type: object
       properties:
         id:
           type: number
-          description: ID of the regulation type
+          description: Unique identifier of the project
         name:
           type: string
-          description: Name of the regulation type
+          description: Name of the project
         description:
           type: string
-          description: Description of the regulation type
+        status:
+          type: string
+          description: Status of the project (active, completed, on-hold)
       required:
         - id
         - name
-        - description
-    RegulationDto:
-      type: object
-      properties:
-        regulationId:
-          type: number
-          description: ID of the regulation
-        name:
-          type: string
-          description: Name of the regulation
-        displayName:
-          type: string
-          description: Display name of the regulation
-        description:
-          type: string
-          description: Description of the regulation
-        type:
-          description: Type of the regulation
-          allOf:
-            - $ref: '#/components/schemas/RegulationTypeDto'
-        projectId:
-          type: number
-          description: Project associated with the regulation
-        config:
-          type: string
-          description: Configuration of the regulation
-        order:
-          type: number
-          description: Order of the regulation
-      required:
-        - regulationId
-        - name
-        - displayName
-        - description
-        - type
-        - projectId
-        - order
     MemberResDto:
       type: object
       properties:
@@ -2394,32 +2744,208 @@ components:
             - project-owner
             - project-admin
             - project-member
+        status:
+          type: string
+          enum:
+            - invited
+            - active
+            - inactive
         defaultProject:
           type: number
           default: -1
       required:
+        - id
+        - email
         - role
+        - status
+    MemberProjectsResDto:
+      type: object
+      properties:
+        member:
+          $ref: '#/components/schemas/MemberResDto'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectDto'
+        invitedProjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectDto'
+    PaginatedResultDto:
+      type: object
+      properties:
+        data:
+          description: The data items for the current page
+          type: array
+          items:
+            type: string
+        total:
+          type: number
+          description: The total number of items available
+          example: 100
+        page:
+          type: number
+          description: The current page number
+          example: 1
+        perPage:
+          type: number
+          description: The number of items per page
+          example: 10
+      required:
+        - data
+        - total
+        - page
+        - perPage
+    ProjectMemberPreferencesDto:
+      type: object
+      properties:
+        pinned:
+          type: boolean
+    ProjectMemberContextDto:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+            - project-owner
+            - project-admin
+            - project-member
+        preferences:
+          $ref: '#/components/schemas/ProjectMemberPreferencesDto'
+      required:
+        - role
+        - preferences
     ProjectDto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Unique identifier of the project
+        name:
+          type: string
+          description: Name of the project
+        description:
+          type: string
+        status:
+          type: string
+          description: Status of the project (active, completed, on-hold)
+        owner:
+          type: string
+          description: Owner of the project
+        numMembers:
+          type: number
+          description: Number of members in the project
+        versions:
+          type: number
+          description: Number of versions available for the project
+          example: 5
+        latestRelease:
+          type: string
+          description: Latest release of the project
+        upcomingRelease:
+          type: string
+          description: Upcoming release
+        upcomingReleaseStage:
+          type: string
+          description: Upcoming release stage
+        memberContext:
+          description: Current member context
+          allOf:
+            - $ref: '#/components/schemas/ProjectMemberContextDto'
+      required:
+        - id
+        - name
+        - owner
+        - versions
+    ProjectTokenDto:
       type: object
       properties:
         id:
           type: number
         name:
           type: string
+        token:
+          type: string
+        expirationDate:
+          format: date-time
+          type: string
+        neverExpires:
+          type: boolean
+          default: false
+        isActive:
+          type: boolean
+          default: true
+        createdAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - name
+        - token
+        - neverExpires
+        - isActive
+        - createdAt
+    DetailedProjectDto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Unique identifier of the project
+        name:
+          type: string
+          description: Name of the project
         description:
           type: string
-        tokens:
-          type: array
-          items:
-            type: string
-        regulation:
-          type: array
-          items:
-            $ref: '#/components/schemas/RegulationDto'
+        status:
+          type: string
+          description: Status of the project (active, completed, on-hold)
+        owner:
+          type: string
+          description: Owner of the project
+        numMembers:
+          type: number
+          description: Number of members in the project
+        versions:
+          type: number
+          description: Number of versions available for the project
+          example: 5
+        latestRelease:
+          type: string
+          description: Latest release of the project
+        upcomingRelease:
+          type: string
+          description: Upcoming release
+        upcomingReleaseStage:
+          type: string
+          description: Upcoming release stage
+        memberContext:
+          description: Current member context
+          allOf:
+            - $ref: '#/components/schemas/ProjectMemberContextDto'
+        createdAt:
+          format: date-time
+          type: string
         members:
           type: array
           items:
             $ref: '#/components/schemas/MemberResDto'
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectTokenDto'
+      required:
+        - id
+        - name
+        - owner
+        - versions
+        - createdAt
+    EditProjectDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
     AddMemberToProjectDto:
       type: object
       properties:
@@ -2435,31 +2961,6 @@ components:
       required:
         - email
         - role
-    MemberProjectResDto:
-      type: object
-      properties:
-        member:
-          $ref: '#/components/schemas/MemberResDto'
-        project:
-          type: object
-    MemberProjectsResDto:
-      type: object
-      properties:
-        member:
-          $ref: '#/components/schemas/MemberResDto'
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectDto'
-        invitedProjects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectDto'
-    ProjectTokenDto:
-      type: object
-      properties:
-        projectToken:
-          type: string
     EditProjectMemberDto:
       type: object
       properties:
@@ -2527,6 +3028,54 @@ components:
           type: string
         availableStorage:
           type: string
+    RegulationTypeDto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: ID of the regulation type
+        name:
+          type: string
+          description: Name of the regulation type
+        description:
+          type: string
+          description: Description of the regulation type
+      required:
+        - id
+        - name
+        - description
+    RegulationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the regulation
+        displayName:
+          type: string
+          description: Display name of the regulation
+        description:
+          type: string
+          description: Description of the regulation
+        type:
+          description: Type of the regulation
+          allOf:
+            - $ref: '#/components/schemas/RegulationTypeDto'
+        projectId:
+          type: number
+          description: Project associated with the regulation
+        config:
+          type: string
+          description: Configuration of the regulation
+        order:
+          type: number
+          description: Order of the regulation
+      required:
+        - name
+        - displayName
+        - description
+        - type
+        - projectId
+        - order
     CreateRegulationDto:
       type: object
       properties:
@@ -2573,6 +3122,31 @@ components:
         order:
           type: number
           description: Order of the regulation
+    CreateProjectTokenDto:
+      type: object
+      properties:
+        name:
+          type: string
+        neverExpires:
+          type: boolean
+          default: false
+        expirationDate:
+          format: date-time
+          type: string
+        isActive:
+          type: boolean
+      required:
+        - name
+        - neverExpires
+    UpdateProjectTokenDto:
+      type: object
+      properties:
+        name:
+          type: string
+        isActive:
+          type: boolean
+      required:
+        - name
     UserSearchDto:
       type: object
       properties:
