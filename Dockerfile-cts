@@ -1,0 +1,38 @@
+# Use the official Node.js image as the base image
+FROM node:18-alpine
+
+WORKDIR /src
+
+# ===   create a uid and a gid to fit CTS project uid === #
+ARG uid=1004370000
+ARG username=getapp
+# Add the user to /etc/passwd
+RUN echo "${username}:x:${uid}:${uid}:${username}:/home/${username}:/sbin/nologin" >> /etc/passwd
+# Add the user to /etc/group
+RUN echo "${username}:x:${uid}:" 
+
+# ===   install ca sofeware === #
+# Install the ca-certificates package to manage certificates
+RUN apk --no-cache add ca-certificates bash curl
+# Create the CA certificates directory
+RUN mkdir -p /usr/local/share/ca-certificates/
+
+# # copt the app files
+RUN chown -R ${uid}:${uid} /src
+
+# Copy package.json and package-lock.json (if present)
+COPY --chown=${uid}:${uid} package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application files
+COPY --chown=${uid}:${uid} . .
+
+RUN npm link
+
+WORKDIR /local
+USER ${username}
+# Set the default command to your CLI
+ENTRYPOINT ["gac"]
+
