@@ -1,5 +1,5 @@
 import { stat } from "fs/promises";
-import { sendUploadArt, updateReg, uploadFileArt } from "../../apis/releases";
+import { sendRegGet, sendUploadArt, updateReg, uploadFileArt } from "../../apis/releases";
 import { FileType, SetRegOptions } from "../../types/release";
 import { ProjToken } from "../token.handler";
 import { SetRegulationStatusDto, SetReleaseArtifactDto } from "../../../client-api/src";
@@ -40,6 +40,14 @@ const validateSetRegOptions = async (options?: SetRegOptions) => {
   }
 };
 
+const validateRegName = async (projId: number, projToken: string, name: string) => {
+  const regs = await sendRegGet(projId, projToken)
+  const regNames = regs.map(r => r.name)
+  if (!regNames.includes(name)) {
+    console.error(`Regulation name for the given project can be only on of ${regNames.map(r => `'${r}'`)}`)
+    process.exit(1)
+  }
+}
 
 export const handleSetReg = async (version: string, name: string, options?: SetRegOptions) => {
 
@@ -52,6 +60,7 @@ export const handleSetReg = async (version: string, name: string, options?: SetR
     const { projectId } = ProjToken.extractProjId(projToken ?? "")
 
     await setRelIfNotExist(projectId, projToken, version)
+    await validateRegName(projectId, projToken, name)
 
 
     if (options?.value) {

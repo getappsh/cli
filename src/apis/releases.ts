@@ -2,7 +2,7 @@ import axios from "axios"
 import { conf } from "./paths"
 import { createReadStream } from "fs";
 import { stat } from "fs/promises";
-import { ReleaseDto, ReleasesApiFp, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
+import { ProjectApiFp, RegulationDto, ReleaseDto, ReleasesApiFp, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
 
 export const sendRelGet = async (projId: number, projToken: string, version: string): Promise<ReleaseDto> => {
   const setRelFn = await ReleasesApiFp(conf).releasesControllerGetRelease(projId.toString(), version, projToken)
@@ -17,6 +17,11 @@ export const sendRelSet = async (data: SetReleaseDto, projToken: string, projId:
     console.log(`Failed to set release, Err: ${err.toString()}`);
     process.exit(1)
   }
+}
+
+export const sendRegGet = async (projId: number, projToken: string): Promise<RegulationDto[]> => {
+  const setRelFn = await ProjectApiFp(conf).projectManagementControllerGetProjectRegulations(projId.toString(), projToken)
+  return (await setRelFn()).data
 }
 
 export const sendUploadArt = async (data: SetReleaseArtifactDto, projToken: string, projId: number, version: string) => {
