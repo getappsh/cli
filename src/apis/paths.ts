@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 import { Configuration } from '../../client-api/src/configuration';
 dotenv.config();
 
-export const BASE_PATH = process.env.BASE_PATH;
+export const BASE_PATH = process.env.GET_APP_PATH;
 
 export const LOGIN = 'login';
 export const REFRESH = 'login/refresh';

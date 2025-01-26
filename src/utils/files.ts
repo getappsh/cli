@@ -2,7 +2,11 @@ import { writeFile, existsSync, mkdirSync, promises as fs } from 'fs';
 import { errorHandler } from '../handlers/errors-handler.js';
 
 const getDirPath = (path: string) => {
-  const filePath = process.cwd() + "\\src\\data";
+
+  let filePath = process.cwd() + "\\gac-data";
+  if (process.env.NODE_ENV === "development") {
+    filePath = process.cwd() + "\\src\\data";
+  }
 
   const pathParts = path.split("/");
   let fileName = pathParts[pathParts.length - 1];

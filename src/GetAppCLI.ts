@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import { Command } from 'commander';
 import { loginHandler } from './handlers/login.handler.js';
 import { sendUploadMessage } from './apis/upload.api.js';

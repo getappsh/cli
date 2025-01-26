@@ -4,8 +4,8 @@
   "description": "cli for getApp",
   "main": "./GetAppCLI.js",
   "scripts": {
-    "dev": "npm run build && npm link && gac",
-    "build": "tsc",
+    "dev": "set NODE_ENV=development tsc && npm link && gac",
+    "build": "node build.js && npx pkg ./dist/GetAppCLI.js --target node18-linux-x64,node18-win-x64,node18-macos-x64 -o ./dist/gac",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/commander": "^2.12.5",
-    "@types/node": "^22.10.5"
+    "@types/node": "^22.10.5",
+    "esbuild": "^0.24.2"
   }
 }

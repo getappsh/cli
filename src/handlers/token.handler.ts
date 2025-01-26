@@ -25,9 +25,12 @@ export class ProjToken {
 
   static async getTokenOrExit(token?: string) {
     if (token) return token
-    if (token = await readFromFile(this.FILE_NAME, true)) return token
-    console.error('Error: Token is required but not provided.');
-    process.exit(1)
+    try {
+      if (token = await readFromFile(this.FILE_NAME, true)) return token
+    } catch (error: any) {
+      console.error('Error: Token is required but not provided.', error.toString());
+      process.exit(1)
+    }
   }
 
   static async clearToken(exit = true) {
