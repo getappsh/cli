@@ -4,12 +4,12 @@ import { createReadStream } from "fs";
 import { stat } from "fs/promises";
 import { ProjectApiFp, RegulationDto, ReleaseDto, ReleasesApiFp, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
 
-export const sendRelGet = async (projId: number, projToken: string, version: string): Promise<ReleaseDto> => {
+export const getRel = async (projId: number, projToken: string, version: string): Promise<ReleaseDto> => {
   const setRelFn = await ReleasesApiFp(conf).releasesControllerGetRelease(projId.toString(), version, projToken)
   return (await setRelFn()).data
 }
 
-export const sendRelSet = async (data: SetReleaseDto, projToken: string, projId: number) => {
+export const setRel = async (data: SetReleaseDto, projToken: string, projId: number) => {
   try {
     const setRelFn = await ReleasesApiFp(conf).releasesControllerSetRelease(projId.toString(), data, projToken)
     return await setRelFn()
@@ -19,12 +19,12 @@ export const sendRelSet = async (data: SetReleaseDto, projToken: string, projId:
   }
 }
 
-export const sendRegGet = async (projId: number, projToken: string): Promise<RegulationDto[]> => {
+export const getReg = async (projId: number, projToken: string): Promise<RegulationDto[]> => {
   const setRelFn = await ProjectApiFp(conf).projectManagementControllerGetProjectRegulations(projId.toString(), projToken)
   return (await setRelFn()).data
 }
 
-export const sendUploadArt = async (data: SetReleaseArtifactDto, projToken: string, projId: number, version: string) => {
+export const uploadArt = async (data: SetReleaseArtifactDto, projToken: string, projId: number, version: string) => {
   try {
     const uploadFn = await ReleasesApiFp(conf).releasesControllerSetReleaseArtifact(projId.toString(), version, data, projToken)
     return await uploadFn()

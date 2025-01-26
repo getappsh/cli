@@ -1,17 +1,17 @@
 import { AxiosError } from "axios";
 import { SetReleaseDto } from "../../../client-api/src";
-import { sendRelGet, sendRelSet } from "../../apis/releases";
+import { getRel, setRel } from "../../apis/releases";
 import { ReleaseSetOptions } from "../../types/release";
 import { readFromFile } from "../../utils/files";
 import { ProjToken } from "../token.handler";
 
 export const setRelIfNotExist = async (projId: number, projToken: string, version: string) => {
   try {
-    await sendRelGet(projId, projToken, version)
+    await getRel(projId, projToken, version)
   } catch (error: any) {
     if (error instanceof AxiosError) {
       if (error.response?.status == 404) {
-        await sendRelSet({ version, isDraft: false }, projToken, projId)
+        await setRel({ version, isDraft: false }, projToken, projId)
       } else {
         console.log(`Failed to set release, Err: ${error.toString()}`);
         process.exit(1)
@@ -60,7 +60,7 @@ export const handleSetRelease = async (version: string, options?: ReleaseSetOpti
     isDraft: options?.draft ?? false
   }
 
-  await sendRelSet(data, projToken, projectId)
+  await setRel(data, projToken, projectId)
   console.log(`Release ${version} set successfully`)
 
 }

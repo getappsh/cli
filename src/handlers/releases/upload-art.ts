@@ -1,5 +1,5 @@
 import { stat } from "fs/promises";
-import { sendUploadArt, uploadFileArt } from "../../apis/releases";
+import { uploadArt, uploadFileArt } from "../../apis/releases";
 import { FileType, UploadArtOptions } from "../../types/release";
 import { readFromFile } from "../../utils/files";
 import { ProjToken } from "../token.handler";
@@ -129,7 +129,7 @@ export const handleUploadArt = async (version: string, type: FileType, options?:
     metadata
   }
 
-  const res = await sendUploadArt(data, projToken, projectId, version);
+  const res = await uploadArt(data, projToken, projectId, version);
 
   if (type == FileType.FILE && res.data.uploadUrl && options?.file) {
     await uploadFileArt(res.data.uploadUrl, options?.file)
