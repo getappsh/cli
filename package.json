@@ -4,7 +4,7 @@
   "description": "CLI for getApp",
   "main": "./GetAppCLI.js",
   "scripts": {
-    "dev": "set NODE_ENV=development tsc && npm link && gac",
+    "dev": "set NODE_ENV=development && tsc && node ./dist/src/GetAppCLI.js",
     "build": "node build.js && npx pkg ./dist/GetAppCLI.js --target node18-linux-x64,node18-win-x64,node18-macos-x64 -o ./dist/gac",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
