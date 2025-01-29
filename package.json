@@ -1,6 +1,6 @@
 {
   "name": "gac",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "CLI for getApp",
   "main": "./GetAppCLI.js",
   "scripts": {
