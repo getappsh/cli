@@ -12,7 +12,8 @@ import { handleSetReg } from './handlers/releases/set-reg.js';
 
 const program = new Command();
 
-program.name('getapp-cli').description('CLI for app management').version('1.1.3');
+const version = process.env.VERSION || 'unknown';
+program.name('getapp-cli').description('CLI for app management').version(version);
 
 const relCmd = program
   .command('releases')

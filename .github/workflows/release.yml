@@ -1,0 +1,51 @@
+name: Release CLI
+
+on:
+  push:
+    branches:
+      - project-refactor
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Use the Node.js version compatible with your CLI
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Commit and push a new version bump
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          NEW_VERSION=$(npm version patch -m "chore: release version %s")
+          echo "new_version=${NEW_VERSION}" >> $GITHUB_ENV
+          git push origin project-refactor --tags
+
+      - name: Build and pack CLI
+        run: |
+          npm run build
+          npm pack
+          mv *.tgz getapp-cli.tgz
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.new_version }}
+          name: Release ${{ env.new_version }}
+          draft: false
+          prerelease: false
+          files: |
+            getapp-cli.tgz
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
