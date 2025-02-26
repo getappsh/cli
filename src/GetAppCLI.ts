@@ -42,7 +42,7 @@ relCmd
   .option('-m,  --metadata <json-string>', 'Additional metadata for the release, in JSON string format (e.g., \'{"key": "value"}\')')
   .option('-mf, --metadata-file <file>', 'Path to a metadata file containing JSON data')
   .option('-n,  --name <name>', 'Name of the artifact, this name affects the file name')
-  // .option('-d,  --deployable', 'Indicates that the artifact is a deployable installation file')
+  .option('-d,  --deployable', 'Indicates that the artifact is a deployable installation file')
   .option('-f,  --file <path>', 'Specify the file path to the artifact to be uploaded (required for file type artifacts)')
   .option('-u,  --docker-image-url <url>', 'URL of the Docker image for the deployable artifact (required for Docker type artifacts)')
   .action((version: string, type: FileType, options: UploadArtOptions) => {
