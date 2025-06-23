@@ -1,1 +1,1 @@
-docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/client-api/docs.yaml -g typescript-axios  -o /local/client-api/src
+docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v7.11.0 generate -i /local/client-api/docs.yaml -g typescript-axios  -o /local/client-api/src

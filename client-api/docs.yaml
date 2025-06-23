@@ -114,7 +114,7 @@ paths:
       tags: *ref_1
       security:
         - bearer: []
-  /api/v1/releases/project/{projectIdentifier}:
+  /api/v1/catalog/releases/project/{projectIdentifier}:
     post:
       operationId: ReleasesController_setRelease
       summary: Set a Release
@@ -144,9 +144,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReleaseDto'
+                $ref: '#/components/schemas/DetailedReleaseDto'
       tags: &ref_3
-        - Releases
+        - Catalog - Upload
       security: &ref_4
         - bearer: []
     get:
@@ -172,7 +172,7 @@ paths:
                   $ref: '#/components/schemas/ReleaseDto'
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectIdentifier}/version/{version}:
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}:
     get:
       operationId: ReleasesController_getRelease
       summary: Get Release
@@ -196,7 +196,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReleaseDto'
+                $ref: '#/components/schemas/DetailedReleaseDto'
       tags: *ref_3
       security: *ref_4
     delete:
@@ -221,7 +221,7 @@ paths:
           description: Release deleted.
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectIdentifier}/version/{version}/artifact:
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/artifact:
     post:
       operationId: ReleasesController_setReleaseArtifact
       summary: Set Release Artifact
@@ -254,7 +254,7 @@ paths:
                 $ref: '#/components/schemas/SetReleaseArtifactResDto'
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectIdentifier}/version/{version}/artifact/{artifactId}:
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/artifact/{artifactId}:
     delete:
       operationId: ReleasesController_deleteReleaseArtifact
       summary: Delete Release Artifact
@@ -282,7 +282,35 @@ paths:
           description: Release artifact deleted.
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectIdentifier}/version/{version}/regulation-status:
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/artifact/download/{fileName}:
+    get:
+      operationId: ReleasesController_downloadArtifact
+      summary: Download Release Artifact
+      description: This service allows downloading a release artifact by file name.
+      parameters:
+        - *ref_2
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: version
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: fileName
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirects to a URL
+      tags: *ref_3
+      security: *ref_4
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/regulation-status:
     get:
       operationId: ReleasesController_getVersionRegulationStatuses
       summary: Get Version Regulation Statuses by Regulation ID
@@ -310,7 +338,7 @@ paths:
                   $ref: '#/components/schemas/RegulationStatusDto'
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}:
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}:
     get:
       operationId: ReleasesController_getRegulationStatus
       summary: Get Regulation Status by Regulation ID and Version ID
@@ -409,7 +437,7 @@ paths:
           description: Regulation status deleted
       tags: *ref_3
       security: *ref_4
-  /api/v1/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}/compliancy:
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}/compliancy:
     post:
       operationId: ReleasesController_setRegulationCompliancy
       summary: Set Regulation Compliancy
@@ -448,6 +476,96 @@ paths:
                 $ref: '#/components/schemas/RegulationStatusDto'
       tags: *ref_3
       security: *ref_4
+  /api/v1/catalog/offering/platform/{platformId}:
+    get:
+      operationId: OfferingController_getOfferingForPlatform
+      summary: Get Offering of Platform
+      description: >-
+        This service message allows retrieval of the offering of a specific
+        platform by platform ID.
+      parameters:
+        - name: platformId
+          required: true
+          in: path
+          description: ID of the platform
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformOfferingDto'
+      tags: &ref_5
+        - Catalog - Offering
+      security: &ref_6
+        - bearer: []
+  /api/v1/catalog/offering/device-type/{deviceTypeId}:
+    get:
+      operationId: OfferingController_getOfferingForDeviceType
+      summary: Get Offering of Device Type
+      description: >-
+        This service message allows retrieval of the offering of a specific
+        device type by device type ID.
+      parameters:
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeOfferingDto'
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/catalog/offering/project/{projectIdentifier}:
+    get:
+      operationId: OfferingController_getOfferingForProject
+      summary: Get Offering of Project
+      description: >-
+        This service message allows retrieval of the offering of a specific
+        project by project identifier.
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRefOfferingDto'
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/catalog/offering/push:
+    post:
+      operationId: OfferingController_pushOffering
+      summary: Push offering of component or map
+      description: >-
+        This service message allows to push component or map by `catalog ID`, to
+        devices or groups of devices
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushOfferingDto'
+      responses:
+        '201':
+          description: ''
+      tags: *ref_5
+      security: *ref_6
   /api/v1/delivery/updateDownloadStatus:
     post:
       operationId: DeliveryController_updateDownloadStatus
@@ -463,9 +581,9 @@ paths:
       responses:
         '200':
           description: ''
-      tags: &ref_5
+      tags: &ref_7
         - Delivery
-      security: &ref_6
+      security: &ref_8
         - bearer: []
   /api/v1/delivery/prepareDelivery:
     post:
@@ -486,8 +604,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrepareDeliveryResDto'
-      tags: *ref_5
-      security: *ref_6
+      tags: *ref_7
+      security: *ref_8
   /api/v1/delivery/preparedDelivery/{catalogId}:
     get:
       operationId: DeliveryController_getPreparedDeliveryStatus
@@ -506,8 +624,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrepareDeliveryResDto'
-      tags: *ref_5
-      security: *ref_6
+      tags: *ref_7
+      security: *ref_8
   /api/v1/delivery/cache/delete:
     delete:
       operationId: DeliveryController_deleteFromCache
@@ -530,11 +648,11 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_5
-      security: *ref_6
+      tags: *ref_7
+      security: *ref_8
   /api/v1/delivery/cache/config:
     get:
-      operationId: DeliveryController_getMapConfig
+      operationId: DeliveryController_getCacheConfig
       summary: Get Delivery Cache Configurations
       description: This service message returns an object of delivery cache configurations.
       parameters: []
@@ -545,10 +663,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CacheConfigResDto'
-      tags: *ref_5
-      security: *ref_6
+      tags: *ref_7
+      security: *ref_8
     put:
-      operationId: DeliveryController_setMapConfig
+      operationId: DeliveryController_setCacheConfig
       summary: Set Delivery Cache Configurations
       description: This service message sets an object of delivery cache configurations.
       parameters: []
@@ -560,49 +678,6 @@ paths:
               $ref: '#/components/schemas/CacheConfigDto'
       responses:
         '200':
-          description: ''
-      tags: *ref_5
-      security: *ref_6
-  /api/v1/offering/component/{catalogId}:
-    get:
-      operationId: OfferingController_getOfferingOfComp
-      summary: Get Offering of Component
-      description: >-
-        This service message allows retrieval of the offering of a specific
-        component by catalog ID.
-      parameters:
-        - name: catalogId
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ComponentDto'
-      tags: &ref_7
-        - Offering
-      security: &ref_8
-        - bearer: []
-  /api/v1/offering/push:
-    post:
-      operationId: OfferingController_pushOffering
-      summary: Push offering of component or map
-      description: >-
-        This service message allows to push component or map by `catalog ID`, to
-        devices or groups of devices
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PushOfferingDto'
-      responses:
-        '201':
           description: ''
       tags: *ref_7
       security: *ref_8
@@ -623,7 +698,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseProjectDto'
+                $ref: '#/components/schemas/ProjectDto'
       tags: &ref_9
         - Project
       security: &ref_10
@@ -708,6 +783,15 @@ paths:
           example: active
           schema:
             type: string
+        - name: type
+          required: false
+          in: query
+          description: Filter by project type
+          schema:
+            enum:
+              - product
+              - formation
+            type: string
         - name: page
           required: false
           in: query
@@ -736,6 +820,22 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BaseProjectDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/regulation-types:
+    get:
+      operationId: ProjectManagementController_getAllRegulationTypes
+      summary: Get all Regulation Types
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegulationTypeDto'
       tags: *ref_9
       security: *ref_10
   /api/v1/project/{projectIdentifier}:
@@ -780,7 +880,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseProjectDto'
+                $ref: '#/components/schemas/ProjectDto'
       tags: *ref_9
       security: *ref_10
     delete:
@@ -1045,22 +1145,6 @@ paths:
                   $ref: '#/components/schemas/DeviceResDto'
       tags: *ref_9
       security: *ref_10
-  /api/v1/project/regulation-types:
-    get:
-      operationId: ProjectManagementController_getAllRegulationTypes
-      summary: Get all Regulation Types
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RegulationTypeDto'
-      tags: *ref_9
-      security: *ref_10
   /api/v1/project/{projectIdentifier}/regulation:
     get:
       operationId: ProjectManagementController_getProjectRegulations
@@ -1111,6 +1195,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegulationDto'
+      tags: *ref_9
+      security: *ref_10
+    put:
+      operationId: ProjectManagementController_editProjectRegulations
+      summary: Edit Regulations
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateOneOfManyRegulationDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegulationDto'
       tags: *ref_9
       security: *ref_10
   /api/v1/project/{projectIdentifier}/regulation/{regulation}:
@@ -1311,6 +1424,134 @@ paths:
         - name: tokenId
           required: true
           in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/docs:
+    get:
+      operationId: ProjectManagementController_getDocs
+      summary: Get all documents for a project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocDto'
+      tags: *ref_9
+      security: *ref_10
+    post:
+      operationId: ProjectManagementController_createDoc
+      summary: Create a document for a project
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocDto'
+      tags: *ref_9
+      security: *ref_10
+  /api/v1/project/{projectIdentifier}/docs/{id}:
+    get:
+      operationId: ProjectManagementController_getDocById
+      summary: Get a document by ID
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: id
+          required: true
+          in: path
+          description: Unique identifier of the documentation
+          example: 1
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocDto'
+      tags: *ref_9
+      security: *ref_10
+    put:
+      operationId: ProjectManagementController_updateDoc
+      summary: Update a document
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: id
+          required: true
+          in: path
+          description: Unique identifier of the documentation
+          example: 1
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDocDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocDto'
+      tags: *ref_9
+      security: *ref_10
+    delete:
+      operationId: ProjectManagementController_deleteDoc
+      summary: Delete a document by ID
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: id
+          required: true
+          in: path
+          description: Unique identifier of the documentation
+          example: 1
           schema:
             type: number
       responses:
@@ -1611,7 +1852,7 @@ paths:
         - Device - discovery
       security: &ref_14
         - bearer: []
-  /api/v1/device/discover/component:
+  /api/v2/device/discover/component:
     post:
       operationId: DiscoveryController_deviceComponentDiscovery
       summary: Discover Device Component
@@ -1624,7 +1865,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscoveryMessageDto'
+              $ref: '#/components/schemas/DiscoveryMessageV2Dto'
       responses:
         '200':
           description: ''
@@ -1647,7 +1888,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscoveryMessageDto'
+              $ref: '#/components/schemas/DiscoveryMessageV2Dto'
       responses:
         '200':
           description: ''
@@ -1668,7 +1909,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscoveryMessageDto'
+              $ref: '#/components/schemas/DiscoveryMessageV2Dto'
       responses:
         '201':
           description: ''
@@ -1737,7 +1978,7 @@ paths:
           description: ''
       tags: *ref_13
       security: *ref_14
-  /api/v1/group:
+  /api/v1/org/groups:
     post:
       operationId: GroupController_createGroup
       summary: Create Devices Group
@@ -1756,7 +1997,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChildGroupDto'
       tags: &ref_15
-        - Device - group
+        - Organization Groups
       security: &ref_16
         - bearer: []
     put:
@@ -1784,16 +2025,14 @@ paths:
       parameters: []
       responses:
         '200':
-          description: >-
-            return type is not documented well, needs to be `Record<number,
-            ChildGroupDto>`
+          description: Returns root group IDs and a mapping of all groups by ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChildGroupDto'
+                $ref: '#/components/schemas/GroupResponseDto'
       tags: *ref_15
       security: *ref_16
-  /api/v1/group/{groupId}:
+  /api/v1/org/groups/{groupId}:
     get:
       operationId: GroupController_getGroupById
       summary: Get groups of the given id and its children groups and devices
@@ -1812,7 +2051,7 @@ paths:
                 $ref: '#/components/schemas/ChildGroupDto'
       tags: *ref_15
       security: *ref_16
-  /api/v1/group/devices:
+  /api/v1/org/groups/devices:
     post:
       operationId: GroupController_setDevicesInGroup
       summary: Set Devices in a Group
@@ -2136,6 +2375,367 @@ paths:
                 $ref: '#/components/schemas/BugReportDto'
       tags: *ref_19
       security: *ref_20
+  /api/v1/platforms:
+    get:
+      operationId: HierarchyController_getPlatforms
+      summary: Get all platforms
+      tags:
+        - Platforms
+      parameters:
+        - name: query
+          required: false
+          in: query
+          description: Query to search platforms
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlatformDto'
+      security: &ref_21
+        - bearer: []
+    post:
+      operationId: HierarchyController_createPlatform
+      summary: Create Platform
+      tags:
+        - Platforms
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlatformDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformDto'
+      security: *ref_21
+  /api/v1/platforms/{platformId}:
+    get:
+      operationId: HierarchyController_getPlatform
+      summary: Get Platform by name
+      tags:
+        - Platforms
+      parameters:
+        - name: platformId
+          required: true
+          in: path
+          description: ID of the platform
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformDto'
+      security: *ref_21
+    put:
+      operationId: HierarchyController_updatePlatform
+      summary: Update Platform
+      tags:
+        - Platforms
+      parameters:
+        - name: platformId
+          required: true
+          in: path
+          description: ID of the platform
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePlatformDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformDto'
+      security: *ref_21
+    delete:
+      operationId: HierarchyController_deletePlatform
+      summary: Delete Platform
+      tags:
+        - Platforms
+      parameters:
+        - name: platformId
+          required: true
+          in: path
+          description: ID of the platform
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      security: *ref_21
+  /api/v1/hierarchy/platforms/{platformId}/tree:
+    get:
+      operationId: HierarchyController_getPlatformHierarchy
+      summary: Get full hierarchy for a platform
+      tags:
+        - Device - Hierarchy
+      parameters:
+        - name: platformId
+          required: true
+          in: path
+          description: ID of the platform
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformHierarchyDto'
+      security: *ref_21
+  /api/v1/hierarchy/platforms/{platformId}/device-types/{deviceTypeId}:
+    put:
+      operationId: HierarchyController_addDeviceTypeToPlatform
+      summary: Add Device Type to Platform
+      tags:
+        - Device - Hierarchy
+      parameters:
+        - name: platformId
+          required: true
+          in: path
+          description: ID of the platform
+          schema:
+            type: number
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformHierarchyDto'
+      security: *ref_21
+    delete:
+      operationId: HierarchyController_removeDeviceTypeFromPlatform
+      summary: Remove Device Type from Platform
+      tags:
+        - Device - Hierarchy
+      parameters:
+        - name: platformId
+          required: true
+          in: path
+          description: ID of the platform
+          schema:
+            type: number
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformHierarchyDto'
+      security: *ref_21
+  /api/v1/device-types:
+    get:
+      operationId: HierarchyController_getDeviceTypes
+      summary: Get all device types
+      tags:
+        - Device Types
+      parameters:
+        - name: query
+          required: false
+          in: query
+          description: Query to search device types
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceTypeDto'
+      security: *ref_21
+    post:
+      operationId: HierarchyController_createDeviceType
+      summary: Create Device Type
+      tags:
+        - Device Types
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeviceTypeDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeDto'
+      security: *ref_21
+  /api/v1/device-types/{deviceTypeId}:
+    get:
+      operationId: HierarchyController_getDeviceType
+      summary: Get Device Type by name
+      tags:
+        - Device Types
+      parameters:
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeDto'
+      security: *ref_21
+    put:
+      operationId: HierarchyController_updateDeviceType
+      summary: Update Device Type
+      tags:
+        - Device Types
+      parameters:
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeviceTypeDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeDto'
+      security: *ref_21
+    delete:
+      operationId: HierarchyController_deleteDeviceType
+      summary: Delete Device Type
+      tags:
+        - Device Types
+      parameters:
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      security: *ref_21
+  /api/v1/hierarchy/device-types/{deviceTypeId}/tree:
+    get:
+      operationId: HierarchyController_getDeviceTypeHierarchy
+      summary: Get all projects for a device type
+      tags:
+        - Device - Hierarchy
+      parameters:
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeHierarchyDto'
+      security: *ref_21
+  /api/v1/hierarchy/device-types/{deviceTypeId}/projects/{projectIdentifier}:
+    put:
+      operationId: HierarchyController_addProjectToDeviceType
+      summary: Add Project to Device Type
+      tags:
+        - Device - Hierarchy
+      parameters:
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeHierarchyDto'
+      security: *ref_21
+    delete:
+      operationId: HierarchyController_removeProjectFromDeviceType
+      summary: Remove Project from Device Type
+      tags:
+        - Device - Hierarchy
+      parameters:
+        - name: deviceTypeId
+          required: true
+          in: path
+          description: ID of the device type
+          schema:
+            type: number
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeHierarchyDto'
+      security: *ref_21
 info:
   title: Get-App
   description: The Get-App API swagger
@@ -2273,6 +2873,14 @@ components:
         isDraft:
           type: boolean
           default: true
+        dependencies:
+          description: >-
+            List of dependencies. Providing an empty array will remove all
+            dependencies. Omitting this field or setting it to null will leave
+            dependencies unchanged.
+          type: array
+          items:
+            type: string
       required:
         - version
     ReleaseArtifactDto:
@@ -2283,7 +2891,10 @@ components:
         artifactName:
           type: string
         type:
-          type: object
+          type: string
+          enum:
+            - file
+            - docker_image
         metadata:
           type: object
         isInstallationFile:
@@ -2292,6 +2903,15 @@ components:
           type: string
         uploadId:
           type: number
+        status:
+          type: string
+          enum:
+            - uploaded
+            - pending
+            - removed
+        size:
+          type: integer
+          format: int64
       required:
         - id
         - artifactName
@@ -2306,6 +2926,8 @@ components:
           type: string
         version:
           type: string
+        projectName:
+          type: string
         projectId:
           type: number
         name:
@@ -2316,16 +2938,12 @@ components:
           type: object
         status:
           type: string
-          enum:
+          enum: &ref_22
             - draft
             - in_review
             - approved
             - released
             - archived
-        artifacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReleaseArtifactDto'
         createdAt:
           format: date-time
           type: string
@@ -2338,9 +2956,15 @@ components:
         compliantRegulationsCount:
           type: number
           description: Total number of compliant regulations
+        latest:
+          type: boolean
+        releasedAt:
+          format: date-time
+          type: string
       required:
         - id
         - version
+        - projectName
         - name
         - releaseNotes
         - metadata
@@ -2349,6 +2973,65 @@ components:
         - updatedAt
         - requiredRegulationsCount
         - compliantRegulationsCount
+        - latest
+    DetailedReleaseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        projectName:
+          type: string
+        projectId:
+          type: number
+        name:
+          type: string
+        releaseNotes:
+          type: string
+        metadata:
+          type: object
+        status:
+          type: string
+          enum: *ref_22
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        requiredRegulationsCount:
+          type: number
+          description: Total number of required regulations
+        compliantRegulationsCount:
+          type: number
+          description: Total number of compliant regulations
+        latest:
+          type: boolean
+        releasedAt:
+          format: date-time
+          type: string
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReleaseArtifactDto'
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReleaseDto'
+      required:
+        - id
+        - version
+        - projectName
+        - name
+        - releaseNotes
+        - metadata
+        - status
+        - createdAt
+        - updatedAt
+        - requiredRegulationsCount
+        - compliantRegulationsCount
+        - latest
     SetReleaseArtifactDto:
       type: object
       properties:
@@ -2426,9 +3109,7 @@ components:
           type: string
           description: Update date of the regulation status
         regulationSnapshot:
-          description: Regulation snapshot
-          allOf:
-            - $ref: '#/components/schemas/RegulationSnapshotDto'
+          $ref: '#/components/schemas/RegulationSnapshotDto'
       required:
         - projectIdentifier
         - version
@@ -2456,6 +3137,124 @@ components:
           description: Compliancy of the regulation
       required:
         - isCompliant
+    ComponentV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        projectName:
+          type: string
+        releaseNotes:
+          type: string
+        metadata:
+          type: object
+        status:
+          type: string
+          enum:
+            - draft
+            - in_review
+            - approved
+            - released
+            - archived
+        type:
+          type: string
+          enum:
+            - product
+            - formation
+        size:
+          type: integer
+          format: int64
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        latest:
+          type: boolean
+        releasedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - version
+        - projectName
+        - status
+        - type
+        - createdAt
+        - updatedAt
+    ProjectRefOfferingDto:
+      type: object
+      properties:
+        projectName:
+          type: string
+          description: Name of the project
+        projectId:
+          type: number
+          description: Identifier of the project
+        release:
+          $ref: '#/components/schemas/ComponentV2Dto'
+      required:
+        - projectName
+        - projectId
+    DeviceTypeOfferingDto:
+      type: object
+      properties:
+        deviceTypeId:
+          type: number
+          description: ID of the device type
+        deviceTypeName:
+          type: string
+          description: Name of the device type
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRefOfferingDto'
+      required:
+        - deviceTypeId
+        - deviceTypeName
+    PlatformOfferingDto:
+      type: object
+      properties:
+        platformId:
+          type: number
+          description: ID of the platform
+        platformName:
+          type: string
+          description: Name of the platform
+        deviceTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceTypeOfferingDto'
+      required:
+        - platformId
+        - platformName
+    PushOfferingDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+        groups:
+          type: array
+          items:
+            type: number
+        itemType:
+          type: string
+          enum:
+            - software
+            - map
+            - cache
+          default: software
+      required:
+        - catalogId
+        - devices
+        - itemType
     DeliveryStatusDto:
       type: object
       properties:
@@ -2545,7 +3344,11 @@ components:
       properties:
         catalogId:
           type: string
+        id:
+          type: integer
         itemKey:
+          type: string
+        artifactType:
           type: string
         metaData:
           type: string
@@ -2622,6 +3425,7 @@ components:
             - done
             - error
             - delete
+            - pending
         progress:
           type: number
         size:
@@ -2679,30 +3483,6 @@ components:
           description: The maximum cache capacity in GB
       required:
         - maxCapacityInGB
-    PushOfferingDto:
-      type: object
-      properties:
-        catalogId:
-          type: string
-        devices:
-          type: array
-          items:
-            type: string
-        groups:
-          type: array
-          items:
-            type: number
-        itemType:
-          type: string
-          enum:
-            - software
-            - map
-            - cache
-          default: software
-      required:
-        - catalogId
-        - devices
-        - itemType
     CreateProjectDto:
       type: object
       properties:
@@ -2710,7 +3490,67 @@ components:
           type: string
         description:
           type: string
-    BaseProjectDto:
+        platforms:
+          type: array
+          items:
+            type: string
+        projectType:
+          type: string
+          enum:
+            - product
+            - formation
+          default: product
+      required:
+        - name
+    ProjectMemberPreferencesDto:
+      type: object
+      properties:
+        pinned:
+          type: boolean
+    ProjectMemberContextDto:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+            - project-owner
+            - project-admin
+            - project-member
+        preferences:
+          $ref: '#/components/schemas/ProjectMemberPreferencesDto'
+      required:
+        - role
+        - preferences
+    MinimalReleaseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        name:
+          type: string
+        requiredRegulationsCount:
+          type: number
+        compliantRegulationsCount:
+          type: number
+      required:
+        - id
+        - version
+        - requiredRegulationsCount
+        - compliantRegulationsCount
+    ProjectSummaryDto:
+      type: object
+      properties:
+        latestRelease:
+          description: Latest release of the project
+          allOf:
+            - $ref: '#/components/schemas/MinimalReleaseDto'
+        upcomingRelease:
+          description: Upcoming release of the project
+          allOf:
+            - $ref: '#/components/schemas/MinimalReleaseDto'
+    ProjectDto:
       type: object
       properties:
         id:
@@ -2721,12 +3561,43 @@ components:
           description: Name of the project
         description:
           type: string
+        projectType:
+          type: string
+          enum: &ref_23
+            - product
+            - formation
         status:
           type: string
           description: Status of the project (active, completed, on-hold)
+        owner:
+          type: string
+          description: Owner of the project
+        platforms:
+          description: Platforms supported by the project
+          type: array
+          items:
+            type: string
+        numMembers:
+          type: number
+          description: Number of members in the project
+        versions:
+          type: number
+          description: Number of versions available for the project
+          example: 5
+        memberContext:
+          description: Current member context
+          allOf:
+            - $ref: '#/components/schemas/ProjectMemberContextDto'
+        summary:
+          description: Summary of the project
+          allOf:
+            - $ref: '#/components/schemas/ProjectSummaryDto'
       required:
         - id
         - name
+        - projectType
+        - owner
+        - versions
     MemberResDto:
       type: object
       properties:
@@ -2770,7 +3641,7 @@ components:
         invitedProjects:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectDto'
+            type: string
     PaginatedResultDto:
       type: object
       properties:
@@ -2778,7 +3649,7 @@ components:
           description: The data items for the current page
           type: array
           items:
-            type: string
+            type: object
         total:
           type: number
           description: The total number of items available
@@ -2796,26 +3667,7 @@ components:
         - total
         - page
         - perPage
-    ProjectMemberPreferencesDto:
-      type: object
-      properties:
-        pinned:
-          type: boolean
-    ProjectMemberContextDto:
-      type: object
-      properties:
-        role:
-          type: string
-          enum:
-            - project-owner
-            - project-admin
-            - project-member
-        preferences:
-          $ref: '#/components/schemas/ProjectMemberPreferencesDto'
-      required:
-        - role
-        - preferences
-    ProjectDto:
+    BaseProjectDto:
       type: object
       properties:
         id:
@@ -2826,37 +3678,32 @@ components:
           description: Name of the project
         description:
           type: string
+        projectType:
+          type: string
+          enum: *ref_23
         status:
           type: string
           description: Status of the project (active, completed, on-hold)
-        owner:
-          type: string
-          description: Owner of the project
-        numMembers:
-          type: number
-          description: Number of members in the project
-        versions:
-          type: number
-          description: Number of versions available for the project
-          example: 5
-        latestRelease:
-          type: string
-          description: Latest release of the project
-        upcomingRelease:
-          type: string
-          description: Upcoming release
-        upcomingReleaseStage:
-          type: string
-          description: Upcoming release stage
-        memberContext:
-          description: Current member context
-          allOf:
-            - $ref: '#/components/schemas/ProjectMemberContextDto'
       required:
         - id
         - name
-        - owner
-        - versions
+        - projectType
+    RegulationTypeDto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: ID of the regulation type
+        name:
+          type: string
+          description: Name of the regulation type
+        description:
+          type: string
+          description: Description of the regulation type
+      required:
+        - id
+        - name
+        - description
     ProjectTokenDto:
       type: object
       properties:
@@ -2896,12 +3743,20 @@ components:
           description: Name of the project
         description:
           type: string
+        projectType:
+          type: string
+          enum: *ref_23
         status:
           type: string
           description: Status of the project (active, completed, on-hold)
         owner:
           type: string
           description: Owner of the project
+        platforms:
+          description: Platforms supported by the project
+          type: array
+          items:
+            type: string
         numMembers:
           type: number
           description: Number of members in the project
@@ -2909,19 +3764,14 @@ components:
           type: number
           description: Number of versions available for the project
           example: 5
-        latestRelease:
-          type: string
-          description: Latest release of the project
-        upcomingRelease:
-          type: string
-          description: Upcoming release
-        upcomingReleaseStage:
-          type: string
-          description: Upcoming release stage
         memberContext:
           description: Current member context
           allOf:
             - $ref: '#/components/schemas/ProjectMemberContextDto'
+        summary:
+          description: Summary of the project
+          allOf:
+            - $ref: '#/components/schemas/ProjectSummaryDto'
         createdAt:
           format: date-time
           type: string
@@ -2936,6 +3786,7 @@ components:
       required:
         - id
         - name
+        - projectType
         - owner
         - versions
         - createdAt
@@ -2946,6 +3797,15 @@ components:
           type: string
         description:
           type: string
+        platforms:
+          type: array
+          items:
+            type: string
+        projectType:
+          type: string
+          enum:
+            - product
+            - formation
     AddMemberToProjectDto:
       type: object
       properties:
@@ -3028,22 +3888,6 @@ components:
           type: string
         availableStorage:
           type: string
-    RegulationTypeDto:
-      type: object
-      properties:
-        id:
-          type: number
-          description: ID of the regulation type
-        name:
-          type: string
-          description: Name of the regulation type
-        description:
-          type: string
-          description: Description of the regulation type
-      required:
-        - id
-        - name
-        - description
     RegulationDto:
       type: object
       properties:
@@ -3071,8 +3915,6 @@ components:
           description: Order of the regulation
       required:
         - name
-        - displayName
-        - description
         - type
         - projectId
         - order
@@ -3101,6 +3943,33 @@ components:
       required:
         - name
         - typeId
+    UpdateOneOfManyRegulationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the regulation
+        displayName:
+          type: string
+          description: Display name of the regulation
+        description:
+          type: string
+          description: Description of the regulation
+        typeId:
+          type: number
+          description: ID of the regulation type
+        config:
+          type: string
+          description: Configuration of the regulation
+        order:
+          type: number
+          description: Order of the regulation
+          default: 0
+        regulation:
+          type: string
+          description: Identifier (name) of the regulation
+      required:
+        - regulation
     UpdateRegulationDto:
       type: object
       properties:
@@ -3122,6 +3991,7 @@ components:
         order:
           type: number
           description: Order of the regulation
+          default: 0
     CreateProjectTokenDto:
       type: object
       properties:
@@ -3147,6 +4017,86 @@ components:
           type: boolean
       required:
         - name
+    DocDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the documentation
+          example: Project README
+        isUrl:
+          type: boolean
+          description: Whether the documentation is an external URL
+          example: false
+        readme:
+          type: string
+          description: The content of the README if isUrl is false
+          example: '# Project Documentation'
+        docUrl:
+          type: string
+          description: The URL to the external documentation if isUrl is true
+          example: https://example.com/docs
+        id:
+          type: number
+          description: Unique identifier of the documentation
+          example: 1
+        createdAt:
+          format: date-time
+          type: string
+          description: Timestamp when the doc was created
+          example: '2025-02-03T12:34:56Z'
+        updatedAt:
+          format: date-time
+          type: string
+          description: Timestamp when the doc was last updated
+          example: '2025-02-03T12:34:56Z'
+      required:
+        - name
+        - isUrl
+        - id
+        - createdAt
+        - updatedAt
+    CreateDocDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the documentation
+          example: Project README
+        isUrl:
+          type: boolean
+          description: Whether the documentation is an external URL
+          example: false
+        readme:
+          type: string
+          description: The content of the README if isUrl is false
+          example: '# Project Documentation'
+        docUrl:
+          type: string
+          description: The URL to the external documentation if isUrl is true
+          example: https://example.com/docs
+      required:
+        - name
+        - isUrl
+    UpdateDocDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the documentation
+          example: Project README
+        isUrl:
+          type: boolean
+          description: Whether the documentation is an external URL
+          example: false
+        readme:
+          type: string
+          description: The content of the README if isUrl is false
+          example: '# Project Documentation'
+        docUrl:
+          type: string
+          description: The URL to the external documentation if isUrl is true
+          example: https://example.com/docs
     UserSearchDto:
       type: object
       properties:
@@ -3165,15 +4115,19 @@ components:
           type: string
         productId:
           type: string
+        catalogId:
+          type: string
+        countries:
+          type: string
+        cities:
+          type: string
+        resolutionMeter:
+          type: number
         productName:
           type: string
         productVersion:
           type: number
         productType:
-          type: string
-        productSubType:
-          type: number
-        description:
           type: string
         imagingTimeBeginUTC:
           format: date-time
@@ -3185,8 +4139,6 @@ components:
           type: number
         footprint:
           type: string
-        transparency:
-          type: string
         region:
           type: string
         ingestionDate:
@@ -3196,6 +4148,11 @@ components:
         - id
         - productId
         - footprint
+    mapOfferingConfig:
+      type: object
+      properties:
+        exportMaxResolutionDeg:
+          type: number
     OfferingMapProductsResDto:
       type: object
       properties:
@@ -3203,14 +4160,23 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MapProductResDto'
+        configs:
+          $ref: '#/components/schemas/mapOfferingConfig'
+        method:
+          type: string
+          enum: &ref_25
+            - single
+            - polygonParts
+          default: polygonParts
         status:
           type: string
-          enum: &ref_22
+          enum: &ref_26
             - Success
             - Error
         error:
           $ref: '#/components/schemas/ErrorDto'
       required:
+        - method
         - status
     MapProperties:
       type: object
@@ -3250,7 +4216,7 @@ components:
           type: string
         status:
           type: string
-          enum: &ref_21
+          enum: &ref_24
             - Start
             - InProgress
             - Done
@@ -3280,10 +4246,14 @@ components:
           default: 0
         size:
           type: integer
+          format: int64
           default: 0
+          minimum: 0
         area:
           type: integer
+          format: int64
           default: 0
+          minimum: 0
         footprint:
           type: string
         zoomLevel:
@@ -3300,7 +4270,7 @@ components:
           type: string
         status:
           type: string
-          enum: *ref_21
+          enum: *ref_24
         error:
           $ref: '#/components/schemas/ErrorDto'
         metaData:
@@ -3628,6 +4598,7 @@ components:
           type: string
         ID:
           type: string
+          deprecated: true
         OS:
           type: string
           enum:
@@ -3641,8 +4612,6 @@ components:
         availableStorage:
           type: string
           deprecated: true
-      required:
-        - ID
     GeneralDiscoveryDto:
       type: object
       properties:
@@ -3657,14 +4626,68 @@ components:
       properties:
         name:
           type: string
-        platformNumber:
+          description: Name of the platform
+        description:
           type: string
-        virtualSize:
+          description: Description of the platform
+          example: This is a sample platform.
+        os:
+          type: string
+          description: Operating system of the platform
+          example: windows
+          enum: &ref_27
+            - android
+            - windows
+            - linux
+        cpuArchitecture:
+          type: string
+          enum: &ref_28
+            - X86_64
+            - ARM64
+        cpuCount:
           type: number
-        components:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentDto'
+          description: Number of vCPUs
+        memoryMb:
+          type: number
+          description: Memory size in MB
+        diskGb:
+          type: number
+          description: Disk size in GB
+        diskType:
+          type: string
+          enum: &ref_29
+            - HDD
+            - SSD
+            - NVME
+        networkType:
+          type: string
+          enum: &ref_30
+            - NAT
+            - BRIDGED
+            - HOST_ONLY
+            - CUSTOM
+        imageId:
+          type: string
+          description: Optional image ID
+        metadata:
+          type: object
+          description: Optional tags or metadata
+        id:
+          type: number
+          description: ID of the platform
+        createdAt:
+          format: date-time
+          type: string
+          description: Timestamp when the platform was created
+        updatedAt:
+          format: date-time
+          type: string
+          description: Timestamp when the platform was last updated
+      required:
+        - name
+        - id
+        - createdAt
+        - updatedAt
     DiscoverySoftwareDto:
       type: object
       properties:
@@ -3744,17 +4767,104 @@ components:
           $ref: '#/components/schemas/OfferingResponseDto'
         map:
           $ref: '#/components/schemas/OfferingMapProductsResDto'
+    ComponentStateDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+        state:
+          type: string
+          enum:
+            - offering
+            - push
+            - delivery
+            - deleted
+            - deploy
+            - installed
+            - uninstalled
+        error:
+          type: string
+      required:
+        - catalogId
+        - state
+    DiscoverySoftwareV2Dto:
+      type: object
+      properties:
+        formations:
+          type: array
+          items:
+            type: string
+        platforms:
+          deprecated: true
+          type: array
+          items:
+            type: string
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentStateDto'
+    DiscoveryMessageV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+        snapshotDate:
+          type: string
+          description: Timestamp when the discovery snapshot was taken
+          example: 2025-06-22T13:02:28.641Z
+        deviceType:
+          type: string
+          description: >-
+            Type of the discovered device (e.g., router, switch, server, etc.),
+            used for discovery of devices of type "device"
+        platform:
+          description: >-
+            Platform-specific discovery information containing device details
+            and associated devices, used for discovery of devices of type
+            "platform"
+          allOf:
+            - $ref: '#/components/schemas/PlatformDiscoverDto'
+        general:
+          $ref: '#/components/schemas/GeneralDiscoveryDto'
+        discoveryType:
+          type: string
+          enum:
+            - get-app
+            - get-map
+            - mTls
+        softwareData:
+          $ref: '#/components/schemas/DiscoverySoftwareV2Dto'
+        mapData:
+          $ref: '#/components/schemas/DiscoveryMapDto'
+      required:
+        - discoveryType
+    PlatformDiscoverDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the platform or system being discovered
+        devices:
+          description: >-
+            Array of devices discovered within this platform. Each device
+            contains detailed discovery information of type
+            "DiscoveryMessageV2Dto".
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveryMessageV2Dto'
+      required:
+        - name
     DeviceComponentsOfferingDto:
       type: object
       properties:
         offer:
           type: array
           items:
-            $ref: '#/components/schemas/ComponentDto'
+            $ref: '#/components/schemas/ComponentV2Dto'
         push:
           type: array
           items:
-            $ref: '#/components/schemas/ComponentDto'
+            $ref: '#/components/schemas/ComponentV2Dto'
       required:
         - offer
         - push
@@ -3769,12 +4879,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MapProductResDto'
+        configs:
+          $ref: '#/components/schemas/mapOfferingConfig'
+        method:
+          type: string
+          enum: *ref_25
+          default: polygonParts
         status:
           type: string
-          enum: *ref_22
+          enum: *ref_26
         error:
           $ref: '#/components/schemas/ErrorDto'
       required:
+        - method
         - status
     DeviceDiscoverResDto:
       type: object
@@ -3787,7 +4904,7 @@ components:
         comps:
           type: array
           items:
-            $ref: '#/components/schemas/ComponentDto'
+            $ref: '#/components/schemas/ComponentV2Dto'
       required:
         - deviceId
         - produceTime
@@ -3838,6 +4955,22 @@ components:
           type: string
       required:
         - id
+    GroupResponseDto:
+      type: object
+      properties:
+        roots:
+          description: Array of group IDs (as strings) that are root nodes
+          type: array
+          items:
+            type: string
+        groups:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ChildGroupDto'
+          description: Map of group ID (as string) to ChildGroupDto
+      required:
+        - roots
+        - groups
     SetChildInGroupDto:
       type: object
       properties:
@@ -3917,6 +5050,12 @@ components:
           type: number
         uid:
           type: number
+        formations:
+          type: array
+          items:
+            type: string
+      required:
+        - id
     AndroidConfigDto:
       type: object
       properties:
@@ -3978,6 +5117,32 @@ components:
           type: string
       required:
         - group
+    LayersConfigDto:
+      type: object
+      properties:
+        layerName:
+          type: string
+          description: The name of the layer
+        tileLayerSource:
+          type: string
+          description: The source of the tile layer
+          enum:
+            - XYZ
+            - WMTS
+        XYZtilesURL:
+          type: string
+          description: URL for XYZ tiles
+        capabilitiesUrl:
+          type: string
+          description: URL for capabilities
+        capabilitiesLayerName:
+          type: string
+          description: URL for capabilities
+        delete:
+          type: boolean
+          description: Flag to indicate if the layer should be deleted
+      required:
+        - layerName
     WindowsConfigDto:
       type: object
       properties:
@@ -4017,6 +5182,60 @@ components:
           type: string
         matomoSiteId:
           type: string
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/LayersConfigDto'
+        getAppServerUrls:
+          type: array
+          items:
+            type: string
+        mapsStoragePath:
+          type: string
+        queryStatusIntervalSec:
+          type: integer
+          description: >-
+            How many seconds to wait between checking the import and prepare
+            status
+        networkAvailabilityUrl:
+          type: string
+        periodicDiscoveryIntervalMins:
+          type: integer
+        networkStatusIntervalMins:
+          type: integer
+          description: >-
+            Interval for background network status checks in minutes. Used when
+            maps are in the import process.
+        maxInventoryMissedIntervalHours:
+          type: integer
+          description: >-
+            Maximum allowed interval (in hours) for inventory updates before
+            triggering an error.
+        mapInventoryMaxSizeMB:
+          type: integer
+        tcpStreamTimeoutSec:
+          type: integer
+          description: >-
+            Maximum time (in seconds) to wait for a response when checking if a
+            TCP connection is valid. If no response is received within this
+            time, an error is returned.
+        matomoMaxRetentionHour:
+          type: integer
+          description: >-
+            Maximum retention time for Matomo data in hours. Data older than
+            this will be cleaned up.
+        matomoMaxBufferSizeMB:
+          type: integer
+          description: >-
+            Maximum buffer size in megabytes. If the buffer limit is reached,
+            the oldest entries will be discarded to free up space.
+        technicianPassword:
+          type: string
+          description: >-
+            The password that allows a technician to modify configurations
+            directly on the device. Must be between 4 and 20 characters.
+          minLength: 4
+          maxLength: 20
       required:
         - group
     DevicePutDto:
@@ -4042,6 +5261,14 @@ components:
             - deleted
             - installed
             - uninstalled
+        error:
+          type: string
+        downloadDate:
+          format: date-time
+          type: string
+        deployDate:
+          format: date-time
+          type: string
     DeviceMapDto:
       type: object
       properties:
@@ -4071,17 +5298,22 @@ components:
           type: number
         uid:
           type: number
+        formations:
+          type: array
+          items:
+            type: string
         maps:
           type: array
           items:
             $ref: '#/components/schemas/MapStateDto'
       required:
+        - id
         - maps
     SoftwareStateDto:
       type: object
       properties:
         software:
-          $ref: '#/components/schemas/ComponentDto'
+          $ref: '#/components/schemas/ComponentV2Dto'
         state:
           type: string
           enum:
@@ -4101,11 +5333,11 @@ components:
         offering:
           type: array
           items:
-            $ref: '#/components/schemas/ComponentDto'
+            $ref: '#/components/schemas/ComponentV2Dto'
+        error:
+          type: string
       required:
         - software
-        - downloadDate
-        - deployDate
         - offering
     DeviceSoftwareDto:
       type: object
@@ -4136,11 +5368,16 @@ components:
           type: number
         uid:
           type: number
+        formations:
+          type: array
+          items:
+            type: string
         softwares:
           type: array
           items:
             $ref: '#/components/schemas/SoftwareStateDto'
       required:
+        - id
         - softwares
     DeviceContentResDto:
       type: object
@@ -4200,3 +5437,271 @@ components:
         - agentVersion
         - device
         - reportDate
+    CreatePlatformDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the platform
+        description:
+          type: string
+          description: Description of the platform
+          example: This is a sample platform.
+        os:
+          type: string
+          description: Operating system of the platform
+          example: windows
+          enum: *ref_27
+        cpuArchitecture:
+          type: string
+          enum: *ref_28
+        cpuCount:
+          type: number
+          description: Number of vCPUs
+        memoryMb:
+          type: number
+          description: Memory size in MB
+        diskGb:
+          type: number
+          description: Disk size in GB
+        diskType:
+          type: string
+          enum: *ref_29
+        networkType:
+          type: string
+          enum: *ref_30
+        imageId:
+          type: string
+          description: Optional image ID
+        metadata:
+          type: object
+          description: Optional tags or metadata
+      required:
+        - name
+    UpdatePlatformDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the platform
+        description:
+          type: string
+          description: Description of the platform
+          example: This is a sample platform.
+        os:
+          type: string
+          description: Operating system of the platform
+          example: windows
+          enum: *ref_27
+        cpuArchitecture:
+          type: string
+          enum: *ref_28
+        cpuCount:
+          type: number
+          description: Number of vCPUs
+        memoryMb:
+          type: number
+          description: Memory size in MB
+        diskGb:
+          type: number
+          description: Disk size in GB
+        diskType:
+          type: string
+          enum: *ref_29
+        networkType:
+          type: string
+          enum: *ref_30
+        imageId:
+          type: string
+          description: Optional image ID
+        metadata:
+          type: object
+          description: Optional tags or metadata
+    ProjectRefDto:
+      type: object
+      properties:
+        projectName:
+          type: string
+          description: Name of the project
+        projectId:
+          type: number
+          description: Identifier of the project
+      required:
+        - projectName
+        - projectId
+    DeviceTypeHierarchyDto:
+      type: object
+      properties:
+        deviceTypeId:
+          type: number
+          description: ID of the device type
+        deviceTypeName:
+          type: string
+          description: Name of the device type
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRefDto'
+      required:
+        - deviceTypeId
+        - deviceTypeName
+    PlatformHierarchyDto:
+      type: object
+      properties:
+        platformId:
+          type: number
+          description: ID of the platform
+        platformName:
+          type: string
+          description: Name of the platform
+        deviceTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceTypeHierarchyDto'
+      required:
+        - platformId
+        - platformName
+    DeviceTypeDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the device type
+        description:
+          type: string
+          description: Description of the device type
+        os:
+          type: string
+          description: Operating system of the platform
+          example: windows
+          enum: &ref_31
+            - android
+            - windows
+            - linux
+        cpuArchitecture:
+          type: string
+          enum: &ref_32
+            - X86_64
+            - ARM64
+        cpuCount:
+          type: number
+          description: Number of vCPUs
+        memoryMb:
+          type: number
+          description: Memory size in MB
+        diskGb:
+          type: number
+          description: Disk size in GB
+        diskType:
+          type: string
+          enum: &ref_33
+            - HDD
+            - SSD
+            - NVME
+        networkType:
+          type: string
+          enum: &ref_34
+            - NAT
+            - BRIDGED
+            - HOST_ONLY
+            - CUSTOM
+        imageId:
+          type: string
+          description: Optional image ID
+        metadata:
+          type: object
+          description: Optional tags or metadata
+        id:
+          type: number
+          description: ID of the device type
+        createdAt:
+          format: date-time
+          type: string
+          description: Timestamp when the device type was created
+        updatedAt:
+          format: date-time
+          type: string
+          description: Timestamp when the device type was last updated
+      required:
+        - name
+        - id
+        - createdAt
+        - updatedAt
+    CreateDeviceTypeDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the device type
+        description:
+          type: string
+          description: Description of the device type
+        os:
+          type: string
+          description: Operating system of the platform
+          example: windows
+          enum: *ref_31
+        cpuArchitecture:
+          type: string
+          enum: *ref_32
+        cpuCount:
+          type: number
+          description: Number of vCPUs
+        memoryMb:
+          type: number
+          description: Memory size in MB
+        diskGb:
+          type: number
+          description: Disk size in GB
+        diskType:
+          type: string
+          enum: *ref_33
+        networkType:
+          type: string
+          enum: *ref_34
+        imageId:
+          type: string
+          description: Optional image ID
+        metadata:
+          type: object
+          description: Optional tags or metadata
+      required:
+        - name
+    UpdateDeviceTypeDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the device type
+        description:
+          type: string
+          description: Description of the device type
+        os:
+          type: string
+          description: Operating system of the platform
+          example: windows
+          enum: *ref_31
+        cpuArchitecture:
+          type: string
+          enum: *ref_32
+        cpuCount:
+          type: number
+          description: Number of vCPUs
+        memoryMb:
+          type: number
+          description: Memory size in MB
+        diskGb:
+          type: number
+          description: Disk size in GB
+        diskType:
+          type: string
+          enum: *ref_33
+        networkType:
+          type: string
+          enum: *ref_34
+        imageId:
+          type: string
+          description: Optional image ID
+        metadata:
+          type: object
+          description: Optional tags or metadata
