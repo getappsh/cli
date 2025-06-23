@@ -27,9 +27,12 @@ jobs:
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          NEW_VERSION=$(npm version patch -m "chore: release version %s")
-          echo "new_version=${NEW_VERSION}" >> $GITHUB_ENV
-          git push origin project-refactor --tags
+          VERSION=$(npm version patch -m "chore: release version %s")
+          BRANCH_NAME=${GITHUB_REF_NAME}
+          TAG_NAME="${VERSION}-${BRANCH_NAME}"
+          echo "new_version=${TAG_NAME}" >> $GITHUB_ENV
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
 
       - name: Build and pack CLI
         run: |
