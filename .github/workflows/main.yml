@@ -151,13 +151,10 @@ jobs:
           MINOR=$(echo "$VERSION" | cut -d. -f2)
           PATCH_PART=$(echo "$VERSION" | cut -d. -f3)
           PATCH=$(echo "$PATCH_PART" | cut -d- -f1)
-          SUFFIX=$(echo "$PATCH_PART" | cut -s -d- -f2)
+          SUFFIX="${GITHUB_REF##*/}"
+          SUFFIX="${SUFFIX//\//-}"
           NEXT_PATCH=$((PATCH + 1))
-          if [[ -n "$SUFFIX" ]]; then
-            NEW_TAG="v$MAJOR.$MINOR.$NEXT_PATCH-$SUFFIX"
-          else
-            NEW_TAG="v$MAJOR.$MINOR.$NEXT_PATCH"
-          fi
+          NEW_TAG="v$MAJOR.$MINOR.$NEXT_PATCH-$SUFFIX"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "new tag is: $NEW_TAG"
 
