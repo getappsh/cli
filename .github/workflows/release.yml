@@ -3,7 +3,7 @@ name: Release CLI
 on:
   push:
     branches:
-      - project-refactor
+      - develop
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
