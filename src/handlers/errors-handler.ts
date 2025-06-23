@@ -1,7 +1,6 @@
-import axios from 'axios';
 import { refreshHandler } from "./login.handler.js";
 
-export const errorHandler = async (error, callback) => {
+export const errorHandler = async (error: any, callback?: () => any) => {
   if (error && !error.response) {
     console.error(error)
     process.exit(1)
@@ -19,7 +18,7 @@ export const errorHandler = async (error, callback) => {
     if (res.status === 401) {
       try {
         await refreshHandler()
-        return await callback()
+        return callback ? await callback() : null
         // return await axios(originalRequest)
       } catch (error) {
         errorHandler(error)

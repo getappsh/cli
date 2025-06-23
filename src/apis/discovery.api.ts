@@ -4,10 +4,10 @@ import { BASE_PATH, DISCOVERY } from "./paths.js";
 import { getTokens, readFromFile } from "../utils/files.js";
 import { errorHandler } from '../handlers/errors-handler.js';
 
-export const sendDiscoveryMessage = async (filePath) => {
+export const sendDiscoveryMessage = async (filePath: string) => {
   const path = BASE_PATH + DISCOVERY
 
-  const data = JSON.parse(await readFromFile(filePath))
+  const data = JSON.parse(await readFromFile(filePath) || "")
 
   const config = {
     headers: {

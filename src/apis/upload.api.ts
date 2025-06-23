@@ -6,7 +6,7 @@ import { getTokens, readFromFile } from '../utils/files.js';
 import { BASE_PATH, STATUS_UPDATE, UPLOAD_ARTIFACT, UPLOAD_MANIFEST } from './paths.js';
 import { errorHandler } from '../handlers/errors-handler.js';
 
-const artifactUpload = async (path, data, config) => {
+const artifactUpload = async (path: string, data: any, config: any) => {
   try {
     const res = await axios.post(path, data, config)
     console.log(res.data);
@@ -15,44 +15,46 @@ const artifactUpload = async (path, data, config) => {
   }
 }
 
-function getAssetType(path){
+function getAssetType(path: string) {
   let assetType = "artifact"
-  try{
+  try {
     const manifestContent = readFileSync(path, 'utf-8');
     const manifestJson = JSON.parse(manifestContent);
 
     assetType = manifestJson.assetType ?? assetType;
-  }catch(e){
+  } catch (e) {
     console.log('Failed to read manifest file, ' + e)
   }
   return assetType
 
 }
 
-const manifestUpload = async (path, data, config) => {
-  const body = new FormData();
-  body.append('file', createReadStream(data.manifestPath));
-  body.append('uploadToken', data.uploadToken)
+const manifestUpload = async (path: string, data: any, config: any) => {
+  const form = new FormData();
 
-  const updateStatus = {}
+
+  form.append('file', createReadStream(data.manifestPath));
+  form.append('uploadToken', data.uploadToken)
+
+  const updateStatus: any = {}
   updateStatus.uploadToken = data.uploadToken
 
   try {
     const assetType = getAssetType(data.manifestPath);
-    console.log("Asset type: " +  assetType);
+    console.log("Asset type: " + assetType);
 
-    const res = await axios.post(path, body, config)
+    const res = await axios.post(path, form, config)
     updateStatus.catalogId = res.data.catalogId
     console.log("Start file upload...");
-    
-    if (assetType == 'docker_image'){
+
+    if (assetType == 'docker_image') {
       console.log("Uploaded successfully");
       return
     }
     const fileData = createReadStream(data.filePath);
     const fileStat = statSync(data.filePath);
     try {
-      await axios.put(res.data.uploadUrl, fileData, {headers: {'Content-Length': fileStat.size}});
+      await axios.put(res.data.uploadUrl, fileData, { headers: { 'Content-Length': fileStat.size } });
       console.log("Uploaded successfully");
       updateStatus.status = "ready";
       const _statusRes = await axios.post(BASE_PATH + STATUS_UPDATE, updateStatus, config)
@@ -60,19 +62,19 @@ const manifestUpload = async (path, data, config) => {
     } catch (error) {
       updateStatus.status = "error";
       await axios.post(BASE_PATH + STATUS_UPDATE, updateStatus, config)
-      errorHandler(error, () => {}) 
+      errorHandler(error, () => { })
     }
   } catch (error) {
     errorHandler(error, () => manifestUpload(path, data, config));
   }
 }
 
-export const sendUploadMessage = async (detailsPath, filePath, uploadToken) => {
+export const sendUploadMessage = async (detailsPath: string, filePath: string, uploadToken: string) => {
 
   const config = {};
 
   if (!uploadToken) {
-    const data = JSON.parse(await readFromFile(detailsPath))
+    const data = JSON.parse(await readFromFile(detailsPath) || "")
     const path = BASE_PATH + UPLOAD_ARTIFACT
     artifactUpload(path, data, config)
   } else {
@@ -84,5 +86,4 @@ export const sendUploadMessage = async (detailsPath, filePath, uploadToken) => {
     )
   }
 }
-
 

@@ -1,4 +1,7 @@
 /node_modules
 .env
-data/login.json
+src/data/*
 jsons/
+dist/
+gac-data/
+

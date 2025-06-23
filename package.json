@@ -1,19 +1,33 @@
 {
-  "name": "getapp-cli",
-  "version": "1.1.2",
-  "type": "module",
-  "description": "cli for getApp",
+  "name": "gac",
+  "version": "1.1.9",
+  "description": "CLI for getApp",
   "main": "./GetAppCLI.js",
-  "bin": {
-    "gac": "./GetAppCLI.js"
+  "scripts": {
+    "dev": "set NODE_ENV=development && tsc && node ./dist/src/GetAppCLI.js",
+    "build": "node build.js && npx pkg ./dist/GetAppCLI.js --target node18-linux-x64,node18-win-x64,node18-macos-x64 -o ./dist/gac",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "axios": "^1.3.4",
+  "bin": {
+    "gac": "./dist/GetAppCLI.js"
+  },
+  "files": [
+    "dits/GetAppCLI.js",
+    "package.json"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "axios": "^1.7.9",
     "body-parser": "^1.20.2",
-    "commander": "^10.0.0",
+    "commander": "^10.0.1",
     "dotenv": "^16.0.3",
     "form-data": "^4.0.0",
     "readline": "^1.3.0",
-    "swagger-codegen": "^0.1.1"
+    "swagger-codegen": "^0.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2",
+    "@types/commander": "^2.12.5",
+    "@types/node": "^22.10.5",
+    "esbuild": "^0.24.2"
   }
 }
