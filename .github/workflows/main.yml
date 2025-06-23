@@ -193,10 +193,8 @@ jobs:
           build-args: upload_version_tag=${{ needs.calculate_new_tag.outputs.tag }}
 
   release_cli:
-    needs: calculate_new_tag
+    needs: [calculate_new_tag, tag_and_push]
     runs-on: ubuntu-latest
-    env:
-      NEW_VERSION: ${{ needs.calculate_new_tag.outputs.tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -210,13 +208,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Bump npm version (without creating new tag again)
-        run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          npm version --no-git-tag-version patch
-          npm pkg set version="$NEW_VERSION"
-
       - name: Build and pack CLI
         run: |
           npm run build
@@ -226,8 +217,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.NEW_VERSION }}
-          name: Release ${{ env.NEW_VERSION }}
+          tag_name: ${{ needs.calculate_new_tag.outputs.tag }}
+          name: Release ${{ needs.calculate_new_tag.outputs.tag }}
           draft: false
           prerelease: false
           files: |
