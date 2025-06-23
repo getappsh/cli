@@ -1,55 +1,55 @@
-name: Release CLI
+# name: Release CLI
 
-on:
-  push:
-    branches:
-      
-      - develop
-  workflow_dispatch: # Allows manual triggering of the workflow
+# on:
+#   push:
+#     branches:
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
+#       - develop
+#   workflow_dispatch: # Allows manual triggering of the workflow
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+# jobs:
+#   release:
+#     runs-on: ubuntu-latest
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18' # Use the Node.js version compatible with your CLI
-          cache: 'npm'
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: npm ci
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '18' # Use the Node.js version compatible with your CLI
+#           cache: 'npm'
 
-      - name: Commit and push a new version bump
-        run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          VERSION=$(npm version patch -m "chore: release version %s")
-          BRANCH_NAME=${GITHUB_REF_NAME}
-          TAG_NAME="${VERSION}-${BRANCH_NAME}"
-          echo "new_version=${TAG_NAME}" >> $GITHUB_ENV
-          git tag "$TAG_NAME"
-          git push origin "$TAG_NAME"
+#       - name: Install dependencies
+#         run: npm ci
 
-      - name: Build and pack CLI
-        run: |
-          npm run build
-          npm pack
-          mv *.tgz getapp-cli.tgz
+#       - name: Commit and push a new version bump
+#         run: |
+#           git config --local user.name "github-actions[bot]"
+#           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+#           VERSION=$(npm version patch -m "chore: release version %s")
+#           BRANCH_NAME=${GITHUB_REF_NAME}
+#           TAG_NAME="${VERSION}-${BRANCH_NAME}"
+#           echo "new_version=${TAG_NAME}" >> $GITHUB_ENV
+#           git tag "$TAG_NAME"
+#           git push origin "$TAG_NAME"
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.new_version }}
-          name: Release ${{ env.new_version }}
-          draft: false
-          prerelease: false
-          files: |
-            getapp-cli.tgz
+#       - name: Build and pack CLI
+#         run: |
+#           npm run build
+#           npm pack
+#           mv *.tgz getapp-cli.tgz
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Create GitHub Release
+#         uses: softprops/action-gh-release@v2
+#         with:
+#           tag_name: ${{ env.new_version }}
+#           name: Release ${{ env.new_version }}
+#           draft: false
+#           prerelease: false
+#           files: |
+#             getapp-cli.tgz
+
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
