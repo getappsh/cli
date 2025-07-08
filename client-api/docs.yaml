@@ -476,7 +476,7 @@ paths:
                 $ref: '#/components/schemas/RegulationStatusDto'
       tags: *ref_3
       security: *ref_4
-  /api/v1/catalog/offering/platform/{platformId}:
+  /api/v1/catalog/offering/platform/{platformIdentifier}:
     get:
       operationId: OfferingController_getOfferingForPlatform
       summary: Get Offering of Platform
@@ -484,12 +484,12 @@ paths:
         This service message allows retrieval of the offering of a specific
         platform by platform ID.
       parameters:
-        - name: platformId
+        - name: platformIdentifier
           required: true
           in: path
-          description: ID of the platform
+          description: Platform identifier (ID or name)
           schema:
-            type: number
+            type: string
       responses:
         '200':
           description: ''
@@ -501,7 +501,7 @@ paths:
         - Catalog - Offering
       security: &ref_6
         - bearer: []
-  /api/v1/catalog/offering/device-type/{deviceTypeId}:
+  /api/v1/catalog/offering/device-type/{deviceTypeIdentifier}:
     get:
       operationId: OfferingController_getOfferingForDeviceType
       summary: Get Offering of Device Type
@@ -509,12 +509,12 @@ paths:
         This service message allows retrieval of the offering of a specific
         device type by device type ID.
       parameters:
-        - name: deviceTypeId
+        - name: deviceTypeIdentifier
           required: true
           in: path
-          description: ID of the device type
+          description: Device type identifier (ID or name)
           schema:
-            type: number
+            type: string
       responses:
         '200':
           description: ''
@@ -545,6 +545,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectRefOfferingDto'
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/catalog/offering/component/{catalogId}:
+    get:
+      operationId: OfferingController_getOfferingOfComp
+      summary: Get Offering of Component
+      description: >-
+        This service message allows retrieval of the offering of a specific
+        component by catalog ID.
+      parameters:
+        - name: catalogId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentV2Dto'
       tags: *ref_5
       security: *ref_6
   /api/v1/catalog/offering/push:
@@ -2000,10 +2022,29 @@ paths:
         - Organization Groups
       security: &ref_16
         - bearer: []
+    get:
+      operationId: GroupController_getGroups
+      summary: Get all root groups with their child groups
+      parameters: []
+      responses:
+        '200':
+          description: Returns root group IDs and a mapping of all groups by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+      tags: *ref_15
+      security: *ref_16
+  /api/v1/org/groups/{groupId}:
     put:
       operationId: GroupController_editGroup
       summary: Edit Devices Group
-      parameters: []
+      parameters:
+        - name: groupId
+          required: true
+          in: path
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -2020,22 +2061,10 @@ paths:
       tags: *ref_15
       security: *ref_16
     get:
-      operationId: GroupController_getGroups
-      summary: Get root groups and its children groups and devices
-      parameters: []
-      responses:
-        '200':
-          description: Returns root group IDs and a mapping of all groups by ID
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupResponseDto'
-      tags: *ref_15
-      security: *ref_16
-  /api/v1/org/groups/{groupId}:
-    get:
       operationId: GroupController_getGroupById
-      summary: Get groups of the given id and its children groups and devices
+      summary: >-
+        Retrieve a group by its ID, including all its child groups and
+        associated devices
       parameters:
         - name: groupId
           required: true
@@ -2049,6 +2078,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChildGroupDto'
+      tags: *ref_15
+      security: *ref_16
+    delete:
+      operationId: GroupController_deleteGroup
+      summary: Delete Devices Group by ID
+      parameters:
+        - name: groupId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildGroupDto'
+      tags: *ref_15
+      security: *ref_16
+  /api/v1/org/groups/devices/{deviceId}:
+    get:
+      operationId: GroupController_getOrgDeviceData
+      summary: Get device org group data
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceOrgDto'
       tags: *ref_15
       security: *ref_16
   /api/v1/org/groups/devices:
@@ -2071,23 +2137,29 @@ paths:
                 $ref: '#/components/schemas/ChildGroupDto'
       tags: *ref_15
       security: *ref_16
-  /api/v1/device/register:
-    post:
-      operationId: DeviceController_register
-      summary: Register Device
-      description: >-
-        This service message allows the device registration process for GetApp
-        services.
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeviceRegisterDto'
+  /api/v1/device/devices:
+    get:
+      operationId: DeviceController_getRegisteredDevices
+      summary: Get Registered Devices
+      description: This service message allows retrieval of all registered devices.
+      parameters:
+        - name: groups
+          required: false
+          in: query
+          description: Array of groups IDs or a single group ID
+          schema:
+            type: array
+            items:
+              type: string
       responses:
-        '201':
+        '200':
           description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceDto'
       tags: &ref_17
         - Device
       security: &ref_18
@@ -2154,29 +2226,48 @@ paths:
                 $ref: '#/components/schemas/DevicesStatisticInfo'
       tags: *ref_17
       security: *ref_18
-  /api/v1/device/devices:
+  /api/v1/device/{deviceId}/maps:
     get:
-      operationId: DeviceController_getRegisteredDevices
-      summary: Get Registered Devices
-      description: This service message allows retrieval of all registered devices.
+      operationId: DeviceController_getDeviceMaps
+      summary: Get Device Maps
+      description: >-
+        This service message allows retrieval of all registered maps on the
+        given device.
       parameters:
-        - name: groups
-          required: false
-          in: query
-          description: Array of groups IDs or a single group ID
+        - name: deviceId
+          required: true
+          in: path
           schema:
-            type: array
-            items:
-              type: string
+            type: string
       responses:
         '200':
           description: ''
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DeviceDto'
+                $ref: '#/components/schemas/DeviceMapDto'
+      tags: *ref_17
+      security: *ref_18
+  /api/v1/device/{deviceId}/softwares:
+    get:
+      operationId: DeviceController_getDeviceSoftwares
+      summary: Get Device softwares
+      description: >-
+        This service message allows retrieval of all software on a process in a
+        given device.
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceSoftwareDto'
       tags: *ref_17
       security: *ref_18
   /api/v1/device/config/{deviceId}:
@@ -2235,6 +2326,25 @@ paths:
       tags: *ref_17
       security: *ref_18
   /api/v1/device/{deviceId}:
+    get:
+      operationId: DeviceController_getDeviceDetails
+      summary: Get Device meta data
+      description: This service message allow to get device meta data and properties
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+      tags: *ref_17
+      security: *ref_18
     put:
       operationId: DeviceController_putDeviceName
       summary: Set Device Name
@@ -2260,48 +2370,23 @@ paths:
                 $ref: '#/components/schemas/DevicePutDto'
       tags: *ref_17
       security: *ref_18
-  /api/v1/device/{deviceId}/maps:
-    get:
-      operationId: DeviceController_getDeviceMaps
-      summary: Get Device Maps
+  /api/v1/device/register:
+    post:
+      operationId: DeviceController_register
+      summary: Register Device
       description: >-
-        This service message allows retrieval of all registered maps on the
-        given device.
-      parameters:
-        - name: deviceId
-          required: true
-          in: path
-          schema:
-            type: string
+        This service message allows the device registration process for GetApp
+        services.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegisterDto'
       responses:
-        '200':
+        '201':
           description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeviceMapDto'
-      tags: *ref_17
-      security: *ref_18
-  /api/v1/device/{deviceId}/softwares:
-    get:
-      operationId: DeviceController_getDeviceSoftwares
-      summary: Get Device softwares
-      description: >-
-        This service message allows retrieval of all software on a process in a
-        given device.
-      parameters:
-        - name: deviceId
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeviceSoftwareDto'
       tags: *ref_17
       security: *ref_18
   /api/v1/device/info/installed/{deviceId}:
@@ -3387,29 +3472,38 @@ components:
             - MAP.requestInProgress
             - MAP.areaTooLarge
             - MAP.areaTooSmall
+            - PLATFORM.notFound
+            - DEVICE.notFound
+            - GROUP.notFound
+            - GROUP.notAllowedToAdd
           description: >-
-            `APP.unknown`: General Error code not listed in the enum <br />
-            `DELIVERY.unknown`: Error code not listed in the enum <br />
-            `DELIVERY.notFound`: No found the delivery with given catalog id <br
-            /> `DELIVERY.download`: Download of delivery item failed <br />
-            `DELIVERY.downloadNotAvailable`: Delivery item not yet available for
-            download <br /> `DELIVERY.notExist`: The Package not exist in
-            storage <br /> `DELIVERY.invalid`: Package of given catalog id is
-            invalid, maybe expired or some else <br /> `DELIVERY.notVerified`:
-            Package of given catalog id is not verified, the package can be in
-            valid <br /> `DELIVERY.packageTooLarge`:  Package of given catalog
-            id is too large, no space in cache<br />
-            `DELIVERY.unableClearCache`:  Some issue occurs when trying to clear
-            cache <br /> `MAP.unknown`: Error code not listed in the enum <br />
-            `MAP.notFound`: No found the map with given id <br />
-            `MAP.bBoxIsInvalid`: BBox is probably invalid <br />
-            `MAP.bBoxNotInAnyPolygon`: The given BBox in not contains in any
-            polygon <br /> `MAP.exportMapFailed`: Some error occurs when import
-            map <br /> `MAP.requestInProgress`: Delivery was already requested
-            and in processing! <br /> `MAP.areaTooLarge`: Area too large to
-            distribute, reduce request size and try again <br />
-            `MAP.areaTooSmall`: Area too small to distribute, increase request
-            size and try again . 
+            `APP.unknown`: General Error code not listed in the
+            enum.<br/>`DELIVERY.unknown`: Error code not listed in the
+            enum.<br/>`DELIVERY.notFound`: Delivery with given catalog id not
+            found.<br/>`DELIVERY.download`: Download of delivery item
+            failed.<br/>`DELIVERY.downloadNotAvailable`: Delivery item not yet
+            available for download.<br/>`DELIVERY.notExist`: The package does
+            not exist in storage.<br/>`DELIVERY.invalid`: Package of given
+            catalog id is invalid, maybe expired or
+            otherwise.<br/>`DELIVERY.notVerified`: Package of given catalog id
+            is not verified, the package may be
+            invalid.<br/>`DELIVERY.packageTooLarge`: Package of given catalog id
+            is too large, no space in cache.<br/>`DELIVERY.unableClearCache`:
+            Issue occurred when trying to clear cache.<br/>`MAP.unknown`: Error
+            code not listed in the enum.<br/>`MAP.notFound`: Map with given id
+            not found.<br/>`MAP.bBoxIsInvalid`: BBox is
+            invalid.<br/>`MAP.bBoxNotInAnyPolygon`: The given BBox is not
+            contained in any polygon.<br/>`MAP.getRecordsFailed`: Failed to get
+            records.<br/>`MAP.exportMapFailed`: Error occurred when exporting
+            map.<br/>`MAP.requestInProgress`: Delivery was already requested and
+            is processing.<br/>`MAP.areaTooLarge`: Area too large to distribute,
+            reduce request size and try again.<br/>`MAP.areaTooSmall`: Area too
+            small to distribute, increase request size and try
+            again.<br/>`PLATFORM.notFound`: Platform with given id or name not
+            found.<br/>`DEVICE.notFound`: Device with given id not
+            found.<br/>`GROUP_NOT_FOUND`: Group with the given id was not
+            found.<br/>`GROUP_NOT_ALLOWED_TO_ADD`: Not allowed to add to the
+            group, see message for cause.
         message:
           type: string
     PrepareDeliveryResDto:
@@ -3888,6 +3982,8 @@ components:
           type: string
         availableStorage:
           type: string
+      required:
+        - ID
     RegulationDto:
       type: object
       properties:
@@ -4538,6 +4634,11 @@ components:
             - Cancelled
             - Error
             - Uninstall
+        progress:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
         type:
           type: string
           enum:
@@ -4778,6 +4879,7 @@ components:
             - offering
             - push
             - delivery
+            - downloaded
             - deleted
             - deploy
             - installed
@@ -4811,7 +4913,7 @@ components:
         snapshotDate:
           type: string
           description: Timestamp when the discovery snapshot was taken
-          example: 2025-06-22T13:02:28.641Z
+          example: 2025-07-08T10:49:16.750Z
         deviceType:
           type: string
           description: >-
@@ -4923,6 +5025,8 @@ components:
           type: string
         description:
           type: string
+      required:
+        - name
     ChildGroupDto:
       type: object
       properties:
@@ -4947,14 +5051,10 @@ components:
     EditDevicesGroupDto:
       type: object
       properties:
-        id:
-          type: number
         name:
           type: string
         description:
           type: string
-      required:
-        - id
     GroupResponseDto:
       type: object
       properties:
@@ -4971,11 +5071,42 @@ components:
       required:
         - roots
         - groups
+    DeviceOrgDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        groupName:
+          type: string
+        platformName:
+          type: string
+        deviceTypeName:
+          type: string
+        groupId:
+          type: number
+        uid:
+          type: number
+        devices:
+          type: array
+          items:
+            type: string
+        deviceParentId:
+          type: string
+      required:
+        - id
     SetChildInGroupDto:
       type: object
       properties:
         id:
           type: number
+        parent:
+          type: number
+          nullable: true
+          description: >-
+            Parent group ID, if set to null then the existing parent will be
+            removed
         devices:
           type: array
           items:
@@ -4983,44 +5114,9 @@ components:
         groups:
           type: array
           items:
-            type: string
+            type: number
       required:
         - id
-    DeviceRegisterDto:
-      type: object
-      properties:
-        deviceId:
-          type: string
-        userName:
-          type: string
-    DevicesStatisticUnit:
-      type: object
-      properties:
-        sum:
-          type: number
-        devices:
-          type: array
-          items:
-            type: string
-      required:
-        - sum
-        - devices
-    DevicesStatisticInfo:
-      type: object
-      properties:
-        count:
-          $ref: '#/components/schemas/DevicesStatisticUnit'
-        updated:
-          $ref: '#/components/schemas/DevicesStatisticUnit'
-        onUpdateProcess:
-          $ref: '#/components/schemas/DevicesStatisticUnit'
-        updateError:
-          $ref: '#/components/schemas/DevicesStatisticUnit'
-      required:
-        - count
-        - updated
-        - onUpdateProcess
-        - updateError
     DeviceDto:
       type: object
       properties:
@@ -5054,8 +5150,200 @@ components:
           type: array
           items:
             type: string
+        platformName:
+          type: string
+        deviceTypeName:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+        deviceParentId:
+          type: string
       required:
         - id
+    DevicesStatisticUnit:
+      type: object
+      properties:
+        sum:
+          type: number
+        devices:
+          type: array
+          items:
+            type: string
+      required:
+        - sum
+        - devices
+    DevicesStatisticInfo:
+      type: object
+      properties:
+        count:
+          $ref: '#/components/schemas/DevicesStatisticUnit'
+        updated:
+          $ref: '#/components/schemas/DevicesStatisticUnit'
+        onUpdateProcess:
+          $ref: '#/components/schemas/DevicesStatisticUnit'
+        updateError:
+          $ref: '#/components/schemas/DevicesStatisticUnit'
+      required:
+        - count
+        - updated
+        - onUpdateProcess
+        - updateError
+    MapStateDto:
+      type: object
+      properties:
+        map:
+          $ref: '#/components/schemas/MapDto'
+        state:
+          type: string
+          enum:
+            - offering
+            - push
+            - import
+            - delivery
+            - deleted
+            - installed
+            - uninstalled
+        error:
+          type: string
+        downloadDate:
+          format: date-time
+          type: string
+        deployDate:
+          format: date-time
+          type: string
+    DeviceMapDto:
+      type: object
+      properties:
+        id:
+          type: string
+        lastUpdatedDate:
+          format: date-time
+          type: string
+        lastConnectionDate:
+          format: date-time
+          type: string
+        name:
+          type: string
+        OS:
+          type: string
+        availableStorage:
+          type: string
+        power:
+          type: number
+        bandwidth:
+          type: number
+        operativeState:
+          type: boolean
+        groupName:
+          type: string
+        groupId:
+          type: number
+        uid:
+          type: number
+        formations:
+          type: array
+          items:
+            type: string
+        platformName:
+          type: string
+        deviceTypeName:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+        deviceParentId:
+          type: string
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/MapStateDto'
+      required:
+        - id
+        - maps
+    SoftwareStateDto:
+      type: object
+      properties:
+        software:
+          $ref: '#/components/schemas/ComponentV2Dto'
+        state:
+          type: string
+          enum:
+            - offering
+            - push
+            - delivery
+            - downloaded
+            - deleted
+            - deploy
+            - installed
+            - uninstalled
+        downloadDate:
+          format: date-time
+          type: string
+        deployDate:
+          format: date-time
+          type: string
+        offering:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentV2Dto'
+        error:
+          type: string
+      required:
+        - software
+        - offering
+    DeviceSoftwareDto:
+      type: object
+      properties:
+        id:
+          type: string
+        lastUpdatedDate:
+          format: date-time
+          type: string
+        lastConnectionDate:
+          format: date-time
+          type: string
+        name:
+          type: string
+        OS:
+          type: string
+        availableStorage:
+          type: string
+        power:
+          type: number
+        bandwidth:
+          type: number
+        operativeState:
+          type: boolean
+        groupName:
+          type: string
+        groupId:
+          type: number
+        uid:
+          type: number
+        formations:
+          type: array
+          items:
+            type: string
+        platformName:
+          type: string
+        deviceTypeName:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+        deviceParentId:
+          type: string
+        softwares:
+          type: array
+          items:
+            $ref: '#/components/schemas/SoftwareStateDto'
+      required:
+        - id
+        - softwares
     AndroidConfigDto:
       type: object
       properties:
@@ -5246,139 +5534,13 @@ components:
         orgUID:
           type: number
           description: Set the unique given id or null to remove the exists uid.
-    MapStateDto:
+    DeviceRegisterDto:
       type: object
       properties:
-        map:
-          $ref: '#/components/schemas/MapDto'
-        state:
+        deviceId:
           type: string
-          enum:
-            - offering
-            - push
-            - import
-            - delivery
-            - deleted
-            - installed
-            - uninstalled
-        error:
+        userName:
           type: string
-        downloadDate:
-          format: date-time
-          type: string
-        deployDate:
-          format: date-time
-          type: string
-    DeviceMapDto:
-      type: object
-      properties:
-        id:
-          type: string
-        lastUpdatedDate:
-          format: date-time
-          type: string
-        lastConnectionDate:
-          format: date-time
-          type: string
-        name:
-          type: string
-        OS:
-          type: string
-        availableStorage:
-          type: string
-        power:
-          type: number
-        bandwidth:
-          type: number
-        operativeState:
-          type: boolean
-        groupName:
-          type: string
-        groupId:
-          type: number
-        uid:
-          type: number
-        formations:
-          type: array
-          items:
-            type: string
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/MapStateDto'
-      required:
-        - id
-        - maps
-    SoftwareStateDto:
-      type: object
-      properties:
-        software:
-          $ref: '#/components/schemas/ComponentV2Dto'
-        state:
-          type: string
-          enum:
-            - offering
-            - push
-            - delivery
-            - deleted
-            - deploy
-            - installed
-            - uninstalled
-        downloadDate:
-          format: date-time
-          type: string
-        deployDate:
-          format: date-time
-          type: string
-        offering:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentV2Dto'
-        error:
-          type: string
-      required:
-        - software
-        - offering
-    DeviceSoftwareDto:
-      type: object
-      properties:
-        id:
-          type: string
-        lastUpdatedDate:
-          format: date-time
-          type: string
-        lastConnectionDate:
-          format: date-time
-          type: string
-        name:
-          type: string
-        OS:
-          type: string
-        availableStorage:
-          type: string
-        power:
-          type: number
-        bandwidth:
-          type: number
-        operativeState:
-          type: boolean
-        groupName:
-          type: string
-        groupId:
-          type: number
-        uid:
-          type: number
-        formations:
-          type: array
-          items:
-            type: string
-        softwares:
-          type: array
-          items:
-            $ref: '#/components/schemas/SoftwareStateDto'
-      required:
-        - id
-        - softwares
     DeviceContentResDto:
       type: object
       properties:
