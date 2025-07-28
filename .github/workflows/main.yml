@@ -223,7 +223,7 @@ jobs:
           tag_name: ${{ needs.calculate_new_tag.outputs.tag }}
           name: Release ${{ needs.calculate_new_tag.outputs.tag }}
           draft: false
-          prerelease: true
+          prerelease: false
           files: |
             getapp-cli.tgz
         env:
