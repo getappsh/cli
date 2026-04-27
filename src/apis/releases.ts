@@ -2,7 +2,7 @@ import axios from "axios"
 import { conf } from "./paths"
 import { createReadStream } from "fs";
 import { stat } from "fs/promises";
-import { ProjectApiFp, RegulationDto, ReleaseDto, CatalogUploadApiFp, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
+import { CatalogUploadApiFp, ProjectApiFp, RegulationDto, ReleaseDto, SetRegulationStatusDto, SetReleaseArtifactDto, SetReleaseDto } from "../../client-api/src";
 
 export const getRel = async (projId: number, projToken: string, version: string): Promise<ReleaseDto> => {
   const setRelFn = await CatalogUploadApiFp(conf).releasesControllerGetRelease(projId.toString(), version, projToken)
