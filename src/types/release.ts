@@ -13,8 +13,10 @@ export interface UploadArtOptions {
   metadataFile?: string;
   name?: string
   deployable: boolean
+  executable?: boolean
   dockerImageUrl: string
   file?: string
+  args?: string
 }
 
 export enum FileType {

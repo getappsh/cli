@@ -45,6 +45,8 @@ relCmd
   .option('-d,  --deployable', 'Indicates that the artifact is a deployable installation file')
   .option('-f,  --file <path>', 'Specify the file path to the artifact to be uploaded (required for file type artifacts)')
   .option('-u,  --docker-image-url <url>', 'URL of the Docker image for the deployable artifact (required for Docker type artifacts)')
+  .option('-a,  --args <args>', 'Arguments to pass to the executable/installer when deploying (e.g., "INSTALL_PASSWORD=secret /quiet")')
+  .option('-e,  --executable', 'Marks the artifact as an executable file')
   .action((version: string, type: FileType, options: UploadArtOptions) => {
     handleUploadArt(version, type, options);
   });
