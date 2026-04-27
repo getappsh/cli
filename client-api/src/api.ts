@@ -26,6 +26,43 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AcceptPendingVersionDto
+ */
+export interface AcceptPendingVersionDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AcceptPendingVersionDto
+     */
+    'projectName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AcceptPendingVersionDto
+     */
+    'version': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AcceptPendingVersionDto
+     */
+    'isDraft'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof AcceptPendingVersionDto
+     */
+    'reason'?: string;
+    /**
+     * Username of the user accepting the version. Populated from auth token.
+     * @type {string}
+     * @memberof AcceptPendingVersionDto
+     */
+    'username'?: string;
+}
+/**
+ * 
+ * @export
  * @interface AddMemberToProjectDto
  */
 export interface AddMemberToProjectDto {
@@ -201,6 +238,18 @@ export interface AndroidConfigDto {
      * @memberof AndroidConfigDto
      */
     'controlMapPath'?: string;
+    /**
+     * Substring to match in ortophoto map filename
+     * @type {string}
+     * @memberof AndroidConfigDto
+     */
+    'ortophotoMapPattern'?: string;
+    /**
+     * Substring to match in control map filename
+     * @type {string}
+     * @memberof AndroidConfigDto
+     */
+    'controlMapPattern'?: string;
 }
 
 export const AndroidConfigDtoTargetStoragePolicyEnum = {
@@ -215,6 +264,68 @@ export type AndroidConfigDtoTargetStoragePolicyEnum = typeof AndroidConfigDtoTar
 /**
  * 
  * @export
+ * @interface ArtifactWarningDto
+ */
+export interface ArtifactWarningDto {
+    /**
+     * Artifact name that failed
+     * @type {string}
+     * @memberof ArtifactWarningDto
+     */
+    'artifactName': string;
+    /**
+     * Warning message
+     * @type {string}
+     * @memberof ArtifactWarningDto
+     */
+    'message': string;
+    /**
+     * Expected SHA256 hash
+     * @type {string}
+     * @memberof ArtifactWarningDto
+     */
+    'expectedSha256': string;
+    /**
+     * Actual SHA256 hash
+     * @type {string}
+     * @memberof ArtifactWarningDto
+     */
+    'actualSha256'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface AttachedReleaseDto
+ */
+export interface AttachedReleaseDto {
+    /**
+     * Catalog ID of the release
+     * @type {string}
+     * @memberof AttachedReleaseDto
+     */
+    'catalogId'?: string;
+    /**
+     * Version string of the release
+     * @type {string}
+     * @memberof AttachedReleaseDto
+     */
+    'version'?: string;
+    /**
+     * Project ID the release belongs to
+     * @type {string}
+     * @memberof AttachedReleaseDto
+     */
+    'projectId'?: string;
+    /**
+     * Project name the release belongs to
+     * @type {string}
+     * @memberof AttachedReleaseDto
+     */
+    'projectName'?: string;
+}
+/**
+ * 
+ * @export
  * @interface BaseProjectDto
  */
 export interface BaseProjectDto {
@@ -225,11 +336,17 @@ export interface BaseProjectDto {
      */
     'id': number;
     /**
-     * Name of the project
+     * Unique slug name of the project
      * @type {string}
      * @memberof BaseProjectDto
      */
     'name': string;
+    /**
+     * Human-friendly name of the project (not unique)
+     * @type {string}
+     * @memberof BaseProjectDto
+     */
+    'projectName'?: string;
     /**
      * 
      * @type {string}
@@ -248,11 +365,20 @@ export interface BaseProjectDto {
      * @memberof BaseProjectDto
      */
     'status'?: string;
+    /**
+     * Label name assigned to the project
+     * @type {string}
+     * @memberof BaseProjectDto
+     */
+    'label'?: string;
 }
 
 export const BaseProjectDtoProjectTypeEnum = {
     Product: 'product',
-    Formation: 'formation'
+    Application: 'application',
+    Lib: 'lib',
+    Bundle: 'bundle',
+    Infra: 'infra'
 } as const;
 
 export type BaseProjectDtoProjectTypeEnum = typeof BaseProjectDtoProjectTypeEnum[keyof typeof BaseProjectDtoProjectTypeEnum];
@@ -299,6 +425,30 @@ export interface BugReportDto {
      * @memberof BugReportDto
      */
     'reportDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BugReportDto
+     */
+    'startDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BugReportDto
+     */
+    'endDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BugReportDto
+     */
+    'logLevel'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof BugReportDto
+     */
+    'isUploaded': boolean;
 }
 /**
  * 
@@ -526,10 +676,28 @@ export interface ComponentV2Dto {
     'version': string;
     /**
      * 
+     * @type {number}
+     * @memberof ComponentV2Dto
+     */
+    'projectId': number;
+    /**
+     * 
      * @type {string}
      * @memberof ComponentV2Dto
      */
     'projectName': string;
+    /**
+     * Human-readable display name of the project
+     * @type {string}
+     * @memberof ComponentV2Dto
+     */
+    'displayName'?: string;
+    /**
+     * Label associated with the project
+     * @type {string}
+     * @memberof ComponentV2Dto
+     */
+    'label'?: string;
     /**
      * 
      * @type {string}
@@ -537,11 +705,11 @@ export interface ComponentV2Dto {
      */
     'releaseNotes'?: string;
     /**
-     * 
-     * @type {object}
+     * Component metadata including autoDeploy and postInstallAction configuration. Additional user-defined properties are supported.
+     * @type {ReleaseMetadata}
      * @memberof ComponentV2Dto
      */
-    'metadata'?: object;
+    'metadata'?: ReleaseMetadata;
     /**
      * 
      * @type {string}
@@ -552,8 +720,15 @@ export interface ComponentV2Dto {
      * 
      * @type {string}
      * @memberof ComponentV2Dto
+     * @deprecated
      */
     'type': ComponentV2DtoTypeEnum;
+    /**
+     * The actual project type, regardless of agent compatibility
+     * @type {string}
+     * @memberof ComponentV2Dto
+     */
+    'projectTypeV2'?: ComponentV2DtoProjectTypeV2Enum;
     /**
      * 
      * @type {number}
@@ -584,6 +759,18 @@ export interface ComponentV2Dto {
      * @memberof ComponentV2Dto
      */
     'releasedAt'?: string;
+    /**
+     * 
+     * @type {Array<ComponentV2Dto>}
+     * @memberof ComponentV2Dto
+     */
+    'dependencies'?: Array<ComponentV2Dto>;
+    /**
+     * Policies associated with this release
+     * @type {Array<ReleasePolicyDto>}
+     * @memberof ComponentV2Dto
+     */
+    'policies'?: Array<ReleasePolicyDto>;
 }
 
 export const ComponentV2DtoStatusEnum = {
@@ -591,16 +778,29 @@ export const ComponentV2DtoStatusEnum = {
     InReview: 'in_review',
     Approved: 'approved',
     Released: 'released',
-    Archived: 'archived'
+    Archived: 'archived',
+    Error: 'error'
 } as const;
 
 export type ComponentV2DtoStatusEnum = typeof ComponentV2DtoStatusEnum[keyof typeof ComponentV2DtoStatusEnum];
 export const ComponentV2DtoTypeEnum = {
     Product: 'product',
-    Formation: 'formation'
+    Application: 'application',
+    Lib: 'lib',
+    Bundle: 'bundle',
+    Infra: 'infra'
 } as const;
 
 export type ComponentV2DtoTypeEnum = typeof ComponentV2DtoTypeEnum[keyof typeof ComponentV2DtoTypeEnum];
+export const ComponentV2DtoProjectTypeV2Enum = {
+    Product: 'product',
+    Application: 'application',
+    Lib: 'lib',
+    Bundle: 'bundle',
+    Infra: 'infra'
+} as const;
+
+export type ComponentV2DtoProjectTypeV2Enum = typeof ComponentV2DtoProjectTypeV2Enum[keyof typeof ComponentV2DtoProjectTypeV2Enum];
 
 /**
  * @type ConfigDto
@@ -685,7 +885,8 @@ export interface CreateDeviceTypeDto {
 export const CreateDeviceTypeDtoOsEnum = {
     Android: 'android',
     Windows: 'windows',
-    Linux: 'linux'
+    Linux: 'linux',
+    Macos: 'macos'
 } as const;
 
 export type CreateDeviceTypeDtoOsEnum = typeof CreateDeviceTypeDtoOsEnum[keyof typeof CreateDeviceTypeDtoOsEnum];
@@ -813,13 +1014,15 @@ export interface CreateImportResDto {
 }
 
 export const CreateImportResDtoStatusEnum = {
+    Draft: 'Draft',
+    Pending: 'Pending',
     Start: 'Start',
     InProgress: 'InProgress',
-    Done: 'Done',
-    Cancel: 'Cancel',
     Pause: 'Pause',
+    Cancel: 'Cancel',
     Error: 'Error',
-    Pending: 'Pending',
+    Done: 'Done',
+    Discovered: 'Discovered',
     Expired: 'Expired',
     Archived: 'Archived'
 } as const;
@@ -903,7 +1106,8 @@ export interface CreatePlatformDto {
 export const CreatePlatformDtoOsEnum = {
     Android: 'android',
     Windows: 'windows',
-    Linux: 'linux'
+    Linux: 'linux',
+    Macos: 'macos'
 } as const;
 
 export type CreatePlatformDtoOsEnum = typeof CreatePlatformDtoOsEnum[keyof typeof CreatePlatformDtoOsEnum];
@@ -932,15 +1136,64 @@ export type CreatePlatformDtoNetworkTypeEnum = typeof CreatePlatformDtoNetworkTy
 /**
  * 
  * @export
+ * @interface CreatePolicyDto
+ */
+export interface CreatePolicyDto {
+    /**
+     * Policy name
+     * @type {string}
+     * @memberof CreatePolicyDto
+     */
+    'name': string;
+    /**
+     * Policy description
+     * @type {string}
+     * @memberof CreatePolicyDto
+     */
+    'description'?: string;
+    /**
+     * Policy associations
+     * @type {PolicyAssociationDto}
+     * @memberof CreatePolicyDto
+     */
+    'association': PolicyAssociationDto;
+    /**
+     * Whether the policy is active
+     * @type {boolean}
+     * @memberof CreatePolicyDto
+     */
+    'isActive'?: boolean;
+    /**
+     * Whether this policy should be pushed to agents
+     * @type {boolean}
+     * @memberof CreatePolicyDto
+     */
+    'isPush'?: boolean;
+    /**
+     * Rule engine compliant rule object
+     * @type {object}
+     * @memberof CreatePolicyDto
+     */
+    'rule': object;
+}
+/**
+ * 
+ * @export
  * @interface CreateProjectDto
  */
 export interface CreateProjectDto {
     /**
-     * 
+     * Unique identifier for the project (slug)
      * @type {string}
      * @memberof CreateProjectDto
      */
     'name': string;
+    /**
+     * Human-friendly name of the project (not unique)
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'projectName'?: string;
     /**
      * 
      * @type {string}
@@ -959,11 +1212,62 @@ export interface CreateProjectDto {
      * @memberof CreateProjectDto
      */
     'projectType'?: CreateProjectDtoProjectTypeEnum;
+    /**
+     * Label name to assign to the project
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'label'?: string;
+    /**
+     * Git repository clone URL (HTTPS or SSH)
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'gitCloneUrl'?: string;
+    /**
+     * SSH private key for git authentication (base64 encoded)
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'gitSshKey'?: string;
+    /**
+     * Interval in minutes for periodic git clone (default: 60 if git configured)
+     * @type {number}
+     * @memberof CreateProjectDto
+     */
+    'gitCloneInterval'?: number;
+    /**
+     * Branch to clone (defaults to repository default branch)
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'gitBranch'?: string;
+    /**
+     * Username for HTTPS git authentication
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'gitHttpsUsername'?: string;
+    /**
+     * Password or personal access token for HTTPS git authentication
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'gitHttpsPassword'?: string;
+    /**
+     * Path to the .getapp file within the repository (defaults to repo root)
+     * @type {string}
+     * @memberof CreateProjectDto
+     */
+    'gitGetappFilePath'?: string;
 }
 
 export const CreateProjectDtoProjectTypeEnum = {
     Product: 'product',
-    Formation: 'formation'
+    Application: 'application',
+    Lib: 'lib',
+    Bundle: 'bundle',
+    Infra: 'infra'
 } as const;
 
 export type CreateProjectDtoProjectTypeEnum = typeof CreateProjectDtoProjectTypeEnum[keyof typeof CreateProjectDtoProjectTypeEnum];
@@ -1045,6 +1349,131 @@ export interface CreateRegulationDto {
 /**
  * 
  * @export
+ * @interface CreateRestrictionDto
+ */
+export interface CreateRestrictionDto {
+    /**
+     * Restriction name
+     * @type {string}
+     * @memberof CreateRestrictionDto
+     */
+    'name': string;
+    /**
+     * Restriction description
+     * @type {string}
+     * @memberof CreateRestrictionDto
+     */
+    'description'?: string;
+    /**
+     * Restriction associations
+     * @type {RestrictionAssociationDto}
+     * @memberof CreateRestrictionDto
+     */
+    'association': RestrictionAssociationDto;
+    /**
+     * Whether the restriction is active
+     * @type {boolean}
+     * @memberof CreateRestrictionDto
+     */
+    'isActive'?: boolean;
+    /**
+     * Rule engine compliant rule object
+     * @type {object}
+     * @memberof CreateRestrictionDto
+     */
+    'rule': object;
+}
+/**
+ * 
+ * @export
+ * @interface CreateRuleFieldDto
+ */
+export interface CreateRuleFieldDto {
+    /**
+     * Field name in JSONPath format (e.g., $.battery.level)
+     * @type {string}
+     * @memberof CreateRuleFieldDto
+     */
+    'name': string;
+    /**
+     * Field data type
+     * @type {string}
+     * @memberof CreateRuleFieldDto
+     */
+    'type': string;
+    /**
+     * Human-readable label
+     * @type {string}
+     * @memberof CreateRuleFieldDto
+     */
+    'label': string;
+    /**
+     * Field description
+     * @type {string}
+     * @memberof CreateRuleFieldDto
+     */
+    'description'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface CreateScanPayload
+ */
+export interface CreateScanPayload {
+    /**
+     * Scan target (image name, file path, registry URL, etc.)
+     * @type {string}
+     * @memberof CreateScanPayload
+     */
+    'target': string;
+    /**
+     * Type of the scan target
+     * @type {string}
+     * @memberof CreateScanPayload
+     */
+    'targetType': CreateScanPayloadTargetTypeEnum;
+    /**
+     * SBOM output format
+     * @type {string}
+     * @memberof CreateScanPayload
+     */
+    'format'?: CreateScanPayloadFormatEnum;
+    /**
+     * Who or what triggered this scan (user ID, service name, etc.)
+     * @type {string}
+     * @memberof CreateScanPayload
+     */
+    'triggeredBy'?: string;
+    /**
+     * Set to true when `target` is a raw object key inside the MinIO bucket (e.g. upload/release/1/file.msi). sbom-generator will generate a fresh presigned URL at execution time. Required for file retries to work correctly.
+     * @type {boolean}
+     * @memberof CreateScanPayload
+     */
+    'isStoredInBucket'?: boolean;
+}
+
+export const CreateScanPayloadTargetTypeEnum = {
+    Docker: 'docker',
+    Registry: 'registry',
+    File: 'file',
+    Dir: 'dir',
+    OciArchive: 'oci-archive'
+} as const;
+
+export type CreateScanPayloadTargetTypeEnum = typeof CreateScanPayloadTargetTypeEnum[keyof typeof CreateScanPayloadTargetTypeEnum];
+export const CreateScanPayloadFormatEnum = {
+    SyftJson: 'syft-json',
+    SpdxJson: 'spdx-json',
+    CyclonedxJson: 'cyclonedx-json',
+    Table: 'table',
+    Text: 'text'
+} as const;
+
+export type CreateScanPayloadFormatEnum = typeof CreateScanPayloadFormatEnum[keyof typeof CreateScanPayloadFormatEnum];
+
+/**
+ * 
+ * @export
  * @interface DeleteFromCacheDto
  */
 export interface DeleteFromCacheDto {
@@ -1121,6 +1550,24 @@ export interface DeliveryItemDto {
      * @memberof DeliveryItemDto
      */
     'hash'?: HashDto;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeliveryItemDto
+     */
+    'signature'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DeliveryItemDto
+     */
+    'isExecutable'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeliveryItemDto
+     */
+    'arguments'?: string;
 }
 /**
  * 
@@ -1319,6 +1766,67 @@ export type DeployStatusDtoTypeEnum = typeof DeployStatusDtoTypeEnum[keyof typeo
 /**
  * 
  * @export
+ * @interface DeploymentReportDto
+ */
+export interface DeploymentReportDto {
+    /**
+     * Project ID
+     * @type {number}
+     * @memberof DeploymentReportDto
+     */
+    'projectId': number;
+    /**
+     * Release name
+     * @type {string}
+     * @memberof DeploymentReportDto
+     */
+    'releaseName': string;
+    /**
+     * Release version
+     * @type {string}
+     * @memberof DeploymentReportDto
+     */
+    'version': string;
+    /**
+     * Number of devices that have downloaded the release
+     * @type {number}
+     * @memberof DeploymentReportDto
+     */
+    'downloadedCount': number;
+    /**
+     * Number of devices with the release installed
+     * @type {number}
+     * @memberof DeploymentReportDto
+     */
+    'installedCount': number;
+    /**
+     * Total number of devices with ongoing delivery process (includes devices waiting for download and mid-deployment)
+     * @type {number}
+     * @memberof DeploymentReportDto
+     */
+    'total': number;
+    /**
+     * Number of devices that are pending (not downloaded or still downloading)
+     * @type {number}
+     * @memberof DeploymentReportDto
+     */
+    'pending': number;
+    /**
+     * Deployment percentage calculated as (installedCount / activeDeliveryCount) * 100
+     * @type {number}
+     * @memberof DeploymentReportDto
+     */
+    'deploymentPercentage': number;
+    /**
+     * List of devices with their deployment statuses
+     * @type {Array<DeviceDeploymentDetailDto>}
+     * @memberof DeploymentReportDto
+     */
+    'devices': Array<DeviceDeploymentDetailDto>;
+}
+/**
+ * 
+ * @export
  * @interface DetailedProjectDto
  */
 export interface DetailedProjectDto {
@@ -1329,11 +1837,17 @@ export interface DetailedProjectDto {
      */
     'id': number;
     /**
-     * Name of the project
+     * Unique slug name of the project
      * @type {string}
      * @memberof DetailedProjectDto
      */
     'name': string;
+    /**
+     * Human-friendly name of the project (not unique)
+     * @type {string}
+     * @memberof DetailedProjectDto
+     */
+    'projectName'?: string;
     /**
      * 
      * @type {string}
@@ -1352,6 +1866,12 @@ export interface DetailedProjectDto {
      * @memberof DetailedProjectDto
      */
     'status'?: string;
+    /**
+     * Label name assigned to the project
+     * @type {string}
+     * @memberof DetailedProjectDto
+     */
+    'label'?: string;
     /**
      * Owner of the project
      * @type {string}
@@ -1406,14 +1926,72 @@ export interface DetailedProjectDto {
      * @memberof DetailedProjectDto
      */
     'tokens'?: Array<ProjectTokenDto>;
+    /**
+     * Generated webhook URL for git integration
+     * @type {string}
+     * @memberof DetailedProjectDto
+     */
+    'gitWebhookUrl'?: string;
+    /**
+     * Git repository clone URL (HTTPS or SSH)
+     * @type {string}
+     * @memberof DetailedProjectDto
+     */
+    'gitCloneUrl'?: string;
+    /**
+     * Whether an SSH private key is configured for git authentication
+     * @type {boolean}
+     * @memberof DetailedProjectDto
+     */
+    'gitSshKeyConfigured'?: boolean;
+    /**
+     * Interval in minutes for periodic git clone
+     * @type {number}
+     * @memberof DetailedProjectDto
+     */
+    'gitCloneInterval'?: number;
+    /**
+     * Branch to clone (defaults to repository default branch)
+     * @type {string}
+     * @memberof DetailedProjectDto
+     */
+    'gitBranch'?: string;
+    /**
+     * Whether HTTPS username/password credentials are configured
+     * @type {boolean}
+     * @memberof DetailedProjectDto
+     */
+    'gitHttpsCredentialsConfigured'?: boolean;
+    /**
+     * Git authentication method in use
+     * @type {string}
+     * @memberof DetailedProjectDto
+     */
+    'gitAuthMethod'?: DetailedProjectDtoGitAuthMethodEnum;
+    /**
+     * Path to the .getapp file within the repository (defaults to repo root)
+     * @type {string}
+     * @memberof DetailedProjectDto
+     */
+    'gitGetappFilePath'?: string;
 }
 
 export const DetailedProjectDtoProjectTypeEnum = {
     Product: 'product',
-    Formation: 'formation'
+    Application: 'application',
+    Lib: 'lib',
+    Bundle: 'bundle',
+    Infra: 'infra'
 } as const;
 
 export type DetailedProjectDtoProjectTypeEnum = typeof DetailedProjectDtoProjectTypeEnum[keyof typeof DetailedProjectDtoProjectTypeEnum];
+export const DetailedProjectDtoGitAuthMethodEnum = {
+    SshKey: 'ssh_key',
+    HttpsCredentials: 'https_credentials',
+    None: 'none'
+} as const;
+
+export type DetailedProjectDtoGitAuthMethodEnum = typeof DetailedProjectDtoGitAuthMethodEnum[keyof typeof DetailedProjectDtoGitAuthMethodEnum];
 
 /**
  * 
@@ -1458,13 +2036,13 @@ export interface DetailedReleaseDto {
      */
     'releaseNotes': string;
     /**
-     * 
-     * @type {object}
+     * Release metadata including autoDeploy and postInstallAction configuration. Additional user-defined properties are supported.
+     * @type {ReleaseMetadata}
      * @memberof DetailedReleaseDto
      */
-    'metadata': object;
+    'metadata': ReleaseMetadata;
     /**
-     * 
+     * `draft`: Release is still being prepared. `in_review`: Submitted for review, not yet approved. `approved`: Approved but not yet released. `released`: Actively released and deployable. `archived`: No longer active. `error`: Release was previously released but one or more artifacts are missing from storage. Requires a user with `edit-released-release` permission to resolve.
      * @type {string}
      * @memberof DetailedReleaseDto
      */
@@ -1507,6 +2085,30 @@ export interface DetailedReleaseDto {
     'releasedAt'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof DetailedReleaseDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DetailedReleaseDto
+     */
+    'updatedBy'?: string;
+    /**
+     * Indicates if this release was imported from another system
+     * @type {boolean}
+     * @memberof DetailedReleaseDto
+     */
+    'isImported': boolean;
+    /**
+     * Indicates if this release is read-only. A release is read-only when its status is `released` or `error` and the current user does not have the `edit-released-release` permission.
+     * @type {boolean}
+     * @memberof DetailedReleaseDto
+     */
+    'readonly': boolean;
+    /**
+     * 
      * @type {Array<ReleaseArtifactDto>}
      * @memberof DetailedReleaseDto
      */
@@ -1517,6 +2119,12 @@ export interface DetailedReleaseDto {
      * @memberof DetailedReleaseDto
      */
     'dependencies'?: Array<ReleaseDto>;
+    /**
+     * Policies associated with this release
+     * @type {Array<ReleasePolicyDto>}
+     * @memberof DetailedReleaseDto
+     */
+    'policies'?: Array<ReleasePolicyDto>;
 }
 
 export const DetailedReleaseDtoStatusEnum = {
@@ -1524,7 +2132,8 @@ export const DetailedReleaseDtoStatusEnum = {
     InReview: 'in_review',
     Approved: 'approved',
     Released: 'released',
-    Archived: 'archived'
+    Archived: 'archived',
+    Error: 'error'
 } as const;
 
 export type DetailedReleaseDtoStatusEnum = typeof DetailedReleaseDtoStatusEnum[keyof typeof DetailedReleaseDtoStatusEnum];
@@ -1536,17 +2145,31 @@ export type DetailedReleaseDtoStatusEnum = typeof DetailedReleaseDtoStatusEnum[k
  */
 export interface DeviceComponentsOfferingDto {
     /**
-     * 
+     * Use \'releases\' field instead
      * @type {Array<ComponentV2Dto>}
      * @memberof DeviceComponentsOfferingDto
+     * @deprecated
      */
     'offer': Array<ComponentV2Dto>;
     /**
-     * 
+     * Use \'releases\' field instead
      * @type {Array<ComponentV2Dto>}
      * @memberof DeviceComponentsOfferingDto
+     * @deprecated
      */
     'push': Array<ComponentV2Dto>;
+    /**
+     * Components with all additional data of platform and device type hierarchy, project and actions
+     * @type {Array<ReleaseOfferingDto>}
+     * @memberof DeviceComponentsOfferingDto
+     */
+    'releases': Array<ReleaseOfferingDto>;
+    /**
+     * List of applicable restrictions for the device based on device ID, device type, OS, and other metadata
+     * @type {Array<RestrictionDto>}
+     * @memberof DeviceComponentsOfferingDto
+     */
+    'restrictions': Array<RestrictionDto>;
 }
 /**
  * 
@@ -1566,6 +2189,68 @@ export interface DeviceContentResDto {
      * @memberof DeviceContentResDto
      */
     'components': Array<ComponentDto>;
+}
+/**
+ * 
+ * @export
+ * @interface DeviceContextDto
+ */
+export interface DeviceContextDto {
+    /**
+     * ID of the discovery message used to build this context
+     * @type {string}
+     * @memberof DeviceContextDto
+     */
+    'discoveryMessageId': string;
+    /**
+     * The device evaluation context as used during rule evaluation
+     * @type {object}
+     * @memberof DeviceContextDto
+     */
+    'context': object;
+}
+/**
+ * 
+ * @export
+ * @interface DeviceDeploymentDetailDto
+ */
+export interface DeviceDeploymentDetailDto {
+    /**
+     * Device ID
+     * @type {string}
+     * @memberof DeviceDeploymentDetailDto
+     */
+    'deviceId': string;
+    /**
+     * Device name
+     * @type {string}
+     * @memberof DeviceDeploymentDetailDto
+     */
+    'deviceName'?: string;
+    /**
+     * Delivery status (e.g., DONE, PENDING, IN_PROGRESS)
+     * @type {string}
+     * @memberof DeviceDeploymentDetailDto
+     */
+    'deliveryStatus'?: string;
+    /**
+     * Deploy/Installation status (e.g., DONE, PENDING, IN_PROGRESS)
+     * @type {string}
+     * @memberof DeviceDeploymentDetailDto
+     */
+    'deployStatus'?: string;
+    /**
+     * Download completion timestamp
+     * @type {string}
+     * @memberof DeviceDeploymentDetailDto
+     */
+    'downloadTime'?: string;
+    /**
+     * Installation completion timestamp
+     * @type {string}
+     * @memberof DeviceDeploymentDetailDto
+     */
+    'installationTime'?: string;
 }
 /**
  * 
@@ -1654,6 +2339,12 @@ export interface DeviceDto {
     'operativeState'?: boolean;
     /**
      * 
+     * @type {object}
+     * @memberof DeviceDto
+     */
+    'metaData'?: object;
+    /**
+     * 
      * @type {string}
      * @memberof DeviceDto
      */
@@ -1700,6 +2391,49 @@ export interface DeviceDto {
      * @memberof DeviceDto
      */
     'deviceParentId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceDto
+     */
+    'deviceParentName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeviceDto
+     */
+    'deviceParentUid'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface DeviceFieldDto
+ */
+export interface DeviceFieldDto {
+    /**
+     * Field name in JSONPath format (e.g., $.battery.level)
+     * @type {string}
+     * @memberof DeviceFieldDto
+     */
+    'name': string;
+    /**
+     * Field data type (number, string, boolean)
+     * @type {string}
+     * @memberof DeviceFieldDto
+     */
+    'type': string;
+    /**
+     * Human-readable label for the field
+     * @type {string}
+     * @memberof DeviceFieldDto
+     */
+    'label'?: string;
+    /**
+     * Field description
+     * @type {string}
+     * @memberof DeviceFieldDto
+     */
+    'description'?: string;
 }
 /**
  * 
@@ -1763,6 +2497,12 @@ export interface DeviceMapDto {
     'operativeState'?: boolean;
     /**
      * 
+     * @type {object}
+     * @memberof DeviceMapDto
+     */
+    'metaData'?: object;
+    /**
+     * 
      * @type {string}
      * @memberof DeviceMapDto
      */
@@ -1809,6 +2549,18 @@ export interface DeviceMapDto {
      * @memberof DeviceMapDto
      */
     'deviceParentId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceMapDto
+     */
+    'deviceParentName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeviceMapDto
+     */
+    'deviceParentUid'?: number;
     /**
      * 
      * @type {Array<MapStateDto>}
@@ -1876,6 +2628,18 @@ export interface DeviceOrgDto {
      * @memberof DeviceOrgDto
      */
     'deviceParentId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceOrgDto
+     */
+    'deviceParentName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeviceOrgDto
+     */
+    'deviceParentUid'?: number;
 }
 /**
  * 
@@ -1894,7 +2658,13 @@ export interface DevicePutDto {
      * @type {number}
      * @memberof DevicePutDto
      */
-    'orgUID'?: number;
+    'orgUID'?: number | null;
+    /**
+     * Set group ID to associate the device with a specific group. set to null to remove the existing group association.
+     * @type {number}
+     * @memberof DevicePutDto
+     */
+    'groupId'?: number | null;
 }
 /**
  * 
@@ -2026,6 +2796,12 @@ export interface DeviceSoftwareDto {
     'operativeState'?: boolean;
     /**
      * 
+     * @type {object}
+     * @memberof DeviceSoftwareDto
+     */
+    'metaData'?: object;
+    /**
+     * 
      * @type {string}
      * @memberof DeviceSoftwareDto
      */
@@ -2072,6 +2848,18 @@ export interface DeviceSoftwareDto {
      * @memberof DeviceSoftwareDto
      */
     'deviceParentId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceSoftwareDto
+     */
+    'deviceParentName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeviceSoftwareDto
+     */
+    'deviceParentUid'?: number;
     /**
      * 
      * @type {Array<SoftwareStateDto>}
@@ -2174,7 +2962,8 @@ export interface DeviceTypeDto {
 export const DeviceTypeDtoOsEnum = {
     Android: 'android',
     Windows: 'windows',
-    Linux: 'linux'
+    Linux: 'linux',
+    Macos: 'macos'
 } as const;
 
 export type DeviceTypeDtoOsEnum = typeof DeviceTypeDtoOsEnum[keyof typeof DeviceTypeDtoOsEnum];
@@ -2249,6 +3038,49 @@ export interface DeviceTypeOfferingDto {
      * @memberof DeviceTypeOfferingDto
      */
     'projects'?: Array<ProjectRefOfferingDto>;
+}
+/**
+ * 
+ * @export
+ * @interface DeviceTypeProjectRefDto
+ */
+export interface DeviceTypeProjectRefDto {
+    /**
+     * ID of the device type
+     * @type {number}
+     * @memberof DeviceTypeProjectRefDto
+     */
+    'deviceTypeId'?: number;
+    /**
+     * Name of the device type
+     * @type {string}
+     * @memberof DeviceTypeProjectRefDto
+     */
+    'deviceTypeName'?: string;
+    /**
+     * ID of the project
+     * @type {number}
+     * @memberof DeviceTypeProjectRefDto
+     */
+    'projectId': number;
+    /**
+     * Name of the project
+     * @type {string}
+     * @memberof DeviceTypeProjectRefDto
+     */
+    'projectName': string;
+    /**
+     * Display name of the project
+     * @type {string}
+     * @memberof DeviceTypeProjectRefDto
+     */
+    'projectDisplayName'?: string;
+    /**
+     * Label of the project
+     * @type {string}
+     * @memberof DeviceTypeProjectRefDto
+     */
+    'projectLabel'?: string;
 }
 /**
  * 
@@ -2466,7 +3298,7 @@ export interface DiscoveryMessageV2Dto {
      * @type {string}
      * @memberof DiscoveryMessageV2Dto
      */
-    'id'?: string;
+    'id': string;
     /**
      * Timestamp when the discovery snapshot was taken
      * @type {string}
@@ -2474,11 +3306,11 @@ export interface DiscoveryMessageV2Dto {
      */
     'snapshotDate'?: string;
     /**
-     * Type of the discovered device (e.g., router, switch, server, etc.), used for discovery of devices of type \"device\"
+     * Name or ID (as string) of the deviceType (e.g., router, switch, server, etc.), used for discovery of devices of type \"device\"
      * @type {string}
      * @memberof DiscoveryMessageV2Dto
      */
-    'deviceType'?: string;
+    'deviceTypeToken'?: string;
     /**
      * Platform-specific discovery information containing device details and associated devices, used for discovery of devices of type \"platform\"
      * @type {PlatformDiscoverDto}
@@ -2504,11 +3336,11 @@ export interface DiscoveryMessageV2Dto {
      */
     'softwareData'?: DiscoverySoftwareV2Dto;
     /**
-     * 
-     * @type {DiscoveryMapDto}
+     * List of fields that the device supports for evaluation, including their types (e.g., number, string, boolean)
+     * @type {Array<DeviceFieldDto>}
      * @memberof DiscoveryMessageV2Dto
      */
-    'mapData'?: DiscoveryMapDto;
+    'supportedFields'?: Array<DeviceFieldDto>;
 }
 
 export const DiscoveryMessageV2DtoDiscoveryTypeEnum = {
@@ -2567,6 +3399,7 @@ export interface DiscoverySoftwareV2Dto {
      * 
      * @type {Array<string>}
      * @memberof DiscoverySoftwareV2Dto
+     * @deprecated
      */
     'formations'?: Array<string>;
     /**
@@ -2658,11 +3491,17 @@ export interface EditDevicesGroupDto {
  */
 export interface EditProjectDto {
     /**
-     * 
+     * Unique identifier for the project (slug)
      * @type {string}
      * @memberof EditProjectDto
      */
     'name'?: string;
+    /**
+     * Human-friendly name of the project (not unique)
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'projectName'?: string;
     /**
      * 
      * @type {string}
@@ -2676,6 +3515,54 @@ export interface EditProjectDto {
      */
     'platforms'?: Array<string>;
     /**
+     * Label name to assign to the project
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'label'?: string;
+    /**
+     * Git repository clone URL (HTTPS or SSH)
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'gitCloneUrl'?: string;
+    /**
+     * SSH private key for git authentication (base64 encoded)
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'gitSshKey'?: string;
+    /**
+     * Interval in minutes for periodic git clone (default: 60 if git configured)
+     * @type {number}
+     * @memberof EditProjectDto
+     */
+    'gitCloneInterval'?: number;
+    /**
+     * Branch to clone (defaults to repository default branch)
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'gitBranch'?: string;
+    /**
+     * Username for HTTPS git authentication
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'gitHttpsUsername'?: string;
+    /**
+     * Password or personal access token for HTTPS git authentication
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'gitHttpsPassword'?: string;
+    /**
+     * Path to the .getapp file within the repository (defaults to repo root)
+     * @type {string}
+     * @memberof EditProjectDto
+     */
+    'gitGetappFilePath'?: string;
+    /**
      * 
      * @type {string}
      * @memberof EditProjectDto
@@ -2685,7 +3572,10 @@ export interface EditProjectDto {
 
 export const EditProjectDtoProjectTypeEnum = {
     Product: 'product',
-    Formation: 'formation'
+    Application: 'application',
+    Lib: 'lib',
+    Bundle: 'bundle',
+    Infra: 'infra'
 } as const;
 
 export type EditProjectDtoProjectTypeEnum = typeof EditProjectDtoProjectTypeEnum[keyof typeof EditProjectDtoProjectTypeEnum];
@@ -2719,7 +3609,7 @@ export type EditProjectMemberDtoRoleEnum = typeof EditProjectMemberDtoRoleEnum[k
  */
 export interface ErrorDto {
     /**
-     * `APP.unknown`: General Error code not listed in the enum.<br/>`DELIVERY.unknown`: Error code not listed in the enum.<br/>`DELIVERY.notFound`: Delivery with given catalog id not found.<br/>`DELIVERY.download`: Download of delivery item failed.<br/>`DELIVERY.downloadNotAvailable`: Delivery item not yet available for download.<br/>`DELIVERY.notExist`: The package does not exist in storage.<br/>`DELIVERY.invalid`: Package of given catalog id is invalid, maybe expired or otherwise.<br/>`DELIVERY.notVerified`: Package of given catalog id is not verified, the package may be invalid.<br/>`DELIVERY.packageTooLarge`: Package of given catalog id is too large, no space in cache.<br/>`DELIVERY.unableClearCache`: Issue occurred when trying to clear cache.<br/>`MAP.unknown`: Error code not listed in the enum.<br/>`MAP.notFound`: Map with given id not found.<br/>`MAP.bBoxIsInvalid`: BBox is invalid.<br/>`MAP.bBoxNotInAnyPolygon`: The given BBox is not contained in any polygon.<br/>`MAP.getRecordsFailed`: Failed to get records.<br/>`MAP.exportMapFailed`: Error occurred when exporting map.<br/>`MAP.requestInProgress`: Delivery was already requested and is processing.<br/>`MAP.areaTooLarge`: Area too large to distribute, reduce request size and try again.<br/>`MAP.areaTooSmall`: Area too small to distribute, increase request size and try again.<br/>`PLATFORM.notFound`: Platform with given id or name not found.<br/>`DEVICE.notFound`: Device with given id not found.<br/>`GROUP_NOT_FOUND`: Group with the given id was not found.<br/>`GROUP_NOT_ALLOWED_TO_ADD`: Not allowed to add to the group, see message for cause.
+     * `APP.unknown`: General Error code not listed in the enum <br /> `DELIVERY.unknown`: Error code not listed in the enum <br /> `DELIVERY.notFound`: No found the delivery with given catalog id <br /> `DELIVERY.download`: Download of delivery item failed <br /> `DELIVERY.downloadNotAvailable`: Delivery item not yet available for download <br /> `DELIVERY.notExist`: The Package not exist in storage <br /> `DELIVERY.invalid`: Package of given catalog id is invalid, maybe expired or some else <br /> `DELIVERY.notVerified`: Package of given catalog id is not verified, the package can be in valid <br /> `DELIVERY.packageTooLarge`:  Package of given catalog id is too large, no space in cache<br /> `DELIVERY.unableClearCache`:  Some issue occurs when trying to clear cache <br /> `PROJECT_MANAGEMENT.unknown`: Error code not listed in the enum <br /> `PROJECT_MANAGEMENT.deleteProjectFailed`: Failed to delete the project <br /> `PROJECT_MANAGEMENT.webhookInvalid`: Webhook token is invalid or no matching project found <br /> `PROJECT_MANAGEMENT.labelNotFound`: Label with the given id or name was not found <br /> `PROJECT_MANAGEMENT.labelAlreadyExists`: Label with the given name already exists <br /> `PROJECT_MANAGEMENT.labelInUse`: Label cannot be deleted as it is being used by projects <br /> `MAP.unknown`: Error code not listed in the enum <br /> `MAP.notFound`: No found the map with given id <br /> `MAP.bBoxIsInvalid`: BBox is probably invalid <br /> `MAP.bBoxNotInAnyPolygon`: The given BBox in not contains in any polygon <br /> `MAP.getRecordsFailed`: Failed to get records.<br/>`MAP.exportMapFailed`: Some error occurs when import map <br /> `MAP.requestInProgress`: Delivery was already requested and in processing! <br /> `MAP.areaTooLarge`: Area too large to distribute, reduce request size and try again <br /> `MAP.areaTooSmall`: Area too small to distribute, increase request size and try again . `DEVICE.notFound`: Device with given id not found.<br/>`DEVICE.hasChildren`: Device has child devices and cannot be deleted.<br/>`DEVICE.hasChildren`: Cannot delete device because it has child devices.<br/>`DEVICE_DT_NOT_FOUND`: Device type with given id not found.<br/>`DEVICE_DT_ALREADY_EXISTS`: Device type with given name already exists.<br/>`DEVICE_PLATFORM.notFound`: Platform with given id or name not found.<br/>`DEVICE_PLATFORM_ALREADY_EXISTS`: Platform with given name already exists.<br/>`GROUP_NOT_FOUND`: Group with the given id was not found.<br/>`GROUP_NOT_ALLOWED_TO_ADD`: Not allowed to add to the group, see message for cause.<br/>`GROUP.orgIdUnknown`: Organization ID is unknown, see message for cause.<br/>`GROUP.orgIdNotAllowed`: Organization ID is not allowed to be used, see message for cause.<br/>`GROUP.orgIdConflict`: Organization ID conflict occurred.<br/>`GROUP.orgIdNotFound`: Organization ID not found.<br/>`RULE.validationFailed`: Rule validation against rule engine failed.<br/>`RULE.fieldNotSupported`: One or more fields in the rule are not supported.<br/>`RULE.fieldAlreadyExists`: Rule field with the given name already exists.<br/>`RULE.fieldNotFound`: Rule field with the given name was not found.<br/>`RELEASE.hasDependents`: Cannot delete release because other releases depend on it.
      * @type {string}
      * @memberof ErrorDto
      */
@@ -2743,6 +3633,12 @@ export const ErrorDtoErrorCodeEnum = {
     DeliveryNotVerified: 'DELIVERY.notVerified',
     DeliveryPackageTooLarge: 'DELIVERY.packageTooLarge',
     DeliveryUnableClearCache: 'DELIVERY.unableClearCache',
+    ProjectManagementUnknown: 'PROJECT_MANAGEMENT.unknown',
+    ProjectManagementDeleteProjectFailed: 'PROJECT_MANAGEMENT.deleteProjectFailed',
+    ProjectManagementWebhookInvalid: 'PROJECT_MANAGEMENT.webhookInvalid',
+    ProjectManagementLabelNotFound: 'PROJECT_MANAGEMENT.labelNotFound',
+    ProjectManagementLabelAlreadyExists: 'PROJECT_MANAGEMENT.labelAlreadyExists',
+    ProjectManagementLabelInUse: 'PROJECT_MANAGEMENT.labelInUse',
     MapUnknown: 'MAP.unknown',
     MapNotFound: 'MAP.notFound',
     MapBBoxIsInvalid: 'MAP.bBoxIsInvalid',
@@ -2752,14 +3648,310 @@ export const ErrorDtoErrorCodeEnum = {
     MapRequestInProgress: 'MAP.requestInProgress',
     MapAreaTooLarge: 'MAP.areaTooLarge',
     MapAreaTooSmall: 'MAP.areaTooSmall',
-    PlatformNotFound: 'PLATFORM.notFound',
     DeviceNotFound: 'DEVICE.notFound',
+    DeviceHasChildren: 'DEVICE.hasChildren',
+    DeviceTypeNotFound: 'DEVICE_TYPE.notFound',
+    DeviceTypeAlreadyExists: 'DEVICE_TYPE.alreadyExists',
+    DevicePlatformNotFound: 'DEVICE_PLATFORM.notFound',
+    DevicePlatformAlreadyExists: 'DEVICE_PLATFORM.alreadyExists',
     GroupNotFound: 'GROUP.notFound',
-    GroupNotAllowedToAdd: 'GROUP.notAllowedToAdd'
+    GroupNotAllowedToAdd: 'GROUP.notAllowedToAdd',
+    GroupOrgIdUnknown: 'GROUP.orgIdUnknown',
+    GroupOrgIdNotAllowed: 'GROUP.orgIdNotAllowed',
+    GroupOrgIdConflict: 'GROUP.orgIdConflict',
+    GroupOrgIdNotFound: 'GROUP.orgIdNotFound',
+    RuleValidationFailed: 'RULE.validationFailed',
+    RuleFieldNotSupported: 'RULE.fieldNotSupported',
+    RuleFieldAlreadyExists: 'RULE.fieldAlreadyExists',
+    RuleFieldNotFound: 'RULE.fieldNotFound',
+    ReleaseHasDependents: 'RELEASE.hasDependents'
 } as const;
 
 export type ErrorDtoErrorCodeEnum = typeof ErrorDtoErrorCodeEnum[keyof typeof ErrorDtoErrorCodeEnum];
 
+/**
+ * 
+ * @export
+ * @interface EvaluateRuleDto
+ */
+export interface EvaluateRuleDto {
+    /**
+     * ID of an existing rule to evaluate. Supply either this or `rule`.
+     * @type {string}
+     * @memberof EvaluateRuleDto
+     */
+    'ruleId'?: string;
+    /**
+     * Inline rule JSON (rule-engine format). Supply either this or `ruleId`.
+     * @type {object}
+     * @memberof EvaluateRuleDto
+     */
+    'rule'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface EvaluateRuleResultDto
+ */
+export interface EvaluateRuleResultDto {
+    /**
+     * Devices whose latest discovery data matched the rule
+     * @type {Array<EvaluatedDeviceDto>}
+     * @memberof EvaluateRuleResultDto
+     */
+    'matchingDevices': Array<EvaluatedDeviceDto>;
+    /**
+     * Total number of devices evaluated
+     * @type {number}
+     * @memberof EvaluateRuleResultDto
+     */
+    'totalDevicesEvaluated': number;
+    /**
+     * Number of devices that matched the rule
+     * @type {number}
+     * @memberof EvaluateRuleResultDto
+     */
+    'matchingCount': number;
+    /**
+     * Releases the policy is attached to (only present for saved policy rules)
+     * @type {Array<AttachedReleaseDto>}
+     * @memberof EvaluateRuleResultDto
+     */
+    'attachedReleases'?: Array<AttachedReleaseDto>;
+}
+/**
+ * 
+ * @export
+ * @interface EvaluatedDeviceDto
+ */
+export interface EvaluatedDeviceDto {
+    /**
+     * Unique device identifier
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'deviceId': string;
+    /**
+     * Human-readable device name
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'deviceName'?: string;
+    /**
+     * Operating system of the device
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'os'?: string;
+    /**
+     * IP address of the device
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'ip'?: string;
+    /**
+     * MAC address of the device
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'mac'?: string;
+    /**
+     * Serial number of the device
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'serialNumber'?: string;
+    /**
+     * Platform name the device belongs to
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'platformName'?: string;
+    /**
+     * Device type names assigned to the device
+     * @type {Array<string>}
+     * @memberof EvaluatedDeviceDto
+     */
+    'deviceTypeNames'?: Array<string>;
+    /**
+     * Names of the groups the device belongs to
+     * @type {Array<string>}
+     * @memberof EvaluatedDeviceDto
+     */
+    'groupNames'?: Array<string>;
+    /**
+     * ID of the discovery message used to build the evaluation context for this device
+     * @type {string}
+     * @memberof EvaluatedDeviceDto
+     */
+    'discoveryMessageId'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ExportArtifactDto
+ */
+export interface ExportArtifactDto {
+    /**
+     * Artifact file name
+     * @type {string}
+     * @memberof ExportArtifactDto
+     */
+    'name': string;
+    /**
+     * File size in bytes
+     * @type {number}
+     * @memberof ExportArtifactDto
+     */
+    'size': number;
+    /**
+     * SHA256 hash for integrity verification
+     * @type {string}
+     * @memberof ExportArtifactDto
+     */
+    'sha256': string;
+    /**
+     * Download URL for the artifact
+     * @type {string}
+     * @memberof ExportArtifactDto
+     */
+    'downloadUrl': string;
+    /**
+     * Additional metadata
+     * @type {object}
+     * @memberof ExportArtifactDto
+     */
+    'metadata'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface ExportDependencyDto
+ */
+export interface ExportDependencyDto {
+    /**
+     * Dependency catalog ID
+     * @type {string}
+     * @memberof ExportDependencyDto
+     */
+    'catalogId': string;
+    /**
+     * Dependency name
+     * @type {string}
+     * @memberof ExportDependencyDto
+     */
+    'name': string;
+    /**
+     * Dependency version
+     * @type {string}
+     * @memberof ExportDependencyDto
+     */
+    'version': string;
+}
+/**
+ * 
+ * @export
+ * @interface ExportDockerImageDto
+ */
+export interface ExportDockerImageDto {
+    /**
+     * Docker image name
+     * @type {string}
+     * @memberof ExportDockerImageDto
+     */
+    'name': string;
+    /**
+     * Docker image URL
+     * @type {string}
+     * @memberof ExportDockerImageDto
+     */
+    'imageUrl': string;
+    /**
+     * Additional metadata
+     * @type {object}
+     * @memberof ExportDockerImageDto
+     */
+    'metadata'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface ExportReleaseDto
+ */
+export interface ExportReleaseDto {
+    /**
+     * Release name
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'name': string;
+    /**
+     * Release version
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'version': string;
+    /**
+     * Release tag
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'tag'?: string;
+    /**
+     * Creation timestamp
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'createdAt': string;
+    /**
+     * Project identifier
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'project': string;
+    /**
+     * Release status
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'status': string;
+    /**
+     * Release notes
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'releaseNotes'?: string;
+    /**
+     * Author email
+     * @type {string}
+     * @memberof ExportReleaseDto
+     */
+    'author': string;
+    /**
+     * Release metadata
+     * @type {object}
+     * @memberof ExportReleaseDto
+     */
+    'metadata': object;
+    /**
+     * List of artifacts
+     * @type {Array<ExportArtifactDto>}
+     * @memberof ExportReleaseDto
+     */
+    'artifacts': Array<ExportArtifactDto>;
+    /**
+     * List of docker images
+     * @type {Array<ExportDockerImageDto>}
+     * @memberof ExportReleaseDto
+     */
+    'dockerImages'?: Array<ExportDockerImageDto>;
+    /**
+     * List of dependencies
+     * @type {Array<ExportDependencyDto>}
+     * @memberof ExportReleaseDto
+     */
+    'dependencies'?: Array<ExportDependencyDto>;
+}
 /**
  * 
  * @export
@@ -2784,6 +3976,12 @@ export interface GeneralDiscoveryDto {
      * @memberof GeneralDiscoveryDto
      */
     'physicalDevice'?: PhysicalDiscoveryDto;
+    /**
+     * 
+     * @type {object}
+     * @memberof GeneralDiscoveryDto
+     */
+    'metaData'?: object;
 }
 /**
  * 
@@ -2856,6 +4054,245 @@ export const HashDtoAlgorithmEnum = {
 
 export type HashDtoAlgorithmEnum = typeof HashDtoAlgorithmEnum[keyof typeof HashDtoAlgorithmEnum];
 
+/**
+ * 
+ * @export
+ * @interface ImportArtifactDto
+ */
+export interface ImportArtifactDto {
+    /**
+     * Artifact file name
+     * @type {string}
+     * @memberof ImportArtifactDto
+     */
+    'name': string;
+    /**
+     * Platform for the artifact (e.g., linux, macos, windows)
+     * @type {string}
+     * @memberof ImportArtifactDto
+     */
+    'platform'?: string;
+    /**
+     * File size in bytes
+     * @type {number}
+     * @memberof ImportArtifactDto
+     */
+    'size': number;
+    /**
+     * SHA256 hash for integrity verification
+     * @type {string}
+     * @memberof ImportArtifactDto
+     */
+    'sha256': string;
+    /**
+     * Download URL for the artifact (can be external or internal)
+     * @type {string}
+     * @memberof ImportArtifactDto
+     */
+    'downloadUrl': string;
+    /**
+     * Whether the artifact is executable
+     * @type {boolean}
+     * @memberof ImportArtifactDto
+     */
+    'isExecutable'?: boolean;
+    /**
+     * Command-line arguments for executable artifacts
+     * @type {string}
+     * @memberof ImportArtifactDto
+     */
+    'arguments'?: string;
+    /**
+     * Additional metadata
+     * @type {object}
+     * @memberof ImportArtifactDto
+     */
+    'metadata'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface ImportDependencyDto
+ */
+export interface ImportDependencyDto {
+    /**
+     * Dependency catalog ID
+     * @type {string}
+     * @memberof ImportDependencyDto
+     */
+    'catalogId': string;
+    /**
+     * Dependency name
+     * @type {string}
+     * @memberof ImportDependencyDto
+     */
+    'name': string;
+    /**
+     * Dependency version
+     * @type {string}
+     * @memberof ImportDependencyDto
+     */
+    'version': string;
+}
+/**
+ * 
+ * @export
+ * @interface ImportDockerImageDto
+ */
+export interface ImportDockerImageDto {
+    /**
+     * Docker image name
+     * @type {string}
+     * @memberof ImportDockerImageDto
+     */
+    'name': string;
+    /**
+     * Docker image URL
+     * @type {string}
+     * @memberof ImportDockerImageDto
+     */
+    'imageUrl': string;
+    /**
+     * Platform for the docker image
+     * @type {string}
+     * @memberof ImportDockerImageDto
+     */
+    'platform'?: string;
+    /**
+     * Additional metadata
+     * @type {object}
+     * @memberof ImportDockerImageDto
+     */
+    'metadata'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface ImportReleaseDto
+ */
+export interface ImportReleaseDto {
+    /**
+     * Release name
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'name'?: string;
+    /**
+     * Release version
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'version': string;
+    /**
+     * Release tag
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'tag'?: string;
+    /**
+     * Creation timestamp
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'createdAt': string;
+    /**
+     * Project identifier (name or ID)
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'project': string;
+    /**
+     * Project ID (set by API layer)
+     * @type {object}
+     * @memberof ImportReleaseDto
+     */
+    'projectIdentifier'?: object;
+    /**
+     * Release status
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'status'?: string;
+    /**
+     * Release notes
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'releaseNotes'?: string;
+    /**
+     * Author email
+     * @type {string}
+     * @memberof ImportReleaseDto
+     */
+    'author': string;
+    /**
+     * Release metadata
+     * @type {object}
+     * @memberof ImportReleaseDto
+     */
+    'metadata'?: object;
+    /**
+     * List of artifacts
+     * @type {Array<ImportArtifactDto>}
+     * @memberof ImportReleaseDto
+     */
+    'artifacts': Array<ImportArtifactDto>;
+    /**
+     * List of docker images
+     * @type {Array<ImportDockerImageDto>}
+     * @memberof ImportReleaseDto
+     */
+    'dockerImages'?: Array<ImportDockerImageDto>;
+    /**
+     * List of dependencies
+     * @type {Array<ImportDependencyDto>}
+     * @memberof ImportReleaseDto
+     */
+    'dependencies'?: Array<ImportDependencyDto>;
+}
+/**
+ * 
+ * @export
+ * @interface ImportReleaseResponseDto
+ */
+export interface ImportReleaseResponseDto {
+    /**
+     * Catalog ID of the created release
+     * @type {string}
+     * @memberof ImportReleaseResponseDto
+     */
+    'catalogId': string;
+    /**
+     * Release name
+     * @type {string}
+     * @memberof ImportReleaseResponseDto
+     */
+    'name': string;
+    /**
+     * Release version
+     * @type {string}
+     * @memberof ImportReleaseResponseDto
+     */
+    'version': string;
+    /**
+     * Release status
+     * @type {string}
+     * @memberof ImportReleaseResponseDto
+     */
+    'status': string;
+    /**
+     * List of warnings for artifacts that failed checksum validation
+     * @type {Array<ArtifactWarningDto>}
+     * @memberof ImportReleaseResponseDto
+     */
+    'warnings'?: Array<ArtifactWarningDto>;
+    /**
+     * Success message
+     * @type {string}
+     * @memberof ImportReleaseResponseDto
+     */
+    'message': string;
+}
 /**
  * 
  * @export
@@ -3031,19 +4468,96 @@ export interface ImportStatusResDto {
 }
 
 export const ImportStatusResDtoStatusEnum = {
+    Draft: 'Draft',
+    Pending: 'Pending',
     Start: 'Start',
     InProgress: 'InProgress',
-    Done: 'Done',
-    Cancel: 'Cancel',
     Pause: 'Pause',
+    Cancel: 'Cancel',
     Error: 'Error',
-    Pending: 'Pending',
+    Done: 'Done',
+    Discovered: 'Discovered',
     Expired: 'Expired',
     Archived: 'Archived'
 } as const;
 
 export type ImportStatusResDtoStatusEnum = typeof ImportStatusResDtoStatusEnum[keyof typeof ImportStatusResDtoStatusEnum];
 
+/**
+ * 
+ * @export
+ * @interface InventoryDetailsDto
+ */
+export interface InventoryDetailsDto {
+    /**
+     * the state of the device for current device
+     * @type {string}
+     * @memberof InventoryDetailsDto
+     */
+    'status': InventoryDetailsDtoStatusEnum;
+    /**
+     * Source of the map for this device — how the device obtained the map (e.g., \'generate\', \'shared\', \'storage\', \'update\', \'push\').
+     * @type {string}
+     * @memberof InventoryDetailsDto
+     */
+    'src'?: string;
+    /**
+     * The footprint of the map associated with the device.
+     * @type {string}
+     * @memberof InventoryDetailsDto
+     */
+    'footprint'?: string;
+    /**
+     * The name of map (generated from file name)
+     * @type {string}
+     * @memberof InventoryDetailsDto
+     */
+    'name'?: string;
+    /**
+     * The name of the file associated with the map.
+     * @type {string}
+     * @memberof InventoryDetailsDto
+     */
+    'fileName'?: string;
+}
+
+export const InventoryDetailsDtoStatusEnum = {
+    Offering: 'offering',
+    Push: 'push',
+    Import: 'import',
+    Delivery: 'delivery',
+    Deleted: 'deleted',
+    Installed: 'installed',
+    Uninstalled: 'uninstalled'
+} as const;
+
+export type InventoryDetailsDtoStatusEnum = typeof InventoryDetailsDtoStatusEnum[keyof typeof InventoryDetailsDtoStatusEnum];
+
+/**
+ * 
+ * @export
+ * @interface InventoryUpdateStatusResDto
+ */
+export interface InventoryUpdateStatusResDto {
+    /**
+     * Indicates whether the map is updated.
+     * @type {boolean}
+     * @memberof InventoryUpdateStatusResDto
+     */
+    'isUpdated': boolean;
+    /**
+     * Catalog ID of the map. a registered catalog ID if the map is unknown.
+     * @type {string}
+     * @memberof InventoryUpdateStatusResDto
+     */
+    'catalogId'?: string;
+    /**
+     * The updated map details if available.
+     * @type {MapDto}
+     * @memberof InventoryUpdateStatusResDto
+     */
+    'updatedMap'?: MapDto;
+}
 /**
  * 
  * @export
@@ -3079,6 +4593,25 @@ export type InventoryUpdatesReqDtoInventoryEnum = typeof InventoryUpdatesReqDtoI
 /**
  * 
  * @export
+ * @interface InventoryUpdatesReqV2Dto
+ */
+export interface InventoryUpdatesReqV2Dto {
+    /**
+     * 
+     * @type {string}
+     * @memberof InventoryUpdatesReqV2Dto
+     */
+    'deviceId': string;
+    /**
+     * 
+     * @type {{ [key: string]: InventoryDetailsDto; }}
+     * @memberof InventoryUpdatesReqV2Dto
+     */
+    'inventory': { [key: string]: InventoryDetailsDto; };
+}
+/**
+ * 
+ * @export
  * @interface InventoryUpdatesResDto
  */
 export interface InventoryUpdatesResDto {
@@ -3088,6 +4621,51 @@ export interface InventoryUpdatesResDto {
      * @memberof InventoryUpdatesResDto
      */
     'updates': { [key: string]: boolean; };
+}
+/**
+ * 
+ * @export
+ * @interface InventoryUpdatesResV2Dto
+ */
+export interface InventoryUpdatesResV2Dto {
+    /**
+     * 
+     * @type {{ [key: string]: InventoryUpdateStatusResDto; }}
+     * @memberof InventoryUpdatesResV2Dto
+     */
+    'updates': { [key: string]: InventoryUpdateStatusResDto; };
+}
+/**
+ * 
+ * @export
+ * @interface LabelDto
+ */
+export interface LabelDto {
+    /**
+     * Unique identifier of the label
+     * @type {number}
+     * @memberof LabelDto
+     */
+    'id': number;
+    /**
+     * Name of the label
+     * @type {string}
+     * @memberof LabelDto
+     */
+    'name': string;
+}
+/**
+ * 
+ * @export
+ * @interface LabelNameDto
+ */
+export interface LabelNameDto {
+    /**
+     * Name of the label
+     * @type {string}
+     * @memberof LabelNameDto
+     */
+    'name': string;
 }
 /**
  * 
@@ -3373,7 +4951,7 @@ export interface MapDevicesDto {
      * @type {string}
      * @memberof MapDevicesDto
      */
-    'status'?: string;
+    'status'?: MapDevicesDtoStatusEnum;
     /**
      * 
      * @type {string}
@@ -3386,6 +4964,18 @@ export interface MapDevicesDto {
      * @memberof MapDevicesDto
      */
     'packageUrl'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MapDevicesDto
+     */
+    'imagingStart'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MapDevicesDto
+     */
+    'imagingEnd'?: string;
     /**
      * 
      * @type {boolean}
@@ -3405,6 +4995,23 @@ export interface MapDevicesDto {
      */
     'devices'?: Array<string>;
 }
+
+export const MapDevicesDtoStatusEnum = {
+    Draft: 'Draft',
+    Pending: 'Pending',
+    Start: 'Start',
+    InProgress: 'InProgress',
+    Pause: 'Pause',
+    Cancel: 'Cancel',
+    Error: 'Error',
+    Done: 'Done',
+    Discovered: 'Discovered',
+    Expired: 'Expired',
+    Archived: 'Archived'
+} as const;
+
+export type MapDevicesDtoStatusEnum = typeof MapDevicesDtoStatusEnum[keyof typeof MapDevicesDtoStatusEnum];
+
 /**
  * 
  * @export
@@ -3464,7 +5071,7 @@ export interface MapDto {
      * @type {string}
      * @memberof MapDto
      */
-    'status'?: string;
+    'status'?: MapDtoStatusEnum;
     /**
      * 
      * @type {string}
@@ -3479,6 +5086,18 @@ export interface MapDto {
     'packageUrl'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof MapDto
+     */
+    'imagingStart'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MapDto
+     */
+    'imagingEnd'?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof MapDto
      */
@@ -3490,6 +5109,23 @@ export interface MapDto {
      */
     'product'?: MapProductResDto;
 }
+
+export const MapDtoStatusEnum = {
+    Draft: 'Draft',
+    Pending: 'Pending',
+    Start: 'Start',
+    InProgress: 'InProgress',
+    Pause: 'Pause',
+    Cancel: 'Cancel',
+    Error: 'Error',
+    Done: 'Done',
+    Discovered: 'Discovered',
+    Expired: 'Expired',
+    Archived: 'Archived'
+} as const;
+
+export type MapDtoStatusEnum = typeof MapDtoStatusEnum[keyof typeof MapDtoStatusEnum];
+
 /**
  * 
  * @export
@@ -3556,6 +5192,18 @@ export interface MapMetadatatDto {
      * @memberof MapMetadatatDto
      */
     'fileName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MapMetadatatDto
+     */
+    'imagingStart'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MapMetadatatDto
+     */
+    'imagingEnd'?: string;
 }
 /**
  * 
@@ -3577,19 +5225,19 @@ export interface MapOfferingConfig {
  */
 export interface MapProductResDto {
     /**
-     * 
+     * Unique identifier for the product (at polygon part method, it the specific polygon part id)
      * @type {string}
      * @memberof MapProductResDto
      */
     'id': string;
     /**
-     * 
+     * Unique identifier for the product
      * @type {string}
      * @memberof MapProductResDto
      */
     'productId': string;
     /**
-     * 
+     * Unique identifier for the product (not the specific polygon part id)
      * @type {string}
      * @memberof MapProductResDto
      */
@@ -3715,6 +5363,18 @@ export interface MapProperties {
      * @memberof MapProperties
      */
     'lastUpdateAfter'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof MapProperties
+     */
+    'catalogId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MapProperties
+     */
+    'fileName'?: string;
 }
 /**
  * 
@@ -3930,6 +5590,24 @@ export interface NewBugReportDto {
      * @memberof NewBugReportDto
      */
     'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewBugReportDto
+     */
+    'startDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewBugReportDto
+     */
+    'endDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NewBugReportDto
+     */
+    'logLevel'?: string;
 }
 /**
  * 
@@ -3948,7 +5626,38 @@ export interface NewBugReportResDto {
      * @type {string}
      * @memberof NewBugReportResDto
      */
-    'uploadLogsUrl': string;
+    'uploadEndpoint': string;
+}
+/**
+ * 
+ * @export
+ * @interface OSDto
+ */
+export interface OSDto {
+    /**
+     * Operating system identifier
+     * @type {string}
+     * @memberof OSDto
+     */
+    'id': string;
+    /**
+     * Operating system display name
+     * @type {string}
+     * @memberof OSDto
+     */
+    'name': string;
+    /**
+     * Operating system description
+     * @type {string}
+     * @memberof OSDto
+     */
+    'description'?: string;
+    /**
+     * Creation timestamp
+     * @type {string}
+     * @memberof OSDto
+     */
+    'createdAt': string;
 }
 /**
  * 
@@ -4080,6 +5789,112 @@ export interface OfferingResponseDto {
 /**
  * 
  * @export
+ * @interface OfferingTreePolicyDto
+ */
+export interface OfferingTreePolicyDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof OfferingTreePolicyDto
+     */
+    'platformId'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof OfferingTreePolicyDto
+     */
+    'deviceTypeId'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof OfferingTreePolicyDto
+     */
+    'projectId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof OfferingTreePolicyDto
+     */
+    'catalogId': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof OfferingTreePolicyDto
+     */
+    'latest': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof OfferingTreePolicyDto
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OfferingTreePolicyDto
+     */
+    'updatedAt': string;
+}
+/**
+ * 
+ * @export
+ * @interface OrgIdDto
+ */
+export interface OrgIdDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof OrgIdDto
+     */
+    'orgId': number;
+}
+/**
+ * 
+ * @export
+ * @interface OrgIdPutDto
+ */
+export interface OrgIdPutDto {
+    /**
+     * Device id related to the org id. Set to null to remove the current device.
+     * @type {string}
+     * @memberof OrgIdPutDto
+     */
+    'device'?: string | null;
+    /**
+     * Group parent id for the org id. Set to null to remove the current group parent.
+     * @type {number}
+     * @memberof OrgIdPutDto
+     */
+    'group'?: number | null;
+}
+/**
+ * 
+ * @export
+ * @interface OrgIdRefDto
+ */
+export interface OrgIdRefDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof OrgIdRefDto
+     */
+    'orgId': number;
+    /**
+     * Device id related to the org id. Set to null to remove the current device.
+     * @type {string}
+     * @memberof OrgIdRefDto
+     */
+    'device'?: string | null;
+    /**
+     * Group parent id for the org id. Set to null to remove the current group parent.
+     * @type {number}
+     * @memberof OrgIdRefDto
+     */
+    'group'?: number | null;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedBaseProjectDto
  */
 export interface PaginatedBaseProjectDto {
@@ -4142,6 +5957,37 @@ export interface PaginatedProjectDto {
 /**
  * 
  * @export
+ * @interface PaginatedProjectRefOfferingDto
+ */
+export interface PaginatedProjectRefOfferingDto {
+    /**
+     * 
+     * @type {Array<ProjectRefOfferingDto>}
+     * @memberof PaginatedProjectRefOfferingDto
+     */
+    'data': Array<ProjectRefOfferingDto>;
+    /**
+     * The total number of items available
+     * @type {number}
+     * @memberof PaginatedProjectRefOfferingDto
+     */
+    'total': number;
+    /**
+     * The current page number
+     * @type {number}
+     * @memberof PaginatedProjectRefOfferingDto
+     */
+    'page': number;
+    /**
+     * The number of items per page
+     * @type {number}
+     * @memberof PaginatedProjectRefOfferingDto
+     */
+    'perPage': number;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedResultDto
  */
 export interface PaginatedResultDto {
@@ -4169,6 +6015,107 @@ export interface PaginatedResultDto {
      * @memberof PaginatedResultDto
      */
     'perPage': number;
+}
+/**
+ * 
+ * @export
+ * @interface PendingVersionDto
+ */
+export interface PendingVersionDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof PendingVersionDto
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PendingVersionDto
+     */
+    'projectName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PendingVersionDto
+     */
+    'version': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PendingVersionDto
+     */
+    'catalogId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PendingVersionDto
+     */
+    'status': PendingVersionDtoStatusEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof PendingVersionDto
+     */
+    'reportedCount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PendingVersionDto
+     */
+    'firstReportedDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PendingVersionDto
+     */
+    'lastReportedDate': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof PendingVersionDto
+     */
+    'reportingDeviceIds': Array<string>;
+    /**
+     * 
+     * @type {object}
+     * @memberof PendingVersionDto
+     */
+    'metadata'?: object;
+    /**
+     * 
+     * @type {string}
+     * @memberof PendingVersionDto
+     */
+    'reason'?: string;
+}
+
+export const PendingVersionDtoStatusEnum = {
+    Pending: 'PENDING',
+    Accepted: 'ACCEPTED',
+    Rejected: 'REJECTED'
+} as const;
+
+export type PendingVersionDtoStatusEnum = typeof PendingVersionDtoStatusEnum[keyof typeof PendingVersionDtoStatusEnum];
+
+/**
+ * 
+ * @export
+ * @interface PendingVersionListDto
+ */
+export interface PendingVersionListDto {
+    /**
+     * 
+     * @type {Array<PendingVersionDto>}
+     * @memberof PendingVersionListDto
+     */
+    'versions': Array<PendingVersionDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof PendingVersionListDto
+     */
+    'total': number;
 }
 /**
  * 
@@ -4250,7 +6197,8 @@ export interface PhysicalDiscoveryDto {
 export const PhysicalDiscoveryDtoOSEnum = {
     Android: 'android',
     Windows: 'windows',
-    Linux: 'linux'
+    Linux: 'linux',
+    Macos: 'macos'
 } as const;
 
 export type PhysicalDiscoveryDtoOSEnum = typeof PhysicalDiscoveryDtoOSEnum[keyof typeof PhysicalDiscoveryDtoOSEnum];
@@ -4258,15 +6206,46 @@ export type PhysicalDiscoveryDtoOSEnum = typeof PhysicalDiscoveryDtoOSEnum[keyof
 /**
  * 
  * @export
+ * @interface PlatformDeviceTypeTreeDto
+ */
+export interface PlatformDeviceTypeTreeDto {
+    /**
+     * Platform Type ID - present when device types are under a platform type
+     * @type {number}
+     * @memberof PlatformDeviceTypeTreeDto
+     */
+    'platformTypeId'?: number;
+    /**
+     * Platform Type name - present when device types are under a platform type
+     * @type {string}
+     * @memberof PlatformDeviceTypeTreeDto
+     */
+    'platformTypeName'?: string;
+    /**
+     * Device types with projects (under platform if platform fields are present, or standalone)
+     * @type {Array<DeviceTypeProjectRefDto>}
+     * @memberof PlatformDeviceTypeTreeDto
+     */
+    'deviceTypes': Array<DeviceTypeProjectRefDto>;
+}
+/**
+ * 
+ * @export
  * @interface PlatformDiscoverDto
  */
 export interface PlatformDiscoverDto {
     /**
-     * Name of the platform or system being discovered
+     * Name or ID (as string) of the platform **type** being discovered.
      * @type {string}
      * @memberof PlatformDiscoverDto
      */
-    'name': string;
+    'token': string;
+    /**
+     * ID (as string) of system or machine being discovered.
+     * @type {string}
+     * @memberof PlatformDiscoverDto
+     */
+    'platformId'?: string;
     /**
      * Array of devices discovered within this platform. Each device contains detailed discovery information of type \"DiscoveryMessageV2Dto\".
      * @type {Array<DiscoveryMessageV2Dto>}
@@ -4369,7 +6348,8 @@ export interface PlatformDto {
 export const PlatformDtoOsEnum = {
     Android: 'android',
     Windows: 'windows',
-    Linux: 'linux'
+    Linux: 'linux',
+    Macos: 'macos'
 } as const;
 
 export type PlatformDtoOsEnum = typeof PlatformDtoOsEnum[keyof typeof PlatformDtoOsEnum];
@@ -4448,6 +6428,53 @@ export interface PlatformOfferingDto {
 /**
  * 
  * @export
+ * @interface PolicyAssociationDto
+ */
+export interface PolicyAssociationDto {
+    /**
+     * Releases for this policy
+     * @type {Array<ReleaseIdentifierDto>}
+     * @memberof PolicyAssociationDto
+     */
+    'releases': Array<ReleaseIdentifierDto>;
+}
+/**
+ * 
+ * @export
+ * @interface PostInstallAction
+ */
+export interface PostInstallAction {
+    /**
+     * Action type: NONE (no action), WEB (open URL), or EXE (run executable)
+     * @type {string}
+     * @memberof PostInstallAction
+     */
+    'type': PostInstallActionTypeEnum;
+    /**
+     * URL to open (required when type is WEB)
+     * @type {string}
+     * @memberof PostInstallAction
+     */
+    'url'?: string;
+    /**
+     * Executable path to run (required when type is EXE)
+     * @type {string}
+     * @memberof PostInstallAction
+     */
+    'exePath'?: string;
+}
+
+export const PostInstallActionTypeEnum = {
+    None: 'NONE',
+    Web: 'WEB',
+    Exe: 'EXE'
+} as const;
+
+export type PostInstallActionTypeEnum = typeof PostInstallActionTypeEnum[keyof typeof PostInstallActionTypeEnum];
+
+/**
+ * 
+ * @export
  * @interface PrepareDeliveryReqDto
  */
 export interface PrepareDeliveryReqDto {
@@ -4469,6 +6496,12 @@ export interface PrepareDeliveryReqDto {
      * @memberof PrepareDeliveryReqDto
      */
     'itemType': PrepareDeliveryReqDtoItemTypeEnum;
+    /**
+     * Custom download folder path — used for agent CORE A2A relay, not consumed by the server.
+     * @type {string}
+     * @memberof PrepareDeliveryReqDto
+     */
+    'downloadFolder'?: string;
 }
 
 export const PrepareDeliveryReqDtoItemTypeEnum = {
@@ -4554,11 +6587,17 @@ export interface ProjectDto {
      */
     'id': number;
     /**
-     * Name of the project
+     * Unique slug name of the project
      * @type {string}
      * @memberof ProjectDto
      */
     'name': string;
+    /**
+     * Human-friendly name of the project (not unique)
+     * @type {string}
+     * @memberof ProjectDto
+     */
+    'projectName'?: string;
     /**
      * 
      * @type {string}
@@ -4577,6 +6616,12 @@ export interface ProjectDto {
      * @memberof ProjectDto
      */
     'status'?: string;
+    /**
+     * Label name assigned to the project
+     * @type {string}
+     * @memberof ProjectDto
+     */
+    'label'?: string;
     /**
      * Owner of the project
      * @type {string}
@@ -4617,7 +6662,10 @@ export interface ProjectDto {
 
 export const ProjectDtoProjectTypeEnum = {
     Product: 'product',
-    Formation: 'formation'
+    Application: 'application',
+    Lib: 'lib',
+    Bundle: 'bundle',
+    Infra: 'infra'
 } as const;
 
 export type ProjectDtoProjectTypeEnum = typeof ProjectDtoProjectTypeEnum[keyof typeof ProjectDtoProjectTypeEnum];
@@ -4670,7 +6718,7 @@ export interface ProjectMemberPreferencesDto {
  */
 export interface ProjectRefDto {
     /**
-     * Name of the project
+     * Unique name of the project
      * @type {string}
      * @memberof ProjectRefDto
      */
@@ -4681,6 +6729,18 @@ export interface ProjectRefDto {
      * @memberof ProjectRefDto
      */
     'projectId': number;
+    /**
+     * Display name of the project
+     * @type {string}
+     * @memberof ProjectRefDto
+     */
+    'displayName'?: string;
+    /**
+     * Label of the project
+     * @type {string}
+     * @memberof ProjectRefDto
+     */
+    'label'?: string;
 }
 /**
  * 
@@ -4700,6 +6760,18 @@ export interface ProjectRefOfferingDto {
      * @memberof ProjectRefOfferingDto
      */
     'projectId': number;
+    /**
+     * Display name of the project
+     * @type {string}
+     * @memberof ProjectRefOfferingDto
+     */
+    'displayName'?: string;
+    /**
+     * Label of the project
+     * @type {string}
+     * @memberof ProjectRefOfferingDto
+     */
+    'label'?: string;
     /**
      * 
      * @type {ComponentV2Dto}
@@ -5090,6 +7162,31 @@ export interface RegulationTypeDto {
 /**
  * 
  * @export
+ * @interface RejectPendingVersionDto
+ */
+export interface RejectPendingVersionDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof RejectPendingVersionDto
+     */
+    'projectName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RejectPendingVersionDto
+     */
+    'version': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RejectPendingVersionDto
+     */
+    'reason'?: string;
+}
+/**
+ * 
+ * @export
  * @interface ReleaseArtifactDto
  */
 export interface ReleaseArtifactDto {
@@ -5131,6 +7228,18 @@ export interface ReleaseArtifactDto {
     'dockerImageUrl'?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ReleaseArtifactDto
+     */
+    'isExecutable'?: boolean;
+    /**
+     * 
+     * @type {object}
+     * @memberof ReleaseArtifactDto
+     */
+    'arguments'?: object;
+    /**
+     * 
      * @type {number}
      * @memberof ReleaseArtifactDto
      */
@@ -5147,6 +7256,36 @@ export interface ReleaseArtifactDto {
      * @memberof ReleaseArtifactDto
      */
     'size'?: number;
+    /**
+     * Upload/download progress percentage (0-100). Check status field for errors.
+     * @type {number}
+     * @memberof ReleaseArtifactDto
+     */
+    'progress'?: number;
+    /**
+     * Error message when status indicates an error
+     * @type {string}
+     * @memberof ReleaseArtifactDto
+     */
+    'error'?: string;
+    /**
+     * SHA256 hash of the file
+     * @type {string}
+     * @memberof ReleaseArtifactDto
+     */
+    'sha256'?: string;
+    /**
+     * Whether SBOM scan is enabled for this artifact
+     * @type {boolean}
+     * @memberof ReleaseArtifactDto
+     */
+    'enableSbomScan'?: boolean;
+    /**
+     * SBOM scan ID associated with this artifact
+     * @type {string}
+     * @memberof ReleaseArtifactDto
+     */
+    'sbomScanId'?: string;
 }
 
 export const ReleaseArtifactDtoTypeEnum = {
@@ -5158,7 +7297,9 @@ export type ReleaseArtifactDtoTypeEnum = typeof ReleaseArtifactDtoTypeEnum[keyof
 export const ReleaseArtifactDtoStatusEnum = {
     Uploaded: 'uploaded',
     Pending: 'pending',
-    Removed: 'removed'
+    Uploading: 'uploading',
+    Removed: 'removed',
+    Error: 'error'
 } as const;
 
 export type ReleaseArtifactDtoStatusEnum = typeof ReleaseArtifactDtoStatusEnum[keyof typeof ReleaseArtifactDtoStatusEnum];
@@ -5206,13 +7347,13 @@ export interface ReleaseDto {
      */
     'releaseNotes': string;
     /**
-     * 
-     * @type {object}
+     * Release metadata including autoDeploy and postInstallAction configuration. Additional user-defined properties are supported.
+     * @type {ReleaseMetadata}
      * @memberof ReleaseDto
      */
-    'metadata': object;
+    'metadata': ReleaseMetadata;
     /**
-     * 
+     * `draft`: Release is still being prepared. `in_review`: Submitted for review, not yet approved. `approved`: Approved but not yet released. `released`: Actively released and deployable. `archived`: No longer active. `error`: Release was previously released but one or more artifacts are missing from storage. Requires a user with `edit-released-release` permission to resolve.
      * @type {string}
      * @memberof ReleaseDto
      */
@@ -5253,6 +7394,30 @@ export interface ReleaseDto {
      * @memberof ReleaseDto
      */
     'releasedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReleaseDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReleaseDto
+     */
+    'updatedBy'?: string;
+    /**
+     * Indicates if this release was imported from another system
+     * @type {boolean}
+     * @memberof ReleaseDto
+     */
+    'isImported': boolean;
+    /**
+     * Indicates if this release is read-only. A release is read-only when its status is `released` or `error` and the current user does not have the `edit-released-release` permission.
+     * @type {boolean}
+     * @memberof ReleaseDto
+     */
+    'readonly': boolean;
 }
 
 export const ReleaseDtoStatusEnum = {
@@ -5260,10 +7425,286 @@ export const ReleaseDtoStatusEnum = {
     InReview: 'in_review',
     Approved: 'approved',
     Released: 'released',
-    Archived: 'archived'
+    Archived: 'archived',
+    Error: 'error'
 } as const;
 
 export type ReleaseDtoStatusEnum = typeof ReleaseDtoStatusEnum[keyof typeof ReleaseDtoStatusEnum];
+
+/**
+ * 
+ * @export
+ * @interface ReleaseIdentifierDto
+ */
+export interface ReleaseIdentifierDto {
+    /**
+     * Project ID
+     * @type {string}
+     * @memberof ReleaseIdentifierDto
+     */
+    'projectId'?: string;
+    /**
+     * Project name
+     * @type {string}
+     * @memberof ReleaseIdentifierDto
+     */
+    'projectName': string;
+    /**
+     * Release version
+     * @type {string}
+     * @memberof ReleaseIdentifierDto
+     */
+    'version': string;
+}
+/**
+ * 
+ * @export
+ * @interface ReleaseMetadata
+ */
+export interface ReleaseMetadata {
+    /**
+     * Enable automatic deployment of this release
+     * @type {boolean}
+     * @memberof ReleaseMetadata
+     */
+    'autoDeploy'?: boolean;
+    /**
+     * Post-installation action configuration
+     * @type {PostInstallAction}
+     * @memberof ReleaseMetadata
+     */
+    'postInstallAction'?: PostInstallAction;
+    /**
+     * Installation size in bytes - disk space required after installation (user-specified)
+     * @type {number}
+     * @memberof ReleaseMetadata
+     */
+    'installationSize'?: number;
+    /**
+     * Total size in bytes - automatically calculated as installationSize + artifactsSize
+     * @type {number}
+     * @memberof ReleaseMetadata
+     */
+    'totalSize'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface ReleaseOfferingDto
+ */
+export interface ReleaseOfferingDto {
+    /**
+     * Release component data
+     * @type {ComponentV2Dto}
+     * @memberof ReleaseOfferingDto
+     */
+    'release': ComponentV2Dto;
+    /**
+     * Flag indicating if this is a push action
+     * @type {boolean}
+     * @memberof ReleaseOfferingDto
+     */
+    'isPush'?: boolean;
+    /**
+     * Platform and device type hierarchy where this release is offered
+     * @type {Array<PlatformDeviceTypeTreeDto>}
+     * @memberof ReleaseOfferingDto
+     */
+    'hierarchyTrees': Array<PlatformDeviceTypeTreeDto>;
+    /**
+     * Array of catalog IDs of releases that directly depend on this release
+     * @type {Array<string>}
+     * @memberof ReleaseOfferingDto
+     */
+    'dependedOnBy'?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface ReleasePolicyDto
+ */
+export interface ReleasePolicyDto {
+    /**
+     * Policy rule ID
+     * @type {string}
+     * @memberof ReleasePolicyDto
+     */
+    'id': string;
+    /**
+     * Policy name
+     * @type {string}
+     * @memberof ReleasePolicyDto
+     */
+    'name': string;
+    /**
+     * Policy description
+     * @type {string}
+     * @memberof ReleasePolicyDto
+     */
+    'description'?: string;
+    /**
+     * Policy type
+     * @type {string}
+     * @memberof ReleasePolicyDto
+     */
+    'type': ReleasePolicyDtoTypeEnum;
+    /**
+     * Policy associations (releases, device types, OS types, devices)
+     * @type {PolicyAssociationDto}
+     * @memberof ReleasePolicyDto
+     */
+    'association': PolicyAssociationDto;
+    /**
+     * Policy version number
+     * @type {number}
+     * @memberof ReleasePolicyDto
+     */
+    'version': number;
+    /**
+     * Policy creation timestamp
+     * @type {string}
+     * @memberof ReleasePolicyDto
+     */
+    'createdAt': string;
+    /**
+     * Policy last update timestamp
+     * @type {string}
+     * @memberof ReleasePolicyDto
+     */
+    'updatedAt': string;
+    /**
+     * Whether the policy is active
+     * @type {boolean}
+     * @memberof ReleasePolicyDto
+     */
+    'isActive': boolean;
+    /**
+     * Whether this policy should be pushed to agents
+     * @type {boolean}
+     * @memberof ReleasePolicyDto
+     */
+    'isPush'?: boolean;
+    /**
+     * The policy rule definition conforming to rule engine schema
+     * @type {object}
+     * @memberof ReleasePolicyDto
+     */
+    'rule': object;
+}
+
+export const ReleasePolicyDtoTypeEnum = {
+    Policy: 'policy',
+    Restriction: 'restriction'
+} as const;
+
+export type ReleasePolicyDtoTypeEnum = typeof ReleasePolicyDtoTypeEnum[keyof typeof ReleasePolicyDtoTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface ReleasesControllerGetSbomEnabled200Response
+ */
+export interface ReleasesControllerGetSbomEnabled200Response {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ReleasesControllerGetSbomEnabled200Response
+     */
+    'enabled'?: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface RestrictionAssociationDto
+ */
+export interface RestrictionAssociationDto {
+    /**
+     * Device type names for restrictions
+     * @type {Array<string>}
+     * @memberof RestrictionAssociationDto
+     */
+    'deviceTypeNames'?: Array<string>;
+    /**
+     * OS types for restrictions
+     * @type {Array<string>}
+     * @memberof RestrictionAssociationDto
+     */
+    'osTypes'?: Array<string>;
+    /**
+     * Specific device IDs for restrictions
+     * @type {Array<string>}
+     * @memberof RestrictionAssociationDto
+     */
+    'deviceIds'?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface RestrictionDto
+ */
+export interface RestrictionDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof RestrictionDto
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RestrictionDto
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RestrictionDto
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RestrictionDto
+     */
+    'type': RestrictionDtoTypeEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof RestrictionDto
+     */
+    'version': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RestrictionDto
+     */
+    'isActive': boolean;
+    /**
+     * The restriction rule object
+     * @type {object}
+     * @memberof RestrictionDto
+     */
+    'rule': object;
+    /**
+     * 
+     * @type {string}
+     * @memberof RestrictionDto
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RestrictionDto
+     */
+    'updatedAt': string;
+}
+
+export const RestrictionDtoTypeEnum = {
+    Policy: 'policy',
+    Restriction: 'restriction'
+} as const;
+
+export type RestrictionDtoTypeEnum = typeof RestrictionDtoTypeEnum[keyof typeof RestrictionDtoTypeEnum];
 
 /**
  * 
@@ -5284,6 +7725,138 @@ export interface Roi {
      */
     'features'?: Array<string>;
 }
+/**
+ * 
+ * @export
+ * @interface RuleAssociationDto
+ */
+export interface RuleAssociationDto {
+    /**
+     * Releases for policies
+     * @type {Array<ReleaseIdentifierDto>}
+     * @memberof RuleAssociationDto
+     */
+    'releases'?: Array<ReleaseIdentifierDto>;
+    /**
+     * Device type names for restrictions
+     * @type {Array<string>}
+     * @memberof RuleAssociationDto
+     */
+    'deviceTypeNames'?: Array<string>;
+    /**
+     * OS types for restrictions
+     * @type {Array<string>}
+     * @memberof RuleAssociationDto
+     */
+    'osTypes'?: Array<string>;
+    /**
+     * Specific device IDs for restrictions
+     * @type {Array<string>}
+     * @memberof RuleAssociationDto
+     */
+    'deviceIds'?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface ScanStatusResponseDto
+ */
+export interface ScanStatusResponseDto {
+    /**
+     * Scan job UUID
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'id': string;
+    /**
+     * Current status of the scan
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'status': ScanStatusResponseDtoStatusEnum;
+    /**
+     * Scan target (image name, file path, registry URL, etc.)
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'target': string;
+    /**
+     * Type of the scan target
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'targetType': ScanStatusResponseDtoTargetTypeEnum;
+    /**
+     * SBOM output format
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'format': ScanStatusResponseDtoFormatEnum;
+    /**
+     * Who or what triggered this scan
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'triggeredBy'?: string;
+    /**
+     * Error message if the scan failed
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'error'?: string;
+    /**
+     * Short reason code for the failure
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'failureReason'?: string;
+    /**
+     * Timestamp when the scan was created
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'createdAt': string;
+    /**
+     * Timestamp of the last status update
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'updatedAt': string;
+    /**
+     * Timestamp when the scan reached a terminal state
+     * @type {string}
+     * @memberof ScanStatusResponseDto
+     */
+    'completedAt'?: string;
+}
+
+export const ScanStatusResponseDtoStatusEnum = {
+    Queued: 'queued',
+    Running: 'running',
+    Complete: 'complete',
+    Failed: 'failed'
+} as const;
+
+export type ScanStatusResponseDtoStatusEnum = typeof ScanStatusResponseDtoStatusEnum[keyof typeof ScanStatusResponseDtoStatusEnum];
+export const ScanStatusResponseDtoTargetTypeEnum = {
+    Docker: 'docker',
+    Registry: 'registry',
+    File: 'file',
+    Dir: 'dir',
+    OciArchive: 'oci-archive'
+} as const;
+
+export type ScanStatusResponseDtoTargetTypeEnum = typeof ScanStatusResponseDtoTargetTypeEnum[keyof typeof ScanStatusResponseDtoTargetTypeEnum];
+export const ScanStatusResponseDtoFormatEnum = {
+    SyftJson: 'syft-json',
+    SpdxJson: 'spdx-json',
+    CyclonedxJson: 'cyclonedx-json',
+    Table: 'table',
+    Text: 'text'
+} as const;
+
+export type ScanStatusResponseDtoFormatEnum = typeof ScanStatusResponseDtoFormatEnum[keyof typeof ScanStatusResponseDtoFormatEnum];
+
 /**
  * 
  * @export
@@ -5383,6 +7956,24 @@ export interface SetReleaseArtifactDto {
      * @memberof SetReleaseArtifactDto
      */
     'metadata'?: object;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SetReleaseArtifactDto
+     */
+    'isExecutable'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof SetReleaseArtifactDto
+     */
+    'arguments'?: string;
+    /**
+     * Whether to trigger an SBOM scan for this artifact after upload. Defaults to true.
+     * @type {boolean}
+     * @memberof SetReleaseArtifactDto
+     */
+    'enableSbomScan'?: boolean;
 }
 
 export const SetReleaseArtifactDtoTypeEnum = {
@@ -5436,11 +8027,11 @@ export interface SetReleaseDto {
      */
     'releaseNotes'?: string;
     /**
-     * 
-     * @type {object}
+     * Release metadata including autoDeploy and postInstallAction configuration. Additional user-defined properties are supported.
+     * @type {ReleaseMetadata}
      * @memberof SetReleaseDto
      */
-    'metadata'?: object;
+    'metadata'?: ReleaseMetadata;
     /**
      * 
      * @type {boolean}
@@ -5545,6 +8136,18 @@ export interface SoftwareStateDto {
      * @memberof SoftwareStateDto
      */
     'error'?: string;
+    /**
+     * Indicates if this version is unknown (not registered in getapp)
+     * @type {boolean}
+     * @memberof SoftwareStateDto
+     */
+    'isUnknown'?: boolean;
+    /**
+     * How this software was offered to the device. \"offering\" = automatically available, \"push\" = explicitly pushed by an admin. Undefined if the software was unpushed or was never directly offered/pushed to this device.
+     * @type {string}
+     * @memberof SoftwareStateDto
+     */
+    'action'?: SoftwareStateDtoActionEnum;
 }
 
 export const SoftwareStateDtoStateEnum = {
@@ -5559,6 +8162,12 @@ export const SoftwareStateDtoStateEnum = {
 } as const;
 
 export type SoftwareStateDtoStateEnum = typeof SoftwareStateDtoStateEnum[keyof typeof SoftwareStateDtoStateEnum];
+export const SoftwareStateDtoActionEnum = {
+    Offering: 'offering',
+    Push: 'push'
+} as const;
+
+export type SoftwareStateDtoActionEnum = typeof SoftwareStateDtoActionEnum[keyof typeof SoftwareStateDtoActionEnum];
 
 /**
  * 
@@ -5668,7 +8277,8 @@ export interface UpdateDeviceTypeDto {
 export const UpdateDeviceTypeDtoOsEnum = {
     Android: 'android',
     Windows: 'windows',
-    Linux: 'linux'
+    Linux: 'linux',
+    Macos: 'macos'
 } as const;
 
 export type UpdateDeviceTypeDtoOsEnum = typeof UpdateDeviceTypeDtoOsEnum[keyof typeof UpdateDeviceTypeDtoOsEnum];
@@ -5724,6 +8334,37 @@ export interface UpdateDocDto {
      * @memberof UpdateDocDto
      */
     'docUrl'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface UpdateFilePropertiesDto
+ */
+export interface UpdateFilePropertiesDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateFilePropertiesDto
+     */
+    'arguments'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateFilePropertiesDto
+     */
+    'isExecutable'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateFilePropertiesDto
+     */
+    'isInstallationFile'?: boolean;
+    /**
+     * 
+     * @type {object}
+     * @memberof UpdateFilePropertiesDto
+     */
+    'metadata'?: object;
 }
 /**
  * 
@@ -5851,7 +8492,8 @@ export interface UpdatePlatformDto {
 export const UpdatePlatformDtoOsEnum = {
     Android: 'android',
     Windows: 'windows',
-    Linux: 'linux'
+    Linux: 'linux',
+    Macos: 'macos'
 } as const;
 
 export type UpdatePlatformDtoOsEnum = typeof UpdatePlatformDtoOsEnum[keyof typeof UpdatePlatformDtoOsEnum];
@@ -5939,6 +8581,63 @@ export interface UpdateRegulationDto {
      */
     'order'?: number;
 }
+/**
+ * 
+ * @export
+ * @interface UpdateRuleDto
+ */
+export interface UpdateRuleDto {
+    /**
+     * Rule name
+     * @type {string}
+     * @memberof UpdateRuleDto
+     */
+    'name'?: string;
+    /**
+     * Rule description
+     * @type {string}
+     * @memberof UpdateRuleDto
+     */
+    'description'?: string;
+    /**
+     * Rule type (policy or restriction)
+     * @type {string}
+     * @memberof UpdateRuleDto
+     */
+    'type'?: UpdateRuleDtoTypeEnum;
+    /**
+     * Rule associations
+     * @type {RuleAssociationDto}
+     * @memberof UpdateRuleDto
+     */
+    'association'?: RuleAssociationDto;
+    /**
+     * Whether the rule is active
+     * @type {boolean}
+     * @memberof UpdateRuleDto
+     */
+    'isActive'?: boolean;
+    /**
+     * Whether this policy should be pushed to agents
+     * @type {boolean}
+     * @memberof UpdateRuleDto
+     */
+    'isPush'?: boolean;
+    /**
+     * Rule engine compliant rule object
+     * @type {object}
+     * @memberof UpdateRuleDto
+     */
+    'rule'?: object;
+}
+
+export const UpdateRuleDtoTypeEnum = {
+    Policy: 'policy',
+    Restriction: 'restriction'
+} as const;
+
+export type UpdateRuleDtoTypeEnum = typeof UpdateRuleDtoTypeEnum[keyof typeof UpdateRuleDtoTypeEnum];
+
 /**
  * 
  * @export
@@ -6044,6 +8743,49 @@ export interface UploadArtifactDto {
      * @memberof UploadArtifactDto
      */
     'uploadToken'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UploadArtifactDto
+     */
+    'isExecutable'?: boolean;
+    /**
+     * 
+     * @type {object}
+     * @memberof UploadArtifactDto
+     */
+    'arguments'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface UpsertOfferingTreePolicyDto
+ */
+export interface UpsertOfferingTreePolicyDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof UpsertOfferingTreePolicyDto
+     */
+    'platformId'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpsertOfferingTreePolicyDto
+     */
+    'deviceTypeId'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpsertOfferingTreePolicyDto
+     */
+    'projectId': number;
+    /**
+     * Set to null to remove the policy
+     * @type {string}
+     * @memberof UpsertOfferingTreePolicyDto
+     */
+    'catalogId'?: string;
 }
 /**
  * 
@@ -6290,13 +9032,15 @@ export interface WindowsConfigDto {
 export const CatalogOfferingApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * This service message allows retrieval of the offering of a specific device type by device type ID.
+         * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
          * @summary Get Offering of Device Type
          * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        offeringControllerGetOfferingForDeviceType: async (deviceTypeIdentifier: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        offeringControllerGetOfferingForDeviceType: async (deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'deviceTypeIdentifier' is not null or undefined
             assertParamExists('offeringControllerGetOfferingForDeviceType', 'deviceTypeIdentifier', deviceTypeIdentifier)
             const localVarPath = `/api/v1/catalog/offering/device-type/{deviceTypeIdentifier}`
@@ -6316,6 +9060,14 @@ export const CatalogOfferingApiAxiosParamCreator = function (configuration?: Con
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (platformIdentifier !== undefined) {
+                localVarQueryParameter['platformIdentifier'] = platformIdentifier;
+            }
+
+            if (withDependencies !== undefined) {
+                localVarQueryParameter['withDependencies'] = withDependencies;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -6331,10 +9083,11 @@ export const CatalogOfferingApiAxiosParamCreator = function (configuration?: Con
          * This service message allows retrieval of the offering of a specific platform by platform ID.
          * @summary Get Offering of Platform
          * @param {string} platformIdentifier Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        offeringControllerGetOfferingForPlatform: async (platformIdentifier: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        offeringControllerGetOfferingForPlatform: async (platformIdentifier: string, withDependencies?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'platformIdentifier' is not null or undefined
             assertParamExists('offeringControllerGetOfferingForPlatform', 'platformIdentifier', platformIdentifier)
             const localVarPath = `/api/v1/catalog/offering/platform/{platformIdentifier}`
@@ -6354,6 +9107,10 @@ export const CatalogOfferingApiAxiosParamCreator = function (configuration?: Con
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (withDependencies !== undefined) {
+                localVarQueryParameter['withDependencies'] = withDependencies;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -6366,16 +9123,19 @@ export const CatalogOfferingApiAxiosParamCreator = function (configuration?: Con
             };
         },
         /**
-         * This service message allows retrieval of the offering of a specific project by project identifier.
+         * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
          * @summary Get Offering of Project
          * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        offeringControllerGetOfferingForProject: async (projectIdentifier: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        offeringControllerGetOfferingForProject: async (projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'projectIdentifier' is not null or undefined
             assertParamExists('offeringControllerGetOfferingForProject', 'projectIdentifier', projectIdentifier)
-            const localVarPath = `/api/v1/catalog/offering/project/{projectIdentifier}`
+            const localVarPath = `/api/v1/catalog/offering/projects/{projectIdentifier}`
                 .replace(`{${"projectIdentifier"}}`, encodeURIComponent(String(projectIdentifier)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6391,6 +9151,67 @@ export const CatalogOfferingApiAxiosParamCreator = function (configuration?: Con
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (deviceTypeIdentifier !== undefined) {
+                localVarQueryParameter['deviceTypeIdentifier'] = deviceTypeIdentifier;
+            }
+
+            if (platformIdentifier !== undefined) {
+                localVarQueryParameter['platformIdentifier'] = platformIdentifier;
+            }
+
+            if (withDependencies !== undefined) {
+                localVarQueryParameter['withDependencies'] = withDependencies;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows retrieval of the offering of all projects.
+         * @summary Get Offering of All Projects
+         * @param {string} [query] The search term (matches project name or partial match)
+         * @param {number} [page] The page number to fetch (default: 1)
+         * @param {number} [perPage] Number of projects per page (default: 20)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringControllerGetOfferingForProjects: async (query?: string, page?: number, perPage?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/catalog/offering/projects`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (query !== undefined) {
+                localVarQueryParameter['query'] = query;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (perPage !== undefined) {
+                localVarQueryParameter['perPage'] = perPage;
+            }
 
 
     
@@ -6481,6 +9302,190 @@ export const CatalogOfferingApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Removes pushed offerings and stops delivery attempts for specified devices and/or groups
+         * @summary Unpush software or map offerings
+         * @param {PushOfferingDto} pushOfferingDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringControllerUnpushOffering: async (pushOfferingDto: PushOfferingDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pushOfferingDto' is not null or undefined
+            assertParamExists('offeringControllerUnpushOffering', 'pushOfferingDto', pushOfferingDto)
+            const localVarPath = `/api/v1/catalog/offering/unpush`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(pushOfferingDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
+         * @summary Get Offering of Device Type
+         * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2OfferingControllerGetOfferingForDeviceType: async (deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deviceTypeIdentifier' is not null or undefined
+            assertParamExists('v2OfferingControllerGetOfferingForDeviceType', 'deviceTypeIdentifier', deviceTypeIdentifier)
+            const localVarPath = `/api/v2/catalog/offering/device-type/{deviceTypeIdentifier}`
+                .replace(`{${"deviceTypeIdentifier"}}`, encodeURIComponent(String(deviceTypeIdentifier)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (platformIdentifier !== undefined) {
+                localVarQueryParameter['platformIdentifier'] = platformIdentifier;
+            }
+
+            if (withDependencies !== undefined) {
+                localVarQueryParameter['withDependencies'] = withDependencies;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific platform by platform ID.
+         * @summary Get Offering of Platform
+         * @param {string} platformIdentifier Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2OfferingControllerGetOfferingForPlatform: async (platformIdentifier: string, withDependencies?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'platformIdentifier' is not null or undefined
+            assertParamExists('v2OfferingControllerGetOfferingForPlatform', 'platformIdentifier', platformIdentifier)
+            const localVarPath = `/api/v2/catalog/offering/platform/{platformIdentifier}`
+                .replace(`{${"platformIdentifier"}}`, encodeURIComponent(String(platformIdentifier)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (withDependencies !== undefined) {
+                localVarQueryParameter['withDependencies'] = withDependencies;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
+         * @summary Get Offering of Project
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2OfferingControllerGetOfferingForProject: async (projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectIdentifier' is not null or undefined
+            assertParamExists('v2OfferingControllerGetOfferingForProject', 'projectIdentifier', projectIdentifier)
+            const localVarPath = `/api/v2/catalog/offering/projects/{projectIdentifier}`
+                .replace(`{${"projectIdentifier"}}`, encodeURIComponent(String(projectIdentifier)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (deviceTypeIdentifier !== undefined) {
+                localVarQueryParameter['deviceTypeIdentifier'] = deviceTypeIdentifier;
+            }
+
+            if (platformIdentifier !== undefined) {
+                localVarQueryParameter['platformIdentifier'] = platformIdentifier;
+            }
+
+            if (withDependencies !== undefined) {
+                localVarQueryParameter['withDependencies'] = withDependencies;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -6492,14 +9497,16 @@ export const CatalogOfferingApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CatalogOfferingApiAxiosParamCreator(configuration)
     return {
         /**
-         * This service message allows retrieval of the offering of a specific device type by device type ID.
+         * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
          * @summary Get Offering of Device Type
          * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceTypeOfferingDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier, options);
+        async offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceTypeOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier, platformIdentifier, withDependencies, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.offeringControllerGetOfferingForDeviceType']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -6508,26 +9515,45 @@ export const CatalogOfferingApiFp = function(configuration?: Configuration) {
          * This service message allows retrieval of the offering of a specific platform by platform ID.
          * @summary Get Offering of Platform
          * @param {string} platformIdentifier Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async offeringControllerGetOfferingForPlatform(platformIdentifier: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PlatformOfferingDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerGetOfferingForPlatform(platformIdentifier, options);
+        async offeringControllerGetOfferingForPlatform(platformIdentifier: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PlatformOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerGetOfferingForPlatform(platformIdentifier, withDependencies, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.offeringControllerGetOfferingForPlatform']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This service message allows retrieval of the offering of a specific project by project identifier.
+         * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
          * @summary Get Offering of Project
          * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async offeringControllerGetOfferingForProject(projectIdentifier: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectRefOfferingDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerGetOfferingForProject(projectIdentifier, options);
+        async offeringControllerGetOfferingForProject(projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectRefOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerGetOfferingForProject(projectIdentifier, deviceTypeIdentifier, platformIdentifier, withDependencies, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.offeringControllerGetOfferingForProject']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message allows retrieval of the offering of all projects.
+         * @summary Get Offering of All Projects
+         * @param {string} [query] The search term (matches project name or partial match)
+         * @param {number} [page] The page number to fetch (default: 1)
+         * @param {number} [perPage] Number of projects per page (default: 20)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async offeringControllerGetOfferingForProjects(query?: string, page?: number, perPage?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedProjectRefOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerGetOfferingForProjects(query, page, perPage, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.offeringControllerGetOfferingForProjects']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -6556,6 +9582,64 @@ export const CatalogOfferingApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.offeringControllerPushOffering']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Removes pushed offerings and stops delivery attempts for specified devices and/or groups
+         * @summary Unpush software or map offerings
+         * @param {PushOfferingDto} pushOfferingDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async offeringControllerUnpushOffering(pushOfferingDto: PushOfferingDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringControllerUnpushOffering(pushOfferingDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.offeringControllerUnpushOffering']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
+         * @summary Get Offering of Device Type
+         * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2OfferingControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceTypeOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2OfferingControllerGetOfferingForDeviceType(deviceTypeIdentifier, platformIdentifier, withDependencies, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.v2OfferingControllerGetOfferingForDeviceType']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific platform by platform ID.
+         * @summary Get Offering of Platform
+         * @param {string} platformIdentifier Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2OfferingControllerGetOfferingForPlatform(platformIdentifier: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PlatformOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2OfferingControllerGetOfferingForPlatform(platformIdentifier, withDependencies, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.v2OfferingControllerGetOfferingForPlatform']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
+         * @summary Get Offering of Project
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2OfferingControllerGetOfferingForProject(projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectRefOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2OfferingControllerGetOfferingForProject(projectIdentifier, deviceTypeIdentifier, platformIdentifier, withDependencies, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogOfferingApi.v2OfferingControllerGetOfferingForProject']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -6567,34 +9651,52 @@ export const CatalogOfferingApiFactory = function (configuration?: Configuration
     const localVarFp = CatalogOfferingApiFp(configuration)
     return {
         /**
-         * This service message allows retrieval of the offering of a specific device type by device type ID.
+         * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
          * @summary Get Offering of Device Type
          * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, options?: RawAxiosRequestConfig): AxiosPromise<DeviceTypeOfferingDto> {
-            return localVarFp.offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier, options).then((request) => request(axios, basePath));
+        offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<DeviceTypeOfferingDto> {
+            return localVarFp.offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(axios, basePath));
         },
         /**
          * This service message allows retrieval of the offering of a specific platform by platform ID.
          * @summary Get Offering of Platform
          * @param {string} platformIdentifier Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        offeringControllerGetOfferingForPlatform(platformIdentifier: string, options?: RawAxiosRequestConfig): AxiosPromise<PlatformOfferingDto> {
-            return localVarFp.offeringControllerGetOfferingForPlatform(platformIdentifier, options).then((request) => request(axios, basePath));
+        offeringControllerGetOfferingForPlatform(platformIdentifier: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<PlatformOfferingDto> {
+            return localVarFp.offeringControllerGetOfferingForPlatform(platformIdentifier, withDependencies, options).then((request) => request(axios, basePath));
         },
         /**
-         * This service message allows retrieval of the offering of a specific project by project identifier.
+         * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
          * @summary Get Offering of Project
          * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        offeringControllerGetOfferingForProject(projectIdentifier: string, options?: RawAxiosRequestConfig): AxiosPromise<ProjectRefOfferingDto> {
-            return localVarFp.offeringControllerGetOfferingForProject(projectIdentifier, options).then((request) => request(axios, basePath));
+        offeringControllerGetOfferingForProject(projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<ProjectRefOfferingDto> {
+            return localVarFp.offeringControllerGetOfferingForProject(projectIdentifier, deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows retrieval of the offering of all projects.
+         * @summary Get Offering of All Projects
+         * @param {string} [query] The search term (matches project name or partial match)
+         * @param {number} [page] The page number to fetch (default: 1)
+         * @param {number} [perPage] Number of projects per page (default: 20)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringControllerGetOfferingForProjects(query?: string, page?: number, perPage?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedProjectRefOfferingDto> {
+            return localVarFp.offeringControllerGetOfferingForProjects(query, page, perPage, options).then((request) => request(axios, basePath));
         },
         /**
          * This service message allows retrieval of the offering of a specific component by catalog ID.
@@ -6616,6 +9718,52 @@ export const CatalogOfferingApiFactory = function (configuration?: Configuration
         offeringControllerPushOffering(pushOfferingDto: PushOfferingDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.offeringControllerPushOffering(pushOfferingDto, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Removes pushed offerings and stops delivery attempts for specified devices and/or groups
+         * @summary Unpush software or map offerings
+         * @param {PushOfferingDto} pushOfferingDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringControllerUnpushOffering(pushOfferingDto: PushOfferingDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.offeringControllerUnpushOffering(pushOfferingDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
+         * @summary Get Offering of Device Type
+         * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2OfferingControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<DeviceTypeOfferingDto> {
+            return localVarFp.v2OfferingControllerGetOfferingForDeviceType(deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific platform by platform ID.
+         * @summary Get Offering of Platform
+         * @param {string} platformIdentifier Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2OfferingControllerGetOfferingForPlatform(platformIdentifier: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<PlatformOfferingDto> {
+            return localVarFp.v2OfferingControllerGetOfferingForPlatform(platformIdentifier, withDependencies, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
+         * @summary Get Offering of Project
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+         * @param {string} [platformIdentifier] Platform identifier (ID or name)
+         * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2OfferingControllerGetOfferingForProject(projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<ProjectRefOfferingDto> {
+            return localVarFp.v2OfferingControllerGetOfferingForProject(projectIdentifier, deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -6627,39 +9775,59 @@ export const CatalogOfferingApiFactory = function (configuration?: Configuration
  */
 export class CatalogOfferingApi extends BaseAPI {
     /**
-     * This service message allows retrieval of the offering of a specific device type by device type ID.
+     * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
      * @summary Get Offering of Device Type
      * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+     * @param {string} [platformIdentifier] Platform identifier (ID or name)
+     * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CatalogOfferingApi
      */
-    public offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, options?: RawAxiosRequestConfig) {
-        return CatalogOfferingApiFp(this.configuration).offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier, options).then((request) => request(this.axios, this.basePath));
+    public offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).offeringControllerGetOfferingForDeviceType(deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * This service message allows retrieval of the offering of a specific platform by platform ID.
      * @summary Get Offering of Platform
      * @param {string} platformIdentifier Platform identifier (ID or name)
+     * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CatalogOfferingApi
      */
-    public offeringControllerGetOfferingForPlatform(platformIdentifier: string, options?: RawAxiosRequestConfig) {
-        return CatalogOfferingApiFp(this.configuration).offeringControllerGetOfferingForPlatform(platformIdentifier, options).then((request) => request(this.axios, this.basePath));
+    public offeringControllerGetOfferingForPlatform(platformIdentifier: string, withDependencies?: boolean, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).offeringControllerGetOfferingForPlatform(platformIdentifier, withDependencies, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * This service message allows retrieval of the offering of a specific project by project identifier.
+     * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
      * @summary Get Offering of Project
      * @param {string} projectIdentifier Project identifier (ID or name)
+     * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+     * @param {string} [platformIdentifier] Platform identifier (ID or name)
+     * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CatalogOfferingApi
      */
-    public offeringControllerGetOfferingForProject(projectIdentifier: string, options?: RawAxiosRequestConfig) {
-        return CatalogOfferingApiFp(this.configuration).offeringControllerGetOfferingForProject(projectIdentifier, options).then((request) => request(this.axios, this.basePath));
+    public offeringControllerGetOfferingForProject(projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).offeringControllerGetOfferingForProject(projectIdentifier, deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows retrieval of the offering of all projects.
+     * @summary Get Offering of All Projects
+     * @param {string} [query] The search term (matches project name or partial match)
+     * @param {number} [page] The page number to fetch (default: 1)
+     * @param {number} [perPage] Number of projects per page (default: 20)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogOfferingApi
+     */
+    public offeringControllerGetOfferingForProjects(query?: string, page?: number, perPage?: number, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).offeringControllerGetOfferingForProjects(query, page, perPage, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -6685,8 +9853,554 @@ export class CatalogOfferingApi extends BaseAPI {
     public offeringControllerPushOffering(pushOfferingDto: PushOfferingDto, options?: RawAxiosRequestConfig) {
         return CatalogOfferingApiFp(this.configuration).offeringControllerPushOffering(pushOfferingDto, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * Removes pushed offerings and stops delivery attempts for specified devices and/or groups
+     * @summary Unpush software or map offerings
+     * @param {PushOfferingDto} pushOfferingDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogOfferingApi
+     */
+    public offeringControllerUnpushOffering(pushOfferingDto: PushOfferingDto, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).offeringControllerUnpushOffering(pushOfferingDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows retrieval of the offering of a specific device type by device token and also optionally specify a specific platform.
+     * @summary Get Offering of Device Type
+     * @param {string} deviceTypeIdentifier Device type identifier (ID or name)
+     * @param {string} [platformIdentifier] Platform identifier (ID or name)
+     * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogOfferingApi
+     */
+    public v2OfferingControllerGetOfferingForDeviceType(deviceTypeIdentifier: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).v2OfferingControllerGetOfferingForDeviceType(deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows retrieval of the offering of a specific platform by platform ID.
+     * @summary Get Offering of Platform
+     * @param {string} platformIdentifier Platform identifier (ID or name)
+     * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogOfferingApi
+     */
+    public v2OfferingControllerGetOfferingForPlatform(platformIdentifier: string, withDependencies?: boolean, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).v2OfferingControllerGetOfferingForPlatform(platformIdentifier, withDependencies, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows retrieval of the offering of a specific project by project identifier and also optionally specify a specific platform and device-type.
+     * @summary Get Offering of Project
+     * @param {string} projectIdentifier Project identifier (ID or name)
+     * @param {string} [deviceTypeIdentifier] Device type identifier (ID or name)
+     * @param {string} [platformIdentifier] Platform identifier (ID or name)
+     * @param {boolean} [withDependencies] Indicates whether to include dependencies in the offering
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogOfferingApi
+     */
+    public v2OfferingControllerGetOfferingForProject(projectIdentifier: string, deviceTypeIdentifier?: string, platformIdentifier?: string, withDependencies?: boolean, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingApiFp(this.configuration).v2OfferingControllerGetOfferingForProject(projectIdentifier, deviceTypeIdentifier, platformIdentifier, withDependencies, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
+
+
+/**
+ * CatalogOfferingPolicyApi - axios parameter creator
+ * @export
+ */
+export const CatalogOfferingPolicyApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Retrieves all offering tree policy. Filter by platform, device-type and project.
+         * @summary Get Offering tree Policies
+         * @param {number} [platformId] 
+         * @param {number} [deviceTypeId] 
+         * @param {number} [projectId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringPolicyControllerFindByProject: async (platformId?: number, deviceTypeId?: number, projectId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/catalog/offering/policy`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (platformId !== undefined) {
+                localVarQueryParameter['platformId'] = platformId;
+            }
+
+            if (deviceTypeId !== undefined) {
+                localVarQueryParameter['deviceTypeId'] = deviceTypeId;
+            }
+
+            if (projectId !== undefined) {
+                localVarQueryParameter['projectId'] = projectId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Create/Update/Delete policy, for managing offering tree policy.
+         * @summary Create/Update/Delete Offering Tree Policy
+         * @param {UpsertOfferingTreePolicyDto} upsertOfferingTreePolicyDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringPolicyControllerUpsert: async (upsertOfferingTreePolicyDto: UpsertOfferingTreePolicyDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'upsertOfferingTreePolicyDto' is not null or undefined
+            assertParamExists('offeringPolicyControllerUpsert', 'upsertOfferingTreePolicyDto', upsertOfferingTreePolicyDto)
+            const localVarPath = `/api/v1/catalog/offering/policy`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(upsertOfferingTreePolicyDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * CatalogOfferingPolicyApi - functional programming interface
+ * @export
+ */
+export const CatalogOfferingPolicyApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = CatalogOfferingPolicyApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Retrieves all offering tree policy. Filter by platform, device-type and project.
+         * @summary Get Offering tree Policies
+         * @param {number} [platformId] 
+         * @param {number} [deviceTypeId] 
+         * @param {number} [projectId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async offeringPolicyControllerFindByProject(platformId?: number, deviceTypeId?: number, projectId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OfferingTreePolicyDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringPolicyControllerFindByProject(platformId, deviceTypeId, projectId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogOfferingPolicyApi.offeringPolicyControllerFindByProject']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Create/Update/Delete policy, for managing offering tree policy.
+         * @summary Create/Update/Delete Offering Tree Policy
+         * @param {UpsertOfferingTreePolicyDto} upsertOfferingTreePolicyDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async offeringPolicyControllerUpsert(upsertOfferingTreePolicyDto: UpsertOfferingTreePolicyDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OfferingTreePolicyDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.offeringPolicyControllerUpsert(upsertOfferingTreePolicyDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogOfferingPolicyApi.offeringPolicyControllerUpsert']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * CatalogOfferingPolicyApi - factory interface
+ * @export
+ */
+export const CatalogOfferingPolicyApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = CatalogOfferingPolicyApiFp(configuration)
+    return {
+        /**
+         * Retrieves all offering tree policy. Filter by platform, device-type and project.
+         * @summary Get Offering tree Policies
+         * @param {number} [platformId] 
+         * @param {number} [deviceTypeId] 
+         * @param {number} [projectId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringPolicyControllerFindByProject(platformId?: number, deviceTypeId?: number, projectId?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<OfferingTreePolicyDto>> {
+            return localVarFp.offeringPolicyControllerFindByProject(platformId, deviceTypeId, projectId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Create/Update/Delete policy, for managing offering tree policy.
+         * @summary Create/Update/Delete Offering Tree Policy
+         * @param {UpsertOfferingTreePolicyDto} upsertOfferingTreePolicyDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        offeringPolicyControllerUpsert(upsertOfferingTreePolicyDto: UpsertOfferingTreePolicyDto, options?: RawAxiosRequestConfig): AxiosPromise<OfferingTreePolicyDto> {
+            return localVarFp.offeringPolicyControllerUpsert(upsertOfferingTreePolicyDto, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * CatalogOfferingPolicyApi - object-oriented interface
+ * @export
+ * @class CatalogOfferingPolicyApi
+ * @extends {BaseAPI}
+ */
+export class CatalogOfferingPolicyApi extends BaseAPI {
+    /**
+     * Retrieves all offering tree policy. Filter by platform, device-type and project.
+     * @summary Get Offering tree Policies
+     * @param {number} [platformId] 
+     * @param {number} [deviceTypeId] 
+     * @param {number} [projectId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogOfferingPolicyApi
+     */
+    public offeringPolicyControllerFindByProject(platformId?: number, deviceTypeId?: number, projectId?: number, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingPolicyApiFp(this.configuration).offeringPolicyControllerFindByProject(platformId, deviceTypeId, projectId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Create/Update/Delete policy, for managing offering tree policy.
+     * @summary Create/Update/Delete Offering Tree Policy
+     * @param {UpsertOfferingTreePolicyDto} upsertOfferingTreePolicyDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogOfferingPolicyApi
+     */
+    public offeringPolicyControllerUpsert(upsertOfferingTreePolicyDto: UpsertOfferingTreePolicyDto, options?: RawAxiosRequestConfig) {
+        return CatalogOfferingPolicyApiFp(this.configuration).offeringPolicyControllerUpsert(upsertOfferingTreePolicyDto, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * CatalogPendingApi - axios parameter creator
+ * @export
+ */
+export const CatalogPendingApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Accepts a pending version and creates the project/version in the system. If the project does not exist, it will be created.
+         * @summary Accept a pending version
+         * @param {AcceptPendingVersionDto} acceptPendingVersionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pendingVersionControllerAcceptPendingVersion: async (acceptPendingVersionDto: AcceptPendingVersionDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'acceptPendingVersionDto' is not null or undefined
+            assertParamExists('pendingVersionControllerAcceptPendingVersion', 'acceptPendingVersionDto', acceptPendingVersionDto)
+            const localVarPath = `/api/v1/catalog/pendingVersions/accept`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(acceptPendingVersionDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns a list of project versions that were reported by devices but do not exist in the system
+         * @summary List all pending versions
+         * @param {number} [limit] Number of results to return (default: 100)
+         * @param {number} [offset] Offset for pagination (default: 0)
+         * @param {PendingVersionControllerListPendingVersionsStatusEnum} [status] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pendingVersionControllerListPendingVersions: async (limit?: number, offset?: number, status?: PendingVersionControllerListPendingVersionsStatusEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/catalog/pendingVersions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Rejects a pending version. The version will be marked as rejected and will not be processed.
+         * @summary Reject a pending version
+         * @param {RejectPendingVersionDto} rejectPendingVersionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pendingVersionControllerRejectPendingVersion: async (rejectPendingVersionDto: RejectPendingVersionDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rejectPendingVersionDto' is not null or undefined
+            assertParamExists('pendingVersionControllerRejectPendingVersion', 'rejectPendingVersionDto', rejectPendingVersionDto)
+            const localVarPath = `/api/v1/catalog/pendingVersions/reject`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(rejectPendingVersionDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * CatalogPendingApi - functional programming interface
+ * @export
+ */
+export const CatalogPendingApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = CatalogPendingApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Accepts a pending version and creates the project/version in the system. If the project does not exist, it will be created.
+         * @summary Accept a pending version
+         * @param {AcceptPendingVersionDto} acceptPendingVersionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async pendingVersionControllerAcceptPendingVersion(acceptPendingVersionDto: AcceptPendingVersionDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.pendingVersionControllerAcceptPendingVersion(acceptPendingVersionDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogPendingApi.pendingVersionControllerAcceptPendingVersion']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Returns a list of project versions that were reported by devices but do not exist in the system
+         * @summary List all pending versions
+         * @param {number} [limit] Number of results to return (default: 100)
+         * @param {number} [offset] Offset for pagination (default: 0)
+         * @param {PendingVersionControllerListPendingVersionsStatusEnum} [status] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async pendingVersionControllerListPendingVersions(limit?: number, offset?: number, status?: PendingVersionControllerListPendingVersionsStatusEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PendingVersionListDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.pendingVersionControllerListPendingVersions(limit, offset, status, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogPendingApi.pendingVersionControllerListPendingVersions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Rejects a pending version. The version will be marked as rejected and will not be processed.
+         * @summary Reject a pending version
+         * @param {RejectPendingVersionDto} rejectPendingVersionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async pendingVersionControllerRejectPendingVersion(rejectPendingVersionDto: RejectPendingVersionDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.pendingVersionControllerRejectPendingVersion(rejectPendingVersionDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogPendingApi.pendingVersionControllerRejectPendingVersion']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * CatalogPendingApi - factory interface
+ * @export
+ */
+export const CatalogPendingApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = CatalogPendingApiFp(configuration)
+    return {
+        /**
+         * Accepts a pending version and creates the project/version in the system. If the project does not exist, it will be created.
+         * @summary Accept a pending version
+         * @param {AcceptPendingVersionDto} acceptPendingVersionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pendingVersionControllerAcceptPendingVersion(acceptPendingVersionDto: AcceptPendingVersionDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.pendingVersionControllerAcceptPendingVersion(acceptPendingVersionDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns a list of project versions that were reported by devices but do not exist in the system
+         * @summary List all pending versions
+         * @param {number} [limit] Number of results to return (default: 100)
+         * @param {number} [offset] Offset for pagination (default: 0)
+         * @param {PendingVersionControllerListPendingVersionsStatusEnum} [status] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pendingVersionControllerListPendingVersions(limit?: number, offset?: number, status?: PendingVersionControllerListPendingVersionsStatusEnum, options?: RawAxiosRequestConfig): AxiosPromise<PendingVersionListDto> {
+            return localVarFp.pendingVersionControllerListPendingVersions(limit, offset, status, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Rejects a pending version. The version will be marked as rejected and will not be processed.
+         * @summary Reject a pending version
+         * @param {RejectPendingVersionDto} rejectPendingVersionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pendingVersionControllerRejectPendingVersion(rejectPendingVersionDto: RejectPendingVersionDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.pendingVersionControllerRejectPendingVersion(rejectPendingVersionDto, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * CatalogPendingApi - object-oriented interface
+ * @export
+ * @class CatalogPendingApi
+ * @extends {BaseAPI}
+ */
+export class CatalogPendingApi extends BaseAPI {
+    /**
+     * Accepts a pending version and creates the project/version in the system. If the project does not exist, it will be created.
+     * @summary Accept a pending version
+     * @param {AcceptPendingVersionDto} acceptPendingVersionDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogPendingApi
+     */
+    public pendingVersionControllerAcceptPendingVersion(acceptPendingVersionDto: AcceptPendingVersionDto, options?: RawAxiosRequestConfig) {
+        return CatalogPendingApiFp(this.configuration).pendingVersionControllerAcceptPendingVersion(acceptPendingVersionDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns a list of project versions that were reported by devices but do not exist in the system
+     * @summary List all pending versions
+     * @param {number} [limit] Number of results to return (default: 100)
+     * @param {number} [offset] Offset for pagination (default: 0)
+     * @param {PendingVersionControllerListPendingVersionsStatusEnum} [status] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogPendingApi
+     */
+    public pendingVersionControllerListPendingVersions(limit?: number, offset?: number, status?: PendingVersionControllerListPendingVersionsStatusEnum, options?: RawAxiosRequestConfig) {
+        return CatalogPendingApiFp(this.configuration).pendingVersionControllerListPendingVersions(limit, offset, status, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Rejects a pending version. The version will be marked as rejected and will not be processed.
+     * @summary Reject a pending version
+     * @param {RejectPendingVersionDto} rejectPendingVersionDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogPendingApi
+     */
+    public pendingVersionControllerRejectPendingVersion(rejectPendingVersionDto: RejectPendingVersionDto, options?: RawAxiosRequestConfig) {
+        return CatalogPendingApiFp(this.configuration).pendingVersionControllerRejectPendingVersion(rejectPendingVersionDto, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+/**
+ * @export
+ */
+export const PendingVersionControllerListPendingVersionsStatusEnum = {
+    Pending: 'PENDING',
+    Accepted: 'ACCEPTED',
+    Rejected: 'REJECTED'
+} as const;
+export type PendingVersionControllerListPendingVersionsStatusEnum = typeof PendingVersionControllerListPendingVersionsStatusEnum[keyof typeof PendingVersionControllerListPendingVersionsStatusEnum];
 
 
 /**
@@ -6892,6 +10606,98 @@ export const CatalogUploadApiAxiosParamCreator = function (configuration?: Confi
             };
         },
         /**
+         * Exports a release configuration and its associated delivery metadata into a JSON format for backup, migration, or integration purposes.
+         * @summary Export Release
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerExportRelease: async (projectIdentifier: string, version: string, xProjectToken?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectIdentifier' is not null or undefined
+            assertParamExists('releasesControllerExportRelease', 'projectIdentifier', projectIdentifier)
+            // verify required parameter 'version' is not null or undefined
+            assertParamExists('releasesControllerExportRelease', 'version', version)
+            const localVarPath = `/api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/export`
+                .replace(`{${"projectIdentifier"}}`, encodeURIComponent(String(projectIdentifier)))
+                .replace(`{${"version"}}`, encodeURIComponent(String(version)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            if (xProjectToken != null) {
+                localVarHeaderParameter['X-Project-Token'] = String(xProjectToken);
+            }
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Generates a comprehensive deployment report for a specific release, including download stats, installation counts, active delivery processes, and deployment percentage.
+         * @summary Get Deployment Report
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerGetDeploymentReport: async (projectIdentifier: string, version: string, xProjectToken?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectIdentifier' is not null or undefined
+            assertParamExists('releasesControllerGetDeploymentReport', 'projectIdentifier', projectIdentifier)
+            // verify required parameter 'version' is not null or undefined
+            assertParamExists('releasesControllerGetDeploymentReport', 'version', version)
+            const localVarPath = `/api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/deployment-report`
+                .replace(`{${"projectIdentifier"}}`, encodeURIComponent(String(projectIdentifier)))
+                .replace(`{${"version"}}`, encodeURIComponent(String(version)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            if (xProjectToken != null) {
+                localVarHeaderParameter['X-Project-Token'] = String(xProjectToken);
+            }
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Get Regulation Status by Regulation ID and Version ID
          * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7030,6 +10836,44 @@ export const CatalogUploadApiAxiosParamCreator = function (configuration?: Confi
             };
         },
         /**
+         * Returns whether SBOM artifact scanning is enabled, based on server configuration.
+         * @summary Get SBOM Enabled
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerGetSbomEnabled: async (xProjectToken?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/catalog/releases/sbom-enabled`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            if (xProjectToken != null) {
+                localVarHeaderParameter['X-Project-Token'] = String(xProjectToken);
+            }
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Get Version Regulation Statuses by Regulation ID
          * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7069,6 +10913,54 @@ export const CatalogUploadApiAxiosParamCreator = function (configuration?: Confi
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Imports a release from a JSON file, creating or updating the delivery configuration and restoring all associated metadata. The release will be created in draft status.
+         * @summary Import Release
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {ImportReleaseDto} importReleaseDto 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerImportRelease: async (projectIdentifier: string, importReleaseDto: ImportReleaseDto, xProjectToken?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectIdentifier' is not null or undefined
+            assertParamExists('releasesControllerImportRelease', 'projectIdentifier', projectIdentifier)
+            // verify required parameter 'importReleaseDto' is not null or undefined
+            assertParamExists('releasesControllerImportRelease', 'importReleaseDto', importReleaseDto)
+            const localVarPath = `/api/v1/catalog/releases/project/{projectIdentifier}/import`
+                .replace(`{${"projectIdentifier"}}`, encodeURIComponent(String(projectIdentifier)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            if (xProjectToken != null) {
+                localVarHeaderParameter['X-Project-Token'] = String(xProjectToken);
+            }
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(importReleaseDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7287,6 +11179,62 @@ export const CatalogUploadApiAxiosParamCreator = function (configuration?: Confi
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This route enables to change the properties of an artifact, f.e metadata, isExecutable, arguments etc.
+         * @summary Update file properties
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {number} artifactId 
+         * @param {UpdateFilePropertiesDto} updateFilePropertiesDto 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerUpdateFileMetadata: async (projectIdentifier: string, version: string, artifactId: number, updateFilePropertiesDto: UpdateFilePropertiesDto, xProjectToken?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectIdentifier' is not null or undefined
+            assertParamExists('releasesControllerUpdateFileMetadata', 'projectIdentifier', projectIdentifier)
+            // verify required parameter 'version' is not null or undefined
+            assertParamExists('releasesControllerUpdateFileMetadata', 'version', version)
+            // verify required parameter 'artifactId' is not null or undefined
+            assertParamExists('releasesControllerUpdateFileMetadata', 'artifactId', artifactId)
+            // verify required parameter 'updateFilePropertiesDto' is not null or undefined
+            assertParamExists('releasesControllerUpdateFileMetadata', 'updateFilePropertiesDto', updateFilePropertiesDto)
+            const localVarPath = `/api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/artifact/{artifactId}`
+                .replace(`{${"projectIdentifier"}}`, encodeURIComponent(String(projectIdentifier)))
+                .replace(`{${"version"}}`, encodeURIComponent(String(version)))
+                .replace(`{${"artifactId"}}`, encodeURIComponent(String(artifactId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            if (xProjectToken != null) {
+                localVarHeaderParameter['X-Project-Token'] = String(xProjectToken);
+            }
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateFilePropertiesDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -7361,6 +11309,36 @@ export const CatalogUploadApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Exports a release configuration and its associated delivery metadata into a JSON format for backup, migration, or integration purposes.
+         * @summary Export Release
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async releasesControllerExportRelease(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExportReleaseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.releasesControllerExportRelease(projectIdentifier, version, xProjectToken, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogUploadApi.releasesControllerExportRelease']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Generates a comprehensive deployment report for a specific release, including download stats, installation counts, active delivery processes, and deployment percentage.
+         * @summary Get Deployment Report
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async releasesControllerGetDeploymentReport(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeploymentReportDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.releasesControllerGetDeploymentReport(projectIdentifier, version, xProjectToken, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogUploadApi.releasesControllerGetDeploymentReport']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Get Regulation Status by Regulation ID and Version ID
          * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7406,6 +11384,19 @@ export const CatalogUploadApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Returns whether SBOM artifact scanning is enabled, based on server configuration.
+         * @summary Get SBOM Enabled
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async releasesControllerGetSbomEnabled(xProjectToken?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReleasesControllerGetSbomEnabled200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.releasesControllerGetSbomEnabled(xProjectToken, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogUploadApi.releasesControllerGetSbomEnabled']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Get Version Regulation Statuses by Regulation ID
          * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7418,6 +11409,21 @@ export const CatalogUploadApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.releasesControllerGetVersionRegulationStatuses(projectIdentifier, version, xProjectToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CatalogUploadApi.releasesControllerGetVersionRegulationStatuses']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Imports a release from a JSON file, creating or updating the delivery configuration and restoring all associated metadata. The release will be created in draft status.
+         * @summary Import Release
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {ImportReleaseDto} importReleaseDto 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async releasesControllerImportRelease(projectIdentifier: string, importReleaseDto: ImportReleaseDto, xProjectToken?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ImportReleaseResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.releasesControllerImportRelease(projectIdentifier, importReleaseDto, xProjectToken, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogUploadApi.releasesControllerImportRelease']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -7485,6 +11491,23 @@ export const CatalogUploadApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['CatalogUploadApi.releasesControllerSetReleaseArtifact']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * This route enables to change the properties of an artifact, f.e metadata, isExecutable, arguments etc.
+         * @summary Update file properties
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {number} artifactId 
+         * @param {UpdateFilePropertiesDto} updateFilePropertiesDto 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async releasesControllerUpdateFileMetadata(projectIdentifier: string, version: string, artifactId: number, updateFilePropertiesDto: UpdateFilePropertiesDto, xProjectToken?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.releasesControllerUpdateFileMetadata(projectIdentifier, version, artifactId, updateFilePropertiesDto, xProjectToken, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CatalogUploadApi.releasesControllerUpdateFileMetadata']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -7547,6 +11570,30 @@ export const CatalogUploadApiFactory = function (configuration?: Configuration, 
             return localVarFp.releasesControllerDownloadArtifact(projectIdentifier, version, fileName, xProjectToken, options).then((request) => request(axios, basePath));
         },
         /**
+         * Exports a release configuration and its associated delivery metadata into a JSON format for backup, migration, or integration purposes.
+         * @summary Export Release
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerExportRelease(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<ExportReleaseDto> {
+            return localVarFp.releasesControllerExportRelease(projectIdentifier, version, xProjectToken, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Generates a comprehensive deployment report for a specific release, including download stats, installation counts, active delivery processes, and deployment percentage.
+         * @summary Get Deployment Report
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerGetDeploymentReport(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<DeploymentReportDto> {
+            return localVarFp.releasesControllerGetDeploymentReport(projectIdentifier, version, xProjectToken, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Get Regulation Status by Regulation ID and Version ID
          * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7583,6 +11630,16 @@ export const CatalogUploadApiFactory = function (configuration?: Configuration, 
             return localVarFp.releasesControllerGetReleases(projectIdentifier, xProjectToken, options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns whether SBOM artifact scanning is enabled, based on server configuration.
+         * @summary Get SBOM Enabled
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerGetSbomEnabled(xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<ReleasesControllerGetSbomEnabled200Response> {
+            return localVarFp.releasesControllerGetSbomEnabled(xProjectToken, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Get Version Regulation Statuses by Regulation ID
          * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7593,6 +11650,18 @@ export const CatalogUploadApiFactory = function (configuration?: Configuration, 
          */
         releasesControllerGetVersionRegulationStatuses(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<RegulationStatusDto>> {
             return localVarFp.releasesControllerGetVersionRegulationStatuses(projectIdentifier, version, xProjectToken, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Imports a release from a JSON file, creating or updating the delivery configuration and restoring all associated metadata. The release will be created in draft status.
+         * @summary Import Release
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {ImportReleaseDto} importReleaseDto 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerImportRelease(projectIdentifier: string, importReleaseDto: ImportReleaseDto, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<ImportReleaseResponseDto> {
+            return localVarFp.releasesControllerImportRelease(projectIdentifier, importReleaseDto, xProjectToken, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7646,6 +11715,20 @@ export const CatalogUploadApiFactory = function (configuration?: Configuration, 
          */
         releasesControllerSetReleaseArtifact(projectIdentifier: string, version: string, setReleaseArtifactDto: SetReleaseArtifactDto, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<SetReleaseArtifactResDto> {
             return localVarFp.releasesControllerSetReleaseArtifact(projectIdentifier, version, setReleaseArtifactDto, xProjectToken, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This route enables to change the properties of an artifact, f.e metadata, isExecutable, arguments etc.
+         * @summary Update file properties
+         * @param {string} projectIdentifier Project identifier (ID or name)
+         * @param {string} version 
+         * @param {number} artifactId 
+         * @param {UpdateFilePropertiesDto} updateFilePropertiesDto 
+         * @param {string} [xProjectToken] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        releasesControllerUpdateFileMetadata(projectIdentifier: string, version: string, artifactId: number, updateFilePropertiesDto: UpdateFilePropertiesDto, xProjectToken?: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.releasesControllerUpdateFileMetadata(projectIdentifier, version, artifactId, updateFilePropertiesDto, xProjectToken, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -7717,6 +11800,34 @@ export class CatalogUploadApi extends BaseAPI {
     }
 
     /**
+     * Exports a release configuration and its associated delivery metadata into a JSON format for backup, migration, or integration purposes.
+     * @summary Export Release
+     * @param {string} projectIdentifier Project identifier (ID or name)
+     * @param {string} version 
+     * @param {string} [xProjectToken] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogUploadApi
+     */
+    public releasesControllerExportRelease(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig) {
+        return CatalogUploadApiFp(this.configuration).releasesControllerExportRelease(projectIdentifier, version, xProjectToken, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Generates a comprehensive deployment report for a specific release, including download stats, installation counts, active delivery processes, and deployment percentage.
+     * @summary Get Deployment Report
+     * @param {string} projectIdentifier Project identifier (ID or name)
+     * @param {string} version 
+     * @param {string} [xProjectToken] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogUploadApi
+     */
+    public releasesControllerGetDeploymentReport(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig) {
+        return CatalogUploadApiFp(this.configuration).releasesControllerGetDeploymentReport(projectIdentifier, version, xProjectToken, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Get Regulation Status by Regulation ID and Version ID
      * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7759,6 +11870,18 @@ export class CatalogUploadApi extends BaseAPI {
     }
 
     /**
+     * Returns whether SBOM artifact scanning is enabled, based on server configuration.
+     * @summary Get SBOM Enabled
+     * @param {string} [xProjectToken] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogUploadApi
+     */
+    public releasesControllerGetSbomEnabled(xProjectToken?: string, options?: RawAxiosRequestConfig) {
+        return CatalogUploadApiFp(this.configuration).releasesControllerGetSbomEnabled(xProjectToken, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Get Version Regulation Statuses by Regulation ID
      * @param {string} projectIdentifier Project identifier (ID or name)
@@ -7770,6 +11893,20 @@ export class CatalogUploadApi extends BaseAPI {
      */
     public releasesControllerGetVersionRegulationStatuses(projectIdentifier: string, version: string, xProjectToken?: string, options?: RawAxiosRequestConfig) {
         return CatalogUploadApiFp(this.configuration).releasesControllerGetVersionRegulationStatuses(projectIdentifier, version, xProjectToken, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Imports a release from a JSON file, creating or updating the delivery configuration and restoring all associated metadata. The release will be created in draft status.
+     * @summary Import Release
+     * @param {string} projectIdentifier Project identifier (ID or name)
+     * @param {ImportReleaseDto} importReleaseDto 
+     * @param {string} [xProjectToken] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogUploadApi
+     */
+    public releasesControllerImportRelease(projectIdentifier: string, importReleaseDto: ImportReleaseDto, xProjectToken?: string, options?: RawAxiosRequestConfig) {
+        return CatalogUploadApiFp(this.configuration).releasesControllerImportRelease(projectIdentifier, importReleaseDto, xProjectToken, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7831,6 +11968,22 @@ export class CatalogUploadApi extends BaseAPI {
      */
     public releasesControllerSetReleaseArtifact(projectIdentifier: string, version: string, setReleaseArtifactDto: SetReleaseArtifactDto, xProjectToken?: string, options?: RawAxiosRequestConfig) {
         return CatalogUploadApiFp(this.configuration).releasesControllerSetReleaseArtifact(projectIdentifier, version, setReleaseArtifactDto, xProjectToken, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This route enables to change the properties of an artifact, f.e metadata, isExecutable, arguments etc.
+     * @summary Update file properties
+     * @param {string} projectIdentifier Project identifier (ID or name)
+     * @param {string} version 
+     * @param {number} artifactId 
+     * @param {UpdateFilePropertiesDto} updateFilePropertiesDto 
+     * @param {string} [xProjectToken] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CatalogUploadApi
+     */
+    public releasesControllerUpdateFileMetadata(projectIdentifier: string, version: string, artifactId: number, updateFilePropertiesDto: UpdateFilePropertiesDto, xProjectToken?: string, options?: RawAxiosRequestConfig) {
+        return CatalogUploadApiFp(this.configuration).releasesControllerUpdateFileMetadata(projectIdentifier, version, artifactId, updateFilePropertiesDto, xProjectToken, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -7920,10 +12073,11 @@ export const DeliveryApiAxiosParamCreator = function (configuration?: Configurat
          * Get status of prepared delivery
          * @summary Get Prepared Delivery Status
          * @param {string} catalogId 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deliveryControllerGetPreparedDeliveryStatus: async (catalogId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deliveryControllerGetPreparedDeliveryStatus: async (catalogId: string, source?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'catalogId' is not null or undefined
             assertParamExists('deliveryControllerGetPreparedDeliveryStatus', 'catalogId', catalogId)
             const localVarPath = `/api/v1/delivery/preparedDelivery/{catalogId}`
@@ -7943,6 +12097,10 @@ export const DeliveryApiAxiosParamCreator = function (configuration?: Configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (source !== undefined) {
+                localVarQueryParameter['source'] = source;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -7958,10 +12116,11 @@ export const DeliveryApiAxiosParamCreator = function (configuration?: Configurat
          * Prepare delivery
          * @summary Prepare Delivery
          * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deliveryControllerPrepareDelivery: async (prepareDeliveryReqDto: PrepareDeliveryReqDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deliveryControllerPrepareDelivery: async (prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'prepareDeliveryReqDto' is not null or undefined
             assertParamExists('deliveryControllerPrepareDelivery', 'prepareDeliveryReqDto', prepareDeliveryReqDto)
             const localVarPath = `/api/v1/delivery/prepareDelivery`;
@@ -7979,6 +12138,10 @@ export const DeliveryApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (source !== undefined) {
+                localVarQueryParameter['source'] = source;
+            }
 
 
     
@@ -8074,6 +12237,134 @@ export const DeliveryApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Get status of prepared delivery
+         * @summary Get Prepared Delivery Status
+         * @param {string} catalogId 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeliveryControllerGetPreparedDeliveryStatus: async (catalogId: string, source?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'catalogId' is not null or undefined
+            assertParamExists('v2DeliveryControllerGetPreparedDeliveryStatus', 'catalogId', catalogId)
+            const localVarPath = `/api/v2/delivery/preparedDelivery/{catalogId}`
+                .replace(`{${"catalogId"}}`, encodeURIComponent(String(catalogId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (source !== undefined) {
+                localVarQueryParameter['source'] = source;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Prepare delivery
+         * @summary Prepare Delivery
+         * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeliveryControllerPrepareDelivery: async (prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'prepareDeliveryReqDto' is not null or undefined
+            assertParamExists('v2DeliveryControllerPrepareDelivery', 'prepareDeliveryReqDto', prepareDeliveryReqDto)
+            const localVarPath = `/api/v2/delivery/prepareDelivery`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (source !== undefined) {
+                localVarQueryParameter['source'] = source;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(prepareDeliveryReqDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows the consumer to report the delivery status
+         * @summary Update Delivery Status
+         * @param {DeliveryStatusDto} deliveryStatusDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeliveryControllerUpdateDownloadStatus: async (deliveryStatusDto: DeliveryStatusDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deliveryStatusDto' is not null or undefined
+            assertParamExists('v2DeliveryControllerUpdateDownloadStatus', 'deliveryStatusDto', deliveryStatusDto)
+            const localVarPath = `/api/v2/delivery/updateDownloadStatus`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deliveryStatusDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -8113,11 +12404,12 @@ export const DeliveryApiFp = function(configuration?: Configuration) {
          * Get status of prepared delivery
          * @summary Get Prepared Delivery Status
          * @param {string} catalogId 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deliveryControllerGetPreparedDeliveryStatus(catalogId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrepareDeliveryResDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deliveryControllerGetPreparedDeliveryStatus(catalogId, options);
+        async deliveryControllerGetPreparedDeliveryStatus(catalogId: string, source?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrepareDeliveryResDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deliveryControllerGetPreparedDeliveryStatus(catalogId, source, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DeliveryApi.deliveryControllerGetPreparedDeliveryStatus']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -8126,11 +12418,12 @@ export const DeliveryApiFp = function(configuration?: Configuration) {
          * Prepare delivery
          * @summary Prepare Delivery
          * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrepareDeliveryResDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deliveryControllerPrepareDelivery(prepareDeliveryReqDto, options);
+        async deliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrepareDeliveryResDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deliveryControllerPrepareDelivery(prepareDeliveryReqDto, source, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DeliveryApi.deliveryControllerPrepareDelivery']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -8159,6 +12452,47 @@ export const DeliveryApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deliveryControllerUpdateDownloadStatus(deliveryStatusDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DeliveryApi.deliveryControllerUpdateDownloadStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get status of prepared delivery
+         * @summary Get Prepared Delivery Status
+         * @param {string} catalogId 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2DeliveryControllerGetPreparedDeliveryStatus(catalogId: string, source?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrepareDeliveryResDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2DeliveryControllerGetPreparedDeliveryStatus(catalogId, source, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeliveryApi.v2DeliveryControllerGetPreparedDeliveryStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Prepare delivery
+         * @summary Prepare Delivery
+         * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2DeliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrepareDeliveryResDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2DeliveryControllerPrepareDelivery(prepareDeliveryReqDto, source, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeliveryApi.v2DeliveryControllerPrepareDelivery']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message allows the consumer to report the delivery status
+         * @summary Update Delivery Status
+         * @param {DeliveryStatusDto} deliveryStatusDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2DeliveryControllerUpdateDownloadStatus(deliveryStatusDto: DeliveryStatusDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2DeliveryControllerUpdateDownloadStatus(deliveryStatusDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeliveryApi.v2DeliveryControllerUpdateDownloadStatus']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -8194,21 +12528,23 @@ export const DeliveryApiFactory = function (configuration?: Configuration, baseP
          * Get status of prepared delivery
          * @summary Get Prepared Delivery Status
          * @param {string} catalogId 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deliveryControllerGetPreparedDeliveryStatus(catalogId: string, options?: RawAxiosRequestConfig): AxiosPromise<PrepareDeliveryResDto> {
-            return localVarFp.deliveryControllerGetPreparedDeliveryStatus(catalogId, options).then((request) => request(axios, basePath));
+        deliveryControllerGetPreparedDeliveryStatus(catalogId: string, source?: string, options?: RawAxiosRequestConfig): AxiosPromise<PrepareDeliveryResDto> {
+            return localVarFp.deliveryControllerGetPreparedDeliveryStatus(catalogId, source, options).then((request) => request(axios, basePath));
         },
         /**
          * Prepare delivery
          * @summary Prepare Delivery
          * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, options?: RawAxiosRequestConfig): AxiosPromise<PrepareDeliveryResDto> {
-            return localVarFp.deliveryControllerPrepareDelivery(prepareDeliveryReqDto, options).then((request) => request(axios, basePath));
+        deliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options?: RawAxiosRequestConfig): AxiosPromise<PrepareDeliveryResDto> {
+            return localVarFp.deliveryControllerPrepareDelivery(prepareDeliveryReqDto, source, options).then((request) => request(axios, basePath));
         },
         /**
          * This service message sets an object of delivery cache configurations.
@@ -8229,6 +12565,38 @@ export const DeliveryApiFactory = function (configuration?: Configuration, baseP
          */
         deliveryControllerUpdateDownloadStatus(deliveryStatusDto: DeliveryStatusDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.deliveryControllerUpdateDownloadStatus(deliveryStatusDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get status of prepared delivery
+         * @summary Get Prepared Delivery Status
+         * @param {string} catalogId 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeliveryControllerGetPreparedDeliveryStatus(catalogId: string, source?: string, options?: RawAxiosRequestConfig): AxiosPromise<PrepareDeliveryResDto> {
+            return localVarFp.v2DeliveryControllerGetPreparedDeliveryStatus(catalogId, source, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Prepare delivery
+         * @summary Prepare Delivery
+         * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+         * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options?: RawAxiosRequestConfig): AxiosPromise<PrepareDeliveryResDto> {
+            return localVarFp.v2DeliveryControllerPrepareDelivery(prepareDeliveryReqDto, source, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows the consumer to report the delivery status
+         * @summary Update Delivery Status
+         * @param {DeliveryStatusDto} deliveryStatusDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeliveryControllerUpdateDownloadStatus(deliveryStatusDto: DeliveryStatusDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.v2DeliveryControllerUpdateDownloadStatus(deliveryStatusDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -8267,24 +12635,26 @@ export class DeliveryApi extends BaseAPI {
      * Get status of prepared delivery
      * @summary Get Prepared Delivery Status
      * @param {string} catalogId 
+     * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DeliveryApi
      */
-    public deliveryControllerGetPreparedDeliveryStatus(catalogId: string, options?: RawAxiosRequestConfig) {
-        return DeliveryApiFp(this.configuration).deliveryControllerGetPreparedDeliveryStatus(catalogId, options).then((request) => request(this.axios, this.basePath));
+    public deliveryControllerGetPreparedDeliveryStatus(catalogId: string, source?: string, options?: RawAxiosRequestConfig) {
+        return DeliveryApiFp(this.configuration).deliveryControllerGetPreparedDeliveryStatus(catalogId, source, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Prepare delivery
      * @summary Prepare Delivery
      * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+     * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DeliveryApi
      */
-    public deliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, options?: RawAxiosRequestConfig) {
-        return DeliveryApiFp(this.configuration).deliveryControllerPrepareDelivery(prepareDeliveryReqDto, options).then((request) => request(this.axios, this.basePath));
+    public deliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options?: RawAxiosRequestConfig) {
+        return DeliveryApiFp(this.configuration).deliveryControllerPrepareDelivery(prepareDeliveryReqDto, source, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -8310,6 +12680,44 @@ export class DeliveryApi extends BaseAPI {
     public deliveryControllerUpdateDownloadStatus(deliveryStatusDto: DeliveryStatusDto, options?: RawAxiosRequestConfig) {
         return DeliveryApiFp(this.configuration).deliveryControllerUpdateDownloadStatus(deliveryStatusDto, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * Get status of prepared delivery
+     * @summary Get Prepared Delivery Status
+     * @param {string} catalogId 
+     * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeliveryApi
+     */
+    public v2DeliveryControllerGetPreparedDeliveryStatus(catalogId: string, source?: string, options?: RawAxiosRequestConfig) {
+        return DeliveryApiFp(this.configuration).v2DeliveryControllerGetPreparedDeliveryStatus(catalogId, source, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Prepare delivery
+     * @summary Prepare Delivery
+     * @param {PrepareDeliveryReqDto} prepareDeliveryReqDto 
+     * @param {string} [source] Delivery source: \&#39;remote\&#39; for direct download from artifact, \&#39;cache\&#39; for download from delivery server cache
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeliveryApi
+     */
+    public v2DeliveryControllerPrepareDelivery(prepareDeliveryReqDto: PrepareDeliveryReqDto, source?: string, options?: RawAxiosRequestConfig) {
+        return DeliveryApiFp(this.configuration).v2DeliveryControllerPrepareDelivery(prepareDeliveryReqDto, source, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows the consumer to report the delivery status
+     * @summary Update Delivery Status
+     * @param {DeliveryStatusDto} deliveryStatusDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeliveryApi
+     */
+    public v2DeliveryControllerUpdateDownloadStatus(deliveryStatusDto: DeliveryStatusDto, options?: RawAxiosRequestConfig) {
+        return DeliveryApiFp(this.configuration).v2DeliveryControllerUpdateDownloadStatus(deliveryStatusDto, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 
@@ -8331,6 +12739,46 @@ export const DeployApiAxiosParamCreator = function (configuration?: Configuratio
             // verify required parameter 'deployStatusDto' is not null or undefined
             assertParamExists('deployControllerUpdateDeployStatus', 'deployStatusDto', deployStatusDto)
             const localVarPath = `/api/v1/deploy/updateDeployStatus`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deployStatusDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows the consumer to report the deploy status. When deploy is done, the device content relevant service will notify. Another option on this service is to update delete content on the device.
+         * @summary Update Deploy Status
+         * @param {DeployStatusDto} deployStatusDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeployControllerUpdateDeployStatus: async (deployStatusDto: DeployStatusDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deployStatusDto' is not null or undefined
+            assertParamExists('v2DeployControllerUpdateDeployStatus', 'deployStatusDto', deployStatusDto)
+            const localVarPath = `/api/v2/deploy/updateDeployStatus`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8383,6 +12831,19 @@ export const DeployApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['DeployApi.deployControllerUpdateDeployStatus']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * This service message allows the consumer to report the deploy status. When deploy is done, the device content relevant service will notify. Another option on this service is to update delete content on the device.
+         * @summary Update Deploy Status
+         * @param {DeployStatusDto} deployStatusDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2DeployControllerUpdateDeployStatus(deployStatusDto: DeployStatusDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2DeployControllerUpdateDeployStatus(deployStatusDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeployApi.v2DeployControllerUpdateDeployStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -8402,6 +12863,16 @@ export const DeployApiFactory = function (configuration?: Configuration, basePat
          */
         deployControllerUpdateDeployStatus(deployStatusDto: DeployStatusDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.deployControllerUpdateDeployStatus(deployStatusDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows the consumer to report the deploy status. When deploy is done, the device content relevant service will notify. Another option on this service is to update delete content on the device.
+         * @summary Update Deploy Status
+         * @param {DeployStatusDto} deployStatusDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeployControllerUpdateDeployStatus(deployStatusDto: DeployStatusDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.v2DeployControllerUpdateDeployStatus(deployStatusDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -8424,6 +12895,18 @@ export class DeployApi extends BaseAPI {
     public deployControllerUpdateDeployStatus(deployStatusDto: DeployStatusDto, options?: RawAxiosRequestConfig) {
         return DeployApiFp(this.configuration).deployControllerUpdateDeployStatus(deployStatusDto, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * This service message allows the consumer to report the deploy status. When deploy is done, the device content relevant service will notify. Another option on this service is to update delete content on the device.
+     * @summary Update Deploy Status
+     * @param {DeployStatusDto} deployStatusDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeployApi
+     */
+    public v2DeployControllerUpdateDeployStatus(deployStatusDto: DeployStatusDto, options?: RawAxiosRequestConfig) {
+        return DeployApiFp(this.configuration).v2DeployControllerUpdateDeployStatus(deployStatusDto, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 
@@ -8434,6 +12917,44 @@ export class DeployApi extends BaseAPI {
  */
 export const DeviceApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * This service message allows de  letion of a device
+         * @summary Delete Device
+         * @param {string} deviceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deviceControllerDeleteDevice: async (deviceId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deviceId' is not null or undefined
+            assertParamExists('deviceControllerDeleteDevice', 'deviceId', deviceId)
+            const localVarPath = `/api/v1/device/{deviceId}`
+                .replace(`{${"deviceId"}}`, encodeURIComponent(String(deviceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * This service message returns an object of device configurations.
          * @summary Get Device Configurations
@@ -8594,6 +13115,44 @@ export const DeviceApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+         * @summary Get Device Restrictions
+         * @param {string} deviceId The unique identifier of the device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deviceControllerGetDeviceRestrictions: async (deviceId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deviceId' is not null or undefined
+            assertParamExists('deviceControllerGetDeviceRestrictions', 'deviceId', deviceId)
+            const localVarPath = `/api/v1/device/{deviceId}/restrictions`
+                .replace(`{${"deviceId"}}`, encodeURIComponent(String(deviceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This service message allows retrieval of all software on a process in a given device.
          * @summary Get Device softwares
          * @param {string} deviceId 
@@ -8720,6 +13279,40 @@ export const DeviceApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * This service message allows retrieval of all known operating systems that devices can report during discovery.
+         * @summary Get Known Operating Systems
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deviceControllerGetOperatingSystems: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/device/os`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This service message allows retrieval of all registered devices.
          * @summary Get Registered Devices
          * @param {Array<string>} [groups] Array of groups IDs or a single group ID
@@ -8760,17 +13353,17 @@ export const DeviceApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * This service message allow to update props of device
-         * @summary Set Device Name
+         * @summary Set Device Properties
          * @param {string} deviceId 
          * @param {DevicePutDto} devicePutDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deviceControllerPutDeviceName: async (deviceId: string, devicePutDto: DevicePutDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deviceControllerPutDeviceProps: async (deviceId: string, devicePutDto: DevicePutDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'deviceId' is not null or undefined
-            assertParamExists('deviceControllerPutDeviceName', 'deviceId', deviceId)
+            assertParamExists('deviceControllerPutDeviceProps', 'deviceId', deviceId)
             // verify required parameter 'devicePutDto' is not null or undefined
-            assertParamExists('deviceControllerPutDeviceName', 'devicePutDto', devicePutDto)
+            assertParamExists('deviceControllerPutDeviceProps', 'devicePutDto', devicePutDto)
             const localVarPath = `/api/v1/device/{deviceId}`
                 .replace(`{${"deviceId"}}`, encodeURIComponent(String(deviceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -8882,6 +13475,44 @@ export const DeviceApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+         * @summary Get Device Restrictions
+         * @param {string} deviceId The unique identifier of the device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeviceControllerGetDeviceRestrictions: async (deviceId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deviceId' is not null or undefined
+            assertParamExists('v2DeviceControllerGetDeviceRestrictions', 'deviceId', deviceId)
+            const localVarPath = `/api/v2/device/{deviceId}/restrictions`
+                .replace(`{${"deviceId"}}`, encodeURIComponent(String(deviceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -8892,6 +13523,19 @@ export const DeviceApiAxiosParamCreator = function (configuration?: Configuratio
 export const DeviceApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DeviceApiAxiosParamCreator(configuration)
     return {
+        /**
+         * This service message allows de  letion of a device
+         * @summary Delete Device
+         * @param {string} deviceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deviceControllerDeleteDevice(deviceId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deviceControllerDeleteDevice(deviceId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeviceApi.deviceControllerDeleteDevice']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
         /**
          * This service message returns an object of device configurations.
          * @summary Get Device Configurations
@@ -8946,6 +13590,19 @@ export const DeviceApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+         * @summary Get Device Restrictions
+         * @param {string} deviceId The unique identifier of the device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deviceControllerGetDeviceRestrictions(deviceId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RestrictionDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deviceControllerGetDeviceRestrictions(deviceId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeviceApi.deviceControllerGetDeviceRestrictions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * This service message allows retrieval of all software on a process in a given device.
          * @summary Get Device softwares
          * @param {string} deviceId 
@@ -8987,6 +13644,18 @@ export const DeviceApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * This service message allows retrieval of all known operating systems that devices can report during discovery.
+         * @summary Get Known Operating Systems
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deviceControllerGetOperatingSystems(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OSDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deviceControllerGetOperatingSystems(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeviceApi.deviceControllerGetOperatingSystems']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * This service message allows retrieval of all registered devices.
          * @summary Get Registered Devices
          * @param {Array<string>} [groups] Array of groups IDs or a single group ID
@@ -9001,16 +13670,16 @@ export const DeviceApiFp = function(configuration?: Configuration) {
         },
         /**
          * This service message allow to update props of device
-         * @summary Set Device Name
+         * @summary Set Device Properties
          * @param {string} deviceId 
          * @param {DevicePutDto} devicePutDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deviceControllerPutDeviceName(deviceId: string, devicePutDto: DevicePutDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DevicePutDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deviceControllerPutDeviceName(deviceId, devicePutDto, options);
+        async deviceControllerPutDeviceProps(deviceId: string, devicePutDto: DevicePutDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DevicePutDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deviceControllerPutDeviceProps(deviceId, devicePutDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DeviceApi.deviceControllerPutDeviceName']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeviceApi.deviceControllerPutDeviceProps']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -9039,6 +13708,19 @@ export const DeviceApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['DeviceApi.deviceControllerSetDeviceConfig']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+         * @summary Get Device Restrictions
+         * @param {string} deviceId The unique identifier of the device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2DeviceControllerGetDeviceRestrictions(deviceId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RestrictionDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2DeviceControllerGetDeviceRestrictions(deviceId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeviceApi.v2DeviceControllerGetDeviceRestrictions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -9049,6 +13731,16 @@ export const DeviceApiFp = function(configuration?: Configuration) {
 export const DeviceApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DeviceApiFp(configuration)
     return {
+        /**
+         * This service message allows de  letion of a device
+         * @summary Delete Device
+         * @param {string} deviceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deviceControllerDeleteDevice(deviceId: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deviceControllerDeleteDevice(deviceId, options).then((request) => request(axios, basePath));
+        },
         /**
          * This service message returns an object of device configurations.
          * @summary Get Device Configurations
@@ -9091,6 +13783,16 @@ export const DeviceApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.deviceControllerGetDeviceMaps(deviceId, options).then((request) => request(axios, basePath));
         },
         /**
+         * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+         * @summary Get Device Restrictions
+         * @param {string} deviceId The unique identifier of the device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deviceControllerGetDeviceRestrictions(deviceId: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<RestrictionDto>> {
+            return localVarFp.deviceControllerGetDeviceRestrictions(deviceId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * This service message allows retrieval of all software on a process in a given device.
          * @summary Get Device softwares
          * @param {string} deviceId 
@@ -9123,6 +13825,15 @@ export const DeviceApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.deviceControllerGetDevicesSoftwareStatisticInfo(groups, software, options).then((request) => request(axios, basePath));
         },
         /**
+         * This service message allows retrieval of all known operating systems that devices can report during discovery.
+         * @summary Get Known Operating Systems
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deviceControllerGetOperatingSystems(options?: RawAxiosRequestConfig): AxiosPromise<Array<OSDto>> {
+            return localVarFp.deviceControllerGetOperatingSystems(options).then((request) => request(axios, basePath));
+        },
+        /**
          * This service message allows retrieval of all registered devices.
          * @summary Get Registered Devices
          * @param {Array<string>} [groups] Array of groups IDs or a single group ID
@@ -9134,14 +13845,14 @@ export const DeviceApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * This service message allow to update props of device
-         * @summary Set Device Name
+         * @summary Set Device Properties
          * @param {string} deviceId 
          * @param {DevicePutDto} devicePutDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deviceControllerPutDeviceName(deviceId: string, devicePutDto: DevicePutDto, options?: RawAxiosRequestConfig): AxiosPromise<DevicePutDto> {
-            return localVarFp.deviceControllerPutDeviceName(deviceId, devicePutDto, options).then((request) => request(axios, basePath));
+        deviceControllerPutDeviceProps(deviceId: string, devicePutDto: DevicePutDto, options?: RawAxiosRequestConfig): AxiosPromise<DevicePutDto> {
+            return localVarFp.deviceControllerPutDeviceProps(deviceId, devicePutDto, options).then((request) => request(axios, basePath));
         },
         /**
          * This service message allows the device registration process for GetApp services.
@@ -9163,6 +13874,16 @@ export const DeviceApiFactory = function (configuration?: Configuration, basePat
         deviceControllerSetDeviceConfig(configDto: ConfigDto, options?: RawAxiosRequestConfig): AxiosPromise<ConfigDto> {
             return localVarFp.deviceControllerSetDeviceConfig(configDto, options).then((request) => request(axios, basePath));
         },
+        /**
+         * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+         * @summary Get Device Restrictions
+         * @param {string} deviceId The unique identifier of the device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DeviceControllerGetDeviceRestrictions(deviceId: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<RestrictionDto>> {
+            return localVarFp.v2DeviceControllerGetDeviceRestrictions(deviceId, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -9173,6 +13894,18 @@ export const DeviceApiFactory = function (configuration?: Configuration, basePat
  * @extends {BaseAPI}
  */
 export class DeviceApi extends BaseAPI {
+    /**
+     * This service message allows de  letion of a device
+     * @summary Delete Device
+     * @param {string} deviceId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeviceApi
+     */
+    public deviceControllerDeleteDevice(deviceId: string, options?: RawAxiosRequestConfig) {
+        return DeviceApiFp(this.configuration).deviceControllerDeleteDevice(deviceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * This service message returns an object of device configurations.
      * @summary Get Device Configurations
@@ -9223,6 +13956,18 @@ export class DeviceApi extends BaseAPI {
     }
 
     /**
+     * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+     * @summary Get Device Restrictions
+     * @param {string} deviceId The unique identifier of the device
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeviceApi
+     */
+    public deviceControllerGetDeviceRestrictions(deviceId: string, options?: RawAxiosRequestConfig) {
+        return DeviceApiFp(this.configuration).deviceControllerGetDeviceRestrictions(deviceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * This service message allows retrieval of all software on a process in a given device.
      * @summary Get Device softwares
      * @param {string} deviceId 
@@ -9261,6 +14006,17 @@ export class DeviceApi extends BaseAPI {
     }
 
     /**
+     * This service message allows retrieval of all known operating systems that devices can report during discovery.
+     * @summary Get Known Operating Systems
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeviceApi
+     */
+    public deviceControllerGetOperatingSystems(options?: RawAxiosRequestConfig) {
+        return DeviceApiFp(this.configuration).deviceControllerGetOperatingSystems(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * This service message allows retrieval of all registered devices.
      * @summary Get Registered Devices
      * @param {Array<string>} [groups] Array of groups IDs or a single group ID
@@ -9274,15 +14030,15 @@ export class DeviceApi extends BaseAPI {
 
     /**
      * This service message allow to update props of device
-     * @summary Set Device Name
+     * @summary Set Device Properties
      * @param {string} deviceId 
      * @param {DevicePutDto} devicePutDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DeviceApi
      */
-    public deviceControllerPutDeviceName(deviceId: string, devicePutDto: DevicePutDto, options?: RawAxiosRequestConfig) {
-        return DeviceApiFp(this.configuration).deviceControllerPutDeviceName(deviceId, devicePutDto, options).then((request) => request(this.axios, this.basePath));
+    public deviceControllerPutDeviceProps(deviceId: string, devicePutDto: DevicePutDto, options?: RawAxiosRequestConfig) {
+        return DeviceApiFp(this.configuration).deviceControllerPutDeviceProps(deviceId, devicePutDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -9307,6 +14063,18 @@ export class DeviceApi extends BaseAPI {
      */
     public deviceControllerSetDeviceConfig(configDto: ConfigDto, options?: RawAxiosRequestConfig) {
         return DeviceApiFp(this.configuration).deviceControllerSetDeviceConfig(configDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message retrieves all applicable restrictions for a device based on device ID, device type, OS, and other metadata collected during discovery.
+     * @summary Get Device Restrictions
+     * @param {string} deviceId The unique identifier of the device
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeviceApi
+     */
+    public v2DeviceControllerGetDeviceRestrictions(deviceId: string, options?: RawAxiosRequestConfig) {
+        return DeviceApiFp(this.configuration).v2DeviceControllerGetDeviceRestrictions(deviceId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -9505,46 +14273,6 @@ export class DeviceBugReportApi extends BaseAPI {
  */
 export const DeviceDiscoveryApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * This service message allows a device to post the discovery context for getting device software offers.
-         * @summary Discover Device Component
-         * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        discoveryControllerDeviceComponentDiscovery: async (discoveryMessageV2Dto: DiscoveryMessageV2Dto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'discoveryMessageV2Dto' is not null or undefined
-            assertParamExists('discoveryControllerDeviceComponentDiscovery', 'discoveryMessageV2Dto', discoveryMessageV2Dto)
-            const localVarPath = `/api/v2/device/discover/component`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(discoveryMessageV2Dto, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * This service message allows a device to post the discovery context.
          * @summary Discover Device Context
@@ -9784,6 +14512,46 @@ export const DeviceDiscoveryApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This service message allows a device to post the discovery context for getting device software offers.
+         * @summary Discover Device Component
+         * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DiscoveryControllerDeviceComponentDiscovery: async (discoveryMessageV2Dto: DiscoveryMessageV2Dto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'discoveryMessageV2Dto' is not null or undefined
+            assertParamExists('v2DiscoveryControllerDeviceComponentDiscovery', 'discoveryMessageV2Dto', discoveryMessageV2Dto)
+            const localVarPath = `/api/v2/device/discover/component`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(discoveryMessageV2Dto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -9795,26 +14563,13 @@ export const DeviceDiscoveryApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DeviceDiscoveryApiAxiosParamCreator(configuration)
     return {
         /**
-         * This service message allows a device to post the discovery context for getting device software offers.
-         * @summary Discover Device Component
-         * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async discoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceComponentsOfferingDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.discoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DeviceDiscoveryApi.discoveryControllerDeviceComponentDiscovery']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * This service message allows a device to post the discovery context.
          * @summary Discover Device Context
          * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async discoveryControllerDeviceContext(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async discoveryControllerDeviceContext(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiscoveryMessageV2Dto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.discoveryControllerDeviceContext(discoveryMessageV2Dto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DeviceDiscoveryApi.discoveryControllerDeviceContext']?.[localVarOperationServerIndex]?.url;
@@ -9884,6 +14639,19 @@ export const DeviceDiscoveryApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['DeviceDiscoveryApi.discoveryControllerUpdateMTlsStatus']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * This service message allows a device to post the discovery context for getting device software offers.
+         * @summary Discover Device Component
+         * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2DiscoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceComponentsOfferingDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2DiscoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeviceDiscoveryApi.v2DiscoveryControllerDeviceComponentDiscovery']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -9895,23 +14663,13 @@ export const DeviceDiscoveryApiFactory = function (configuration?: Configuration
     const localVarFp = DeviceDiscoveryApiFp(configuration)
     return {
         /**
-         * This service message allows a device to post the discovery context for getting device software offers.
-         * @summary Discover Device Component
-         * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        discoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): AxiosPromise<DeviceComponentsOfferingDto> {
-            return localVarFp.discoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto, options).then((request) => request(axios, basePath));
-        },
-        /**
          * This service message allows a device to post the discovery context.
          * @summary Discover Device Context
          * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        discoveryControllerDeviceContext(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        discoveryControllerDeviceContext(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): AxiosPromise<DiscoveryMessageV2Dto> {
             return localVarFp.discoveryControllerDeviceContext(discoveryMessageV2Dto, options).then((request) => request(axios, basePath));
         },
         /**
@@ -9963,6 +14721,16 @@ export const DeviceDiscoveryApiFactory = function (configuration?: Configuration
         discoveryControllerUpdateMTlsStatus(mTlsStatusDto: MTlsStatusDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.discoveryControllerUpdateMTlsStatus(mTlsStatusDto, options).then((request) => request(axios, basePath));
         },
+        /**
+         * This service message allows a device to post the discovery context for getting device software offers.
+         * @summary Discover Device Component
+         * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2DiscoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig): AxiosPromise<DeviceComponentsOfferingDto> {
+            return localVarFp.v2DiscoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -9973,18 +14741,6 @@ export const DeviceDiscoveryApiFactory = function (configuration?: Configuration
  * @extends {BaseAPI}
  */
 export class DeviceDiscoveryApi extends BaseAPI {
-    /**
-     * This service message allows a device to post the discovery context for getting device software offers.
-     * @summary Discover Device Component
-     * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DeviceDiscoveryApi
-     */
-    public discoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig) {
-        return DeviceDiscoveryApiFp(this.configuration).discoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * This service message allows a device to post the discovery context.
      * @summary Discover Device Context
@@ -10054,6 +14810,18 @@ export class DeviceDiscoveryApi extends BaseAPI {
      */
     public discoveryControllerUpdateMTlsStatus(mTlsStatusDto: MTlsStatusDto, options?: RawAxiosRequestConfig) {
         return DeviceDiscoveryApiFp(this.configuration).discoveryControllerUpdateMTlsStatus(mTlsStatusDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows a device to post the discovery context for getting device software offers.
+     * @summary Discover Device Component
+     * @param {DiscoveryMessageV2Dto} discoveryMessageV2Dto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeviceDiscoveryApi
+     */
+    public v2DiscoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto: DiscoveryMessageV2Dto, options?: RawAxiosRequestConfig) {
+        return DeviceDiscoveryApiFp(this.configuration).v2DiscoveryControllerDeviceComponentDiscovery(discoveryMessageV2Dto, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -11408,6 +16176,124 @@ export const GetMapApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This service message allows the consumer to request the start of exporting a map stamp and tracking the packaging process.
+         * @summary Create Import
+         * @param {CreateImportDto} createImportDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2GetMapControllerCreateImportV2: async (createImportDto: CreateImportDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createImportDto' is not null or undefined
+            assertParamExists('v2GetMapControllerCreateImportV2', 'createImportDto', createImportDto)
+            const localVarPath = `/api/v2/map/import/create`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createImportDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows the consumer to get status information and tracking of the packaging process.
+         * @summary Get Import Status
+         * @param {string} importRequestId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2GetMapControllerGetImportStatusV2: async (importRequestId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'importRequestId' is not null or undefined
+            assertParamExists('v2GetMapControllerGetImportStatusV2', 'importRequestId', importRequestId)
+            const localVarPath = `/api/v2/map/import/status/{importRequestId}`
+                .replace(`{${"importRequestId"}}`, encodeURIComponent(String(importRequestId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message gets a list of map request IDs and responds if there is new data map-product for them.
+         * @summary Get Inventory Updates (Version 2)
+         * @param {InventoryUpdatesReqV2Dto} inventoryUpdatesReqV2Dto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2GetMapControllerGetInventoryUpdatesV2: async (inventoryUpdatesReqV2Dto: InventoryUpdatesReqV2Dto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inventoryUpdatesReqV2Dto' is not null or undefined
+            assertParamExists('v2GetMapControllerGetInventoryUpdatesV2', 'inventoryUpdatesReqV2Dto', inventoryUpdatesReqV2Dto)
+            const localVarPath = `/api/v2/map/inventory/updates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inventoryUpdatesReqV2Dto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -11561,6 +16447,45 @@ export const GetMapApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['GetMapApi.getMapControllerStartMapUpdatedCronJob']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * This service message allows the consumer to request the start of exporting a map stamp and tracking the packaging process.
+         * @summary Create Import
+         * @param {CreateImportDto} createImportDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2GetMapControllerCreateImportV2(createImportDto: CreateImportDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateImportResDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2GetMapControllerCreateImportV2(createImportDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GetMapApi.v2GetMapControllerCreateImportV2']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message allows the consumer to get status information and tracking of the packaging process.
+         * @summary Get Import Status
+         * @param {string} importRequestId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2GetMapControllerGetImportStatusV2(importRequestId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ImportStatusResDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2GetMapControllerGetImportStatusV2(importRequestId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GetMapApi.v2GetMapControllerGetImportStatusV2']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message gets a list of map request IDs and responds if there is new data map-product for them.
+         * @summary Get Inventory Updates (Version 2)
+         * @param {InventoryUpdatesReqV2Dto} inventoryUpdatesReqV2Dto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2GetMapControllerGetInventoryUpdatesV2(inventoryUpdatesReqV2Dto: InventoryUpdatesReqV2Dto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InventoryUpdatesResV2Dto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2GetMapControllerGetInventoryUpdatesV2(inventoryUpdatesReqV2Dto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GetMapApi.v2GetMapControllerGetInventoryUpdatesV2']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -11680,6 +16605,36 @@ export const GetMapApiFactory = function (configuration?: Configuration, basePat
          */
         getMapControllerStartMapUpdatedCronJob(options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.getMapControllerStartMapUpdatedCronJob(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows the consumer to request the start of exporting a map stamp and tracking the packaging process.
+         * @summary Create Import
+         * @param {CreateImportDto} createImportDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2GetMapControllerCreateImportV2(createImportDto: CreateImportDto, options?: RawAxiosRequestConfig): AxiosPromise<CreateImportResDto> {
+            return localVarFp.v2GetMapControllerCreateImportV2(createImportDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows the consumer to get status information and tracking of the packaging process.
+         * @summary Get Import Status
+         * @param {string} importRequestId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2GetMapControllerGetImportStatusV2(importRequestId: string, options?: RawAxiosRequestConfig): AxiosPromise<ImportStatusResDto> {
+            return localVarFp.v2GetMapControllerGetImportStatusV2(importRequestId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message gets a list of map request IDs and responds if there is new data map-product for them.
+         * @summary Get Inventory Updates (Version 2)
+         * @param {InventoryUpdatesReqV2Dto} inventoryUpdatesReqV2Dto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2GetMapControllerGetInventoryUpdatesV2(inventoryUpdatesReqV2Dto: InventoryUpdatesReqV2Dto, options?: RawAxiosRequestConfig): AxiosPromise<InventoryUpdatesResV2Dto> {
+            return localVarFp.v2GetMapControllerGetInventoryUpdatesV2(inventoryUpdatesReqV2Dto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -11822,6 +16777,42 @@ export class GetMapApi extends BaseAPI {
     public getMapControllerStartMapUpdatedCronJob(options?: RawAxiosRequestConfig) {
         return GetMapApiFp(this.configuration).getMapControllerStartMapUpdatedCronJob(options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * This service message allows the consumer to request the start of exporting a map stamp and tracking the packaging process.
+     * @summary Create Import
+     * @param {CreateImportDto} createImportDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GetMapApi
+     */
+    public v2GetMapControllerCreateImportV2(createImportDto: CreateImportDto, options?: RawAxiosRequestConfig) {
+        return GetMapApiFp(this.configuration).v2GetMapControllerCreateImportV2(createImportDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows the consumer to get status information and tracking of the packaging process.
+     * @summary Get Import Status
+     * @param {string} importRequestId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GetMapApi
+     */
+    public v2GetMapControllerGetImportStatusV2(importRequestId: string, options?: RawAxiosRequestConfig) {
+        return GetMapApiFp(this.configuration).v2GetMapControllerGetImportStatusV2(importRequestId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message gets a list of map request IDs and responds if there is new data map-product for them.
+     * @summary Get Inventory Updates (Version 2)
+     * @param {InventoryUpdatesReqV2Dto} inventoryUpdatesReqV2Dto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GetMapApi
+     */
+    public v2GetMapControllerGetInventoryUpdatesV2(inventoryUpdatesReqV2Dto: InventoryUpdatesReqV2Dto, options?: RawAxiosRequestConfig) {
+        return GetMapApiFp(this.configuration).v2GetMapControllerGetInventoryUpdatesV2(inventoryUpdatesReqV2Dto, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 
@@ -11904,6 +16895,78 @@ export const LoginApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This service message allows a user to get a refresh token.
+         * @summary Get Refresh Token
+         * @param {RefreshTokenDto} refreshTokenDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2LoginControllerGetRefreshToken: async (refreshTokenDto: RefreshTokenDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'refreshTokenDto' is not null or undefined
+            assertParamExists('v2LoginControllerGetRefreshToken', 'refreshTokenDto', refreshTokenDto)
+            const localVarPath = `/api/v2/login/refresh`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(refreshTokenDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This service message allows a user to log in and receive a token.
+         * @summary User Login
+         * @param {UserLoginDto} userLoginDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2LoginControllerGetToken: async (userLoginDto: UserLoginDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userLoginDto' is not null or undefined
+            assertParamExists('v2LoginControllerGetToken', 'userLoginDto', userLoginDto)
+            const localVarPath = `/api/v2/login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(userLoginDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -11940,6 +17003,32 @@ export const LoginApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['LoginApi.loginControllerGetToken']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * This service message allows a user to get a refresh token.
+         * @summary Get Refresh Token
+         * @param {RefreshTokenDto} refreshTokenDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2LoginControllerGetRefreshToken(refreshTokenDto: RefreshTokenDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TokensDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2LoginControllerGetRefreshToken(refreshTokenDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LoginApi.v2LoginControllerGetRefreshToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This service message allows a user to log in and receive a token.
+         * @summary User Login
+         * @param {UserLoginDto} userLoginDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2LoginControllerGetToken(userLoginDto: UserLoginDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TokensDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2LoginControllerGetToken(userLoginDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LoginApi.v2LoginControllerGetToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -11969,6 +17058,26 @@ export const LoginApiFactory = function (configuration?: Configuration, basePath
          */
         loginControllerGetToken(userLoginDto: UserLoginDto, options?: RawAxiosRequestConfig): AxiosPromise<TokensDto> {
             return localVarFp.loginControllerGetToken(userLoginDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows a user to get a refresh token.
+         * @summary Get Refresh Token
+         * @param {RefreshTokenDto} refreshTokenDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2LoginControllerGetRefreshToken(refreshTokenDto: RefreshTokenDto, options?: RawAxiosRequestConfig): AxiosPromise<TokensDto> {
+            return localVarFp.v2LoginControllerGetRefreshToken(refreshTokenDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows a user to log in and receive a token.
+         * @summary User Login
+         * @param {UserLoginDto} userLoginDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2LoginControllerGetToken(userLoginDto: UserLoginDto, options?: RawAxiosRequestConfig): AxiosPromise<TokensDto> {
+            return localVarFp.v2LoginControllerGetToken(userLoginDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -12003,6 +17112,30 @@ export class LoginApi extends BaseAPI {
     public loginControllerGetToken(userLoginDto: UserLoginDto, options?: RawAxiosRequestConfig) {
         return LoginApiFp(this.configuration).loginControllerGetToken(userLoginDto, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * This service message allows a user to get a refresh token.
+     * @summary Get Refresh Token
+     * @param {RefreshTokenDto} refreshTokenDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApi
+     */
+    public v2LoginControllerGetRefreshToken(refreshTokenDto: RefreshTokenDto, options?: RawAxiosRequestConfig) {
+        return LoginApiFp(this.configuration).v2LoginControllerGetRefreshToken(refreshTokenDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows a user to log in and receive a token.
+     * @summary User Login
+     * @param {UserLoginDto} userLoginDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApi
+     */
+    public v2LoginControllerGetToken(userLoginDto: UserLoginDto, options?: RawAxiosRequestConfig) {
+        return LoginApiFp(this.configuration).v2LoginControllerGetToken(userLoginDto, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 
@@ -12015,7 +17148,7 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
     return {
         /**
          * 
-         * @summary Create Devices Group
+         * @summary Create organization group of devices
          * @param {CreateDevicesGroupDto} createDevicesGroupDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12055,7 +17188,47 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
         },
         /**
          * 
-         * @summary Delete Devices Group by ID
+         * @summary Create Organization ID
+         * @param {OrgIdDto} orgIdDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerCreateOrgIds: async (orgIdDto: OrgIdDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orgIdDto' is not null or undefined
+            assertParamExists('groupControllerCreateOrgIds', 'orgIdDto', orgIdDto)
+            const localVarPath = `/api/v1/org/orgIds`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(orgIdDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete organization group of devices by ID
          * @param {string} groupId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12093,7 +17266,45 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
         },
         /**
          * 
-         * @summary Edit Devices Group
+         * @summary Delete Organization ID
+         * @param {number} orgId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerDeleteOrgIds: async (orgId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orgId' is not null or undefined
+            assertParamExists('groupControllerDeleteOrgIds', 'orgId', orgId)
+            const localVarPath = `/api/v1/org/orgIds/{orgId}`
+                .replace(`{${"orgId"}}`, encodeURIComponent(String(orgId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Edit organization group of devices
          * @param {string} groupId 
          * @param {EditDevicesGroupDto} editDevicesGroupDto 
          * @param {*} [options] Override http request option.
@@ -12129,6 +17340,50 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(editDevicesGroupDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Edit Organization ID
+         * @param {number} orgId 
+         * @param {OrgIdPutDto} orgIdPutDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerEditOrgIds: async (orgId: number, orgIdPutDto: OrgIdPutDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orgId' is not null or undefined
+            assertParamExists('groupControllerEditOrgIds', 'orgId', orgId)
+            // verify required parameter 'orgIdPutDto' is not null or undefined
+            assertParamExists('groupControllerEditOrgIds', 'orgIdPutDto', orgIdPutDto)
+            const localVarPath = `/api/v1/org/orgIds/{orgId}`
+                .replace(`{${"orgId"}}`, encodeURIComponent(String(orgId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(orgIdPutDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -12209,7 +17464,7 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
         },
         /**
          * 
-         * @summary Get device org group data
+         * @summary Get organization device data by ID
          * @param {string} deviceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12217,7 +17472,7 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
         groupControllerGetOrgDeviceData: async (deviceId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'deviceId' is not null or undefined
             assertParamExists('groupControllerGetOrgDeviceData', 'deviceId', deviceId)
-            const localVarPath = `/api/v1/org/groups/devices/{deviceId}`
+            const localVarPath = `/api/v1/org/devices/{deviceId}`
                 .replace(`{${"deviceId"}}`, encodeURIComponent(String(deviceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12247,7 +17502,128 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
         },
         /**
          * 
-         * @summary Set Devices in a Group
+         * @summary Get org devices data
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerGetOrgDevicesData: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/org/devices`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Organization IDs details
+         * @param {number} orgId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerGetOrgId: async (orgId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orgId' is not null or undefined
+            assertParamExists('groupControllerGetOrgId', 'orgId', orgId)
+            const localVarPath = `/api/v1/org/orgIds/{orgId}`
+                .replace(`{${"orgId"}}`, encodeURIComponent(String(orgId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Organization IDs details
+         * @param {number} [group] Filter by group ID
+         * @param {boolean} [emptyGroup] If true: (with group) also include IDs without group; (without group) only IDs without group
+         * @param {boolean} [emptyDevice] If true, only IDs without device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerGetOrgIds: async (group?: number, emptyGroup?: boolean, emptyDevice?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/org/orgIds`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (group !== undefined) {
+                localVarQueryParameter['group'] = group;
+            }
+
+            if (emptyGroup !== undefined) {
+                localVarQueryParameter['emptyGroup'] = emptyGroup;
+            }
+
+            if (emptyDevice !== undefined) {
+                localVarQueryParameter['emptyDevice'] = emptyDevice;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Set groups and devices in group
          * @param {SetChildInGroupDto} setChildInGroupDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12255,7 +17631,7 @@ export const OrganizationGroupsApiAxiosParamCreator = function (configuration?: 
         groupControllerSetDevicesInGroup: async (setChildInGroupDto: SetChildInGroupDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'setChildInGroupDto' is not null or undefined
             assertParamExists('groupControllerSetDevicesInGroup', 'setChildInGroupDto', setChildInGroupDto)
-            const localVarPath = `/api/v1/org/groups/devices`;
+            const localVarPath = `/api/v1/org/groups/childs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12297,7 +17673,7 @@ export const OrganizationGroupsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Create Devices Group
+         * @summary Create organization group of devices
          * @param {CreateDevicesGroupDto} createDevicesGroupDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12310,7 +17686,20 @@ export const OrganizationGroupsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Delete Devices Group by ID
+         * @summary Create Organization ID
+         * @param {OrgIdDto} orgIdDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupControllerCreateOrgIds(orgIdDto: OrgIdDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrgIdRefDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.groupControllerCreateOrgIds(orgIdDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationGroupsApi.groupControllerCreateOrgIds']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Delete organization group of devices by ID
          * @param {string} groupId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12323,7 +17712,20 @@ export const OrganizationGroupsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Edit Devices Group
+         * @summary Delete Organization ID
+         * @param {number} orgId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupControllerDeleteOrgIds(orgId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrgIdRefDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.groupControllerDeleteOrgIds(orgId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationGroupsApi.groupControllerDeleteOrgIds']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Edit organization group of devices
          * @param {string} groupId 
          * @param {EditDevicesGroupDto} editDevicesGroupDto 
          * @param {*} [options] Override http request option.
@@ -12333,6 +17735,20 @@ export const OrganizationGroupsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.groupControllerEditGroup(groupId, editDevicesGroupDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['OrganizationGroupsApi.groupControllerEditGroup']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Edit Organization ID
+         * @param {number} orgId 
+         * @param {OrgIdPutDto} orgIdPutDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupControllerEditOrgIds(orgId: number, orgIdPutDto: OrgIdPutDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrgIdRefDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.groupControllerEditOrgIds(orgId, orgIdPutDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationGroupsApi.groupControllerEditOrgIds']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -12362,7 +17778,7 @@ export const OrganizationGroupsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Get device org group data
+         * @summary Get organization device data by ID
          * @param {string} deviceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12375,7 +17791,47 @@ export const OrganizationGroupsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Set Devices in a Group
+         * @summary Get org devices data
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupControllerGetOrgDevicesData(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DeviceOrgDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.groupControllerGetOrgDevicesData(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationGroupsApi.groupControllerGetOrgDevicesData']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Organization IDs details
+         * @param {number} orgId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupControllerGetOrgId(orgId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrgIdRefDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.groupControllerGetOrgId(orgId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationGroupsApi.groupControllerGetOrgId']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Organization IDs details
+         * @param {number} [group] Filter by group ID
+         * @param {boolean} [emptyGroup] If true: (with group) also include IDs without group; (without group) only IDs without group
+         * @param {boolean} [emptyDevice] If true, only IDs without device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupControllerGetOrgIds(group?: number, emptyGroup?: boolean, emptyDevice?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrgIdRefDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.groupControllerGetOrgIds(group, emptyGroup, emptyDevice, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationGroupsApi.groupControllerGetOrgIds']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Set groups and devices in group
          * @param {SetChildInGroupDto} setChildInGroupDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12398,7 +17854,7 @@ export const OrganizationGroupsApiFactory = function (configuration?: Configurat
     return {
         /**
          * 
-         * @summary Create Devices Group
+         * @summary Create organization group of devices
          * @param {CreateDevicesGroupDto} createDevicesGroupDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12408,7 +17864,17 @@ export const OrganizationGroupsApiFactory = function (configuration?: Configurat
         },
         /**
          * 
-         * @summary Delete Devices Group by ID
+         * @summary Create Organization ID
+         * @param {OrgIdDto} orgIdDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerCreateOrgIds(orgIdDto: OrgIdDto, options?: RawAxiosRequestConfig): AxiosPromise<OrgIdRefDto> {
+            return localVarFp.groupControllerCreateOrgIds(orgIdDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete organization group of devices by ID
          * @param {string} groupId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12418,7 +17884,17 @@ export const OrganizationGroupsApiFactory = function (configuration?: Configurat
         },
         /**
          * 
-         * @summary Edit Devices Group
+         * @summary Delete Organization ID
+         * @param {number} orgId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerDeleteOrgIds(orgId: number, options?: RawAxiosRequestConfig): AxiosPromise<OrgIdRefDto> {
+            return localVarFp.groupControllerDeleteOrgIds(orgId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Edit organization group of devices
          * @param {string} groupId 
          * @param {EditDevicesGroupDto} editDevicesGroupDto 
          * @param {*} [options] Override http request option.
@@ -12426,6 +17902,17 @@ export const OrganizationGroupsApiFactory = function (configuration?: Configurat
          */
         groupControllerEditGroup(groupId: string, editDevicesGroupDto: EditDevicesGroupDto, options?: RawAxiosRequestConfig): AxiosPromise<ChildGroupDto> {
             return localVarFp.groupControllerEditGroup(groupId, editDevicesGroupDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Edit Organization ID
+         * @param {number} orgId 
+         * @param {OrgIdPutDto} orgIdPutDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerEditOrgIds(orgId: number, orgIdPutDto: OrgIdPutDto, options?: RawAxiosRequestConfig): AxiosPromise<OrgIdRefDto> {
+            return localVarFp.groupControllerEditOrgIds(orgId, orgIdPutDto, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -12448,7 +17935,7 @@ export const OrganizationGroupsApiFactory = function (configuration?: Configurat
         },
         /**
          * 
-         * @summary Get device org group data
+         * @summary Get organization device data by ID
          * @param {string} deviceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12458,7 +17945,38 @@ export const OrganizationGroupsApiFactory = function (configuration?: Configurat
         },
         /**
          * 
-         * @summary Set Devices in a Group
+         * @summary Get org devices data
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerGetOrgDevicesData(options?: RawAxiosRequestConfig): AxiosPromise<Array<DeviceOrgDto>> {
+            return localVarFp.groupControllerGetOrgDevicesData(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Organization IDs details
+         * @param {number} orgId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerGetOrgId(orgId: number, options?: RawAxiosRequestConfig): AxiosPromise<OrgIdRefDto> {
+            return localVarFp.groupControllerGetOrgId(orgId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Organization IDs details
+         * @param {number} [group] Filter by group ID
+         * @param {boolean} [emptyGroup] If true: (with group) also include IDs without group; (without group) only IDs without group
+         * @param {boolean} [emptyDevice] If true, only IDs without device
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupControllerGetOrgIds(group?: number, emptyGroup?: boolean, emptyDevice?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<Array<OrgIdRefDto>> {
+            return localVarFp.groupControllerGetOrgIds(group, emptyGroup, emptyDevice, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Set groups and devices in group
          * @param {SetChildInGroupDto} setChildInGroupDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -12478,7 +17996,7 @@ export const OrganizationGroupsApiFactory = function (configuration?: Configurat
 export class OrganizationGroupsApi extends BaseAPI {
     /**
      * 
-     * @summary Create Devices Group
+     * @summary Create organization group of devices
      * @param {CreateDevicesGroupDto} createDevicesGroupDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -12490,7 +18008,19 @@ export class OrganizationGroupsApi extends BaseAPI {
 
     /**
      * 
-     * @summary Delete Devices Group by ID
+     * @summary Create Organization ID
+     * @param {OrgIdDto} orgIdDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationGroupsApi
+     */
+    public groupControllerCreateOrgIds(orgIdDto: OrgIdDto, options?: RawAxiosRequestConfig) {
+        return OrganizationGroupsApiFp(this.configuration).groupControllerCreateOrgIds(orgIdDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete organization group of devices by ID
      * @param {string} groupId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -12502,7 +18032,19 @@ export class OrganizationGroupsApi extends BaseAPI {
 
     /**
      * 
-     * @summary Edit Devices Group
+     * @summary Delete Organization ID
+     * @param {number} orgId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationGroupsApi
+     */
+    public groupControllerDeleteOrgIds(orgId: number, options?: RawAxiosRequestConfig) {
+        return OrganizationGroupsApiFp(this.configuration).groupControllerDeleteOrgIds(orgId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Edit organization group of devices
      * @param {string} groupId 
      * @param {EditDevicesGroupDto} editDevicesGroupDto 
      * @param {*} [options] Override http request option.
@@ -12511,6 +18053,19 @@ export class OrganizationGroupsApi extends BaseAPI {
      */
     public groupControllerEditGroup(groupId: string, editDevicesGroupDto: EditDevicesGroupDto, options?: RawAxiosRequestConfig) {
         return OrganizationGroupsApiFp(this.configuration).groupControllerEditGroup(groupId, editDevicesGroupDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Edit Organization ID
+     * @param {number} orgId 
+     * @param {OrgIdPutDto} orgIdPutDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationGroupsApi
+     */
+    public groupControllerEditOrgIds(orgId: number, orgIdPutDto: OrgIdPutDto, options?: RawAxiosRequestConfig) {
+        return OrganizationGroupsApiFp(this.configuration).groupControllerEditOrgIds(orgId, orgIdPutDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -12538,7 +18093,7 @@ export class OrganizationGroupsApi extends BaseAPI {
 
     /**
      * 
-     * @summary Get device org group data
+     * @summary Get organization device data by ID
      * @param {string} deviceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -12550,7 +18105,44 @@ export class OrganizationGroupsApi extends BaseAPI {
 
     /**
      * 
-     * @summary Set Devices in a Group
+     * @summary Get org devices data
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationGroupsApi
+     */
+    public groupControllerGetOrgDevicesData(options?: RawAxiosRequestConfig) {
+        return OrganizationGroupsApiFp(this.configuration).groupControllerGetOrgDevicesData(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Organization IDs details
+     * @param {number} orgId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationGroupsApi
+     */
+    public groupControllerGetOrgId(orgId: number, options?: RawAxiosRequestConfig) {
+        return OrganizationGroupsApiFp(this.configuration).groupControllerGetOrgId(orgId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Organization IDs details
+     * @param {number} [group] Filter by group ID
+     * @param {boolean} [emptyGroup] If true: (with group) also include IDs without group; (without group) only IDs without group
+     * @param {boolean} [emptyDevice] If true, only IDs without device
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationGroupsApi
+     */
+    public groupControllerGetOrgIds(group?: number, emptyGroup?: boolean, emptyDevice?: boolean, options?: RawAxiosRequestConfig) {
+        return OrganizationGroupsApiFp(this.configuration).groupControllerGetOrgIds(group, emptyGroup, emptyDevice, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Set groups and devices in group
      * @param {SetChildInGroupDto} setChildInGroupDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -12980,6 +18572,668 @@ export class PlatformsApi extends BaseAPI {
 
 
 /**
+ * PoliciesApi - axios parameter creator
+ * @export
+ */
+export const PoliciesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Adds a new field that can be used in rules (via upload service)
+         * @summary Add a new rule field
+         * @param {CreateRuleFieldDto} createRuleFieldDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerAddRuleField: async (createRuleFieldDto: CreateRuleFieldDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createRuleFieldDto' is not null or undefined
+            assertParamExists('policiesControllerAddRuleField', 'createRuleFieldDto', createRuleFieldDto)
+            const localVarPath = `/api/v1/upload/policies/fields`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createRuleFieldDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Creates a new policy (release-associated rule) in the upload service
+         * @summary Create a new policy
+         * @param {CreatePolicyDto} createPolicyDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerCreatePolicy: async (createPolicyDto: CreatePolicyDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createPolicyDto' is not null or undefined
+            assertParamExists('policiesControllerCreatePolicy', 'createPolicyDto', createPolicyDto)
+            const localVarPath = `/api/v1/upload/policies`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createPolicyDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Deletes an existing policy
+         * @summary Delete a policy
+         * @param {string} id Policy ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerDeletePolicy: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('policiesControllerDeletePolicy', 'id', id)
+            const localVarPath = `/api/v1/upload/policies/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetches all available fields that can be used in rules from the upload service
+         * @summary Get available rule fields
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerGetAvailableFields: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/upload/policies/fields/available`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetches all policies (release-associated rules) from the upload service
+         * @summary Get all policies
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [releaseId] Filter by release catalog ID
+         * @param {number} [deviceTypeId] Filter by device type ID
+         * @param {string} [deviceId] Filter by device ID
+         * @param {string} [osType] Filter by OS type
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerGetPolicies: async (isActive?: boolean, releaseId?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/upload/policies`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (isActive !== undefined) {
+                localVarQueryParameter['isActive'] = isActive;
+            }
+
+            if (releaseId !== undefined) {
+                localVarQueryParameter['releaseId'] = releaseId;
+            }
+
+            if (deviceTypeId !== undefined) {
+                localVarQueryParameter['deviceTypeId'] = deviceTypeId;
+            }
+
+            if (deviceId !== undefined) {
+                localVarQueryParameter['deviceId'] = deviceId;
+            }
+
+            if (osType !== undefined) {
+                localVarQueryParameter['osType'] = osType;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetches a specific policy by its ID
+         * @summary Get policy by ID
+         * @param {string} id Policy ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerGetPolicy: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('policiesControllerGetPolicy', 'id', id)
+            const localVarPath = `/api/v1/upload/policies/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Removes a field from the available fields list (via upload service)
+         * @summary Remove a rule field
+         * @param {string} name Field name (e.g., $.battery.level)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerRemoveRuleField: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('policiesControllerRemoveRuleField', 'name', name)
+            const localVarPath = `/api/v1/upload/policies/fields/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates an existing policy. Version is auto-incremented when rule is modified.
+         * @summary Update a policy
+         * @param {string} id Policy ID
+         * @param {UpdateRuleDto} updateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerUpdatePolicy: async (id: string, updateRuleDto: UpdateRuleDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('policiesControllerUpdatePolicy', 'id', id)
+            // verify required parameter 'updateRuleDto' is not null or undefined
+            assertParamExists('policiesControllerUpdatePolicy', 'updateRuleDto', updateRuleDto)
+            const localVarPath = `/api/v1/upload/policies/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateRuleDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PoliciesApi - functional programming interface
+ * @export
+ */
+export const PoliciesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PoliciesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Adds a new field that can be used in rules (via upload service)
+         * @summary Add a new rule field
+         * @param {CreateRuleFieldDto} createRuleFieldDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerAddRuleField(createRuleFieldDto: CreateRuleFieldDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerAddRuleField(createRuleFieldDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerAddRuleField']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Creates a new policy (release-associated rule) in the upload service
+         * @summary Create a new policy
+         * @param {CreatePolicyDto} createPolicyDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerCreatePolicy(createPolicyDto: CreatePolicyDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerCreatePolicy(createPolicyDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerCreatePolicy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Deletes an existing policy
+         * @summary Delete a policy
+         * @param {string} id Policy ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerDeletePolicy(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerDeletePolicy(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerDeletePolicy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetches all available fields that can be used in rules from the upload service
+         * @summary Get available rule fields
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerGetAvailableFields(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerGetAvailableFields(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerGetAvailableFields']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetches all policies (release-associated rules) from the upload service
+         * @summary Get all policies
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [releaseId] Filter by release catalog ID
+         * @param {number} [deviceTypeId] Filter by device type ID
+         * @param {string} [deviceId] Filter by device ID
+         * @param {string} [osType] Filter by OS type
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerGetPolicies(isActive?: boolean, releaseId?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerGetPolicies(isActive, releaseId, deviceTypeId, deviceId, osType, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerGetPolicies']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetches a specific policy by its ID
+         * @summary Get policy by ID
+         * @param {string} id Policy ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerGetPolicy(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerGetPolicy(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerGetPolicy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Removes a field from the available fields list (via upload service)
+         * @summary Remove a rule field
+         * @param {string} name Field name (e.g., $.battery.level)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerRemoveRuleField(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerRemoveRuleField(name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerRemoveRuleField']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates an existing policy. Version is auto-incremented when rule is modified.
+         * @summary Update a policy
+         * @param {string} id Policy ID
+         * @param {UpdateRuleDto} updateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async policiesControllerUpdatePolicy(id: string, updateRuleDto: UpdateRuleDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.policiesControllerUpdatePolicy(id, updateRuleDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PoliciesApi.policiesControllerUpdatePolicy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * PoliciesApi - factory interface
+ * @export
+ */
+export const PoliciesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PoliciesApiFp(configuration)
+    return {
+        /**
+         * Adds a new field that can be used in rules (via upload service)
+         * @summary Add a new rule field
+         * @param {CreateRuleFieldDto} createRuleFieldDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerAddRuleField(createRuleFieldDto: CreateRuleFieldDto, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.policiesControllerAddRuleField(createRuleFieldDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Creates a new policy (release-associated rule) in the upload service
+         * @summary Create a new policy
+         * @param {CreatePolicyDto} createPolicyDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerCreatePolicy(createPolicyDto: CreatePolicyDto, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.policiesControllerCreatePolicy(createPolicyDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Deletes an existing policy
+         * @summary Delete a policy
+         * @param {string} id Policy ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerDeletePolicy(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.policiesControllerDeletePolicy(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetches all available fields that can be used in rules from the upload service
+         * @summary Get available rule fields
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerGetAvailableFields(options?: RawAxiosRequestConfig): AxiosPromise<Array<object>> {
+            return localVarFp.policiesControllerGetAvailableFields(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetches all policies (release-associated rules) from the upload service
+         * @summary Get all policies
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [releaseId] Filter by release catalog ID
+         * @param {number} [deviceTypeId] Filter by device type ID
+         * @param {string} [deviceId] Filter by device ID
+         * @param {string} [osType] Filter by OS type
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerGetPolicies(isActive?: boolean, releaseId?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<object>> {
+            return localVarFp.policiesControllerGetPolicies(isActive, releaseId, deviceTypeId, deviceId, osType, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetches a specific policy by its ID
+         * @summary Get policy by ID
+         * @param {string} id Policy ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerGetPolicy(id: string, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.policiesControllerGetPolicy(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Removes a field from the available fields list (via upload service)
+         * @summary Remove a rule field
+         * @param {string} name Field name (e.g., $.battery.level)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerRemoveRuleField(name: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.policiesControllerRemoveRuleField(name, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates an existing policy. Version is auto-incremented when rule is modified.
+         * @summary Update a policy
+         * @param {string} id Policy ID
+         * @param {UpdateRuleDto} updateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        policiesControllerUpdatePolicy(id: string, updateRuleDto: UpdateRuleDto, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.policiesControllerUpdatePolicy(id, updateRuleDto, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PoliciesApi - object-oriented interface
+ * @export
+ * @class PoliciesApi
+ * @extends {BaseAPI}
+ */
+export class PoliciesApi extends BaseAPI {
+    /**
+     * Adds a new field that can be used in rules (via upload service)
+     * @summary Add a new rule field
+     * @param {CreateRuleFieldDto} createRuleFieldDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerAddRuleField(createRuleFieldDto: CreateRuleFieldDto, options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerAddRuleField(createRuleFieldDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Creates a new policy (release-associated rule) in the upload service
+     * @summary Create a new policy
+     * @param {CreatePolicyDto} createPolicyDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerCreatePolicy(createPolicyDto: CreatePolicyDto, options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerCreatePolicy(createPolicyDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Deletes an existing policy
+     * @summary Delete a policy
+     * @param {string} id Policy ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerDeletePolicy(id: string, options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerDeletePolicy(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetches all available fields that can be used in rules from the upload service
+     * @summary Get available rule fields
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerGetAvailableFields(options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerGetAvailableFields(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetches all policies (release-associated rules) from the upload service
+     * @summary Get all policies
+     * @param {boolean} [isActive] Filter by active status
+     * @param {string} [releaseId] Filter by release catalog ID
+     * @param {number} [deviceTypeId] Filter by device type ID
+     * @param {string} [deviceId] Filter by device ID
+     * @param {string} [osType] Filter by OS type
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerGetPolicies(isActive?: boolean, releaseId?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerGetPolicies(isActive, releaseId, deviceTypeId, deviceId, osType, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetches a specific policy by its ID
+     * @summary Get policy by ID
+     * @param {string} id Policy ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerGetPolicy(id: string, options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerGetPolicy(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Removes a field from the available fields list (via upload service)
+     * @summary Remove a rule field
+     * @param {string} name Field name (e.g., $.battery.level)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerRemoveRuleField(name: string, options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerRemoveRuleField(name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates an existing policy. Version is auto-incremented when rule is modified.
+     * @summary Update a policy
+     * @param {string} id Policy ID
+     * @param {UpdateRuleDto} updateRuleDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PoliciesApi
+     */
+    public policiesControllerUpdatePolicy(id: string, updateRuleDto: UpdateRuleDto, options?: RawAxiosRequestConfig) {
+        return PoliciesApiFp(this.configuration).policiesControllerUpdatePolicy(id, updateRuleDto, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
  * ProjectApi - axios parameter creator
  * @export
  */
@@ -13105,6 +19359,46 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createDocDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Create a new label
+         * @param {LabelNameDto} labelNameDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerCreateLabel: async (labelNameDto: LabelNameDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'labelNameDto' is not null or undefined
+            assertParamExists('projectManagementControllerCreateLabel', 'labelNameDto', labelNameDto)
+            const localVarPath = `/api/v1/project/labels`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(labelNameDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -13292,6 +19586,44 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('projectManagementControllerDeleteDoc', 'id', id)
             const localVarPath = `/api/v1/project/{projectIdentifier}/docs/{id}`
                 .replace(`{${"projectIdentifier"}}`, encodeURIComponent(String(projectIdentifier)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete a label
+         * @param {number} id Label ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerDeleteLabel: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('projectManagementControllerDeleteLabel', 'id', id)
+            const localVarPath = `/api/v1/project/labels/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -13855,6 +20187,45 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get all labels
+         * @param {string} [name] Filter labels by name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerGetLabels: async (name?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/project/labels`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get member project preferences
          * @param {string} projectIdentifier Project identifier (ID or name)
          * @param {*} [options] Override http request option.
@@ -14137,16 +20508,12 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Get all projects
-         * @param {boolean} [pinned] If true, include only pinned projects
-         * @param {boolean} [includePinned] Include pinned projects along with regular projects
-         * @param {number} [page] The page number to fetch (default: 1)
-         * @param {number} [perPage] Number of projects per page (default: 10)
+         * @summary Get all User\'s projects
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        projectManagementControllerGetProjects: async (pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v2/project`;
+        projectManagementControllerGetUserProjects: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/project`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -14162,22 +20529,6 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (pinned !== undefined) {
-                localVarQueryParameter['pinned'] = pinned;
-            }
-
-            if (includePinned !== undefined) {
-                localVarQueryParameter['includePinned'] = includePinned;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (perPage !== undefined) {
-                localVarQueryParameter['perPage'] = perPage;
-            }
-
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -14191,12 +20542,16 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Get all User\'s projects
+         * @summary Webhook endpoint for git integration (called by GitHub/GitLab)
+         * @param {string} token Webhook authentication token
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        projectManagementControllerGetUserProjects: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/project`;
+        projectManagementControllerHandleGitWebhook: async (token: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'token' is not null or undefined
+            assertParamExists('projectManagementControllerHandleGitWebhook', 'token', token)
+            const localVarPath = `/api/v1/project/git-webhook/{token}`
+                .replace(`{${"token"}}`, encodeURIComponent(String(token)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -14204,7 +20559,7 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -14268,17 +20623,15 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Search projects
-         * @param {string} query The search term (matches project name or partial match)
+         * @param {string} [query] The search term (matches project name or partial match)
          * @param {string} [status] Filter by project status (active, completed, on-hold)
-         * @param {ProjectManagementControllerSearchProjectsTypeEnum} [type] Filter by project type
+         * @param {boolean} [includeUnassociated] Include projects not owned or associated with the user
          * @param {number} [page] The page number to fetch (default: 1)
-         * @param {number} [perPage] Number of projects per page (default: 10)
+         * @param {number} [perPage] Number of projects per page (default: 15)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        projectManagementControllerSearchProjects: async (query: string, status?: string, type?: ProjectManagementControllerSearchProjectsTypeEnum, page?: number, perPage?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'query' is not null or undefined
-            assertParamExists('projectManagementControllerSearchProjects', 'query', query)
+        projectManagementControllerSearchProjects: async (query?: string, status?: string, includeUnassociated?: boolean, page?: number, perPage?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/project/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -14303,8 +20656,8 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
                 localVarQueryParameter['status'] = status;
             }
 
-            if (type !== undefined) {
-                localVarQueryParameter['type'] = type;
+            if (includeUnassociated !== undefined) {
+                localVarQueryParameter['includeUnassociated'] = includeUnassociated;
             }
 
             if (page !== undefined) {
@@ -14368,6 +20721,50 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(updateDocDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update a label
+         * @param {number} id Label ID
+         * @param {LabelNameDto} labelNameDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerUpdateLabel: async (id: number, labelNameDto: LabelNameDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('projectManagementControllerUpdateLabel', 'id', id)
+            // verify required parameter 'labelNameDto' is not null or undefined
+            assertParamExists('projectManagementControllerUpdateLabel', 'labelNameDto', labelNameDto)
+            const localVarPath = `/api/v1/project/labels/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(labelNameDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -14466,6 +20863,65 @@ export const ProjectApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Get all projects
+         * @param {boolean} [pinned] If true, include only pinned projects
+         * @param {boolean} [includePinned] Include pinned projects along with regular projects
+         * @param {number} [page] The page number to fetch (default: 1)
+         * @param {number} [perPage] Number of projects per page (default: 15)
+         * @param {Array<string>} [projectNames] Filter by specific project names
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2ProjectManagementControllerGetProjects: async (pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, projectNames?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v2/project`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (pinned !== undefined) {
+                localVarQueryParameter['pinned'] = pinned;
+            }
+
+            if (includePinned !== undefined) {
+                localVarQueryParameter['includePinned'] = includePinned;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (perPage !== undefined) {
+                localVarQueryParameter['perPage'] = perPage;
+            }
+
+            if (projectNames) {
+                localVarQueryParameter['projectNames'] = projectNames;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -14515,6 +20971,19 @@ export const ProjectApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerCreateDoc(projectIdentifier, createDocDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerCreateDoc']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Create a new label
+         * @param {LabelNameDto} labelNameDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async projectManagementControllerCreateLabel(labelNameDto: LabelNameDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LabelDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerCreateLabel(labelNameDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerCreateLabel']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14583,6 +21052,19 @@ export const ProjectApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerDeleteDoc(projectIdentifier, id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerDeleteDoc']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Delete a label
+         * @param {number} id Label ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async projectManagementControllerDeleteLabel(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerDeleteLabel(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerDeleteLabel']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14764,6 +21246,19 @@ export const ProjectApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get all labels
+         * @param {string} [name] Filter labels by name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async projectManagementControllerGetLabels(name?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<LabelDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerGetLabels(name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerGetLabels']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get member project preferences
          * @param {string} projectIdentifier Project identifier (ID or name)
          * @param {*} [options] Override http request option.
@@ -14859,22 +21354,6 @@ export const ProjectApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Get all projects
-         * @param {boolean} [pinned] If true, include only pinned projects
-         * @param {boolean} [includePinned] Include pinned projects along with regular projects
-         * @param {number} [page] The page number to fetch (default: 1)
-         * @param {number} [perPage] Number of projects per page (default: 10)
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async projectManagementControllerGetProjects(pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedProjectDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerGetProjects(pinned, includePinned, page, perPage, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerGetProjects']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary Get all User\'s projects
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -14883,6 +21362,19 @@ export const ProjectApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerGetUserProjects(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerGetUserProjects']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Webhook endpoint for git integration (called by GitHub/GitLab)
+         * @param {string} token Webhook authentication token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async projectManagementControllerHandleGitWebhook(token: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerHandleGitWebhook(token, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerHandleGitWebhook']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14902,16 +21394,16 @@ export const ProjectApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Search projects
-         * @param {string} query The search term (matches project name or partial match)
+         * @param {string} [query] The search term (matches project name or partial match)
          * @param {string} [status] Filter by project status (active, completed, on-hold)
-         * @param {ProjectManagementControllerSearchProjectsTypeEnum} [type] Filter by project type
+         * @param {boolean} [includeUnassociated] Include projects not owned or associated with the user
          * @param {number} [page] The page number to fetch (default: 1)
-         * @param {number} [perPage] Number of projects per page (default: 10)
+         * @param {number} [perPage] Number of projects per page (default: 15)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async projectManagementControllerSearchProjects(query: string, status?: string, type?: ProjectManagementControllerSearchProjectsTypeEnum, page?: number, perPage?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseProjectDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerSearchProjects(query, status, type, page, perPage, options);
+        async projectManagementControllerSearchProjects(query?: string, status?: string, includeUnassociated?: boolean, page?: number, perPage?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseProjectDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerSearchProjects(query, status, includeUnassociated, page, perPage, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerSearchProjects']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -14929,6 +21421,20 @@ export const ProjectApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerUpdateDoc(projectIdentifier, id, updateDocDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerUpdateDoc']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Update a label
+         * @param {number} id Label ID
+         * @param {LabelNameDto} labelNameDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async projectManagementControllerUpdateLabel(id: number, labelNameDto: LabelNameDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LabelDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerUpdateLabel(id, labelNameDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerUpdateLabel']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14958,6 +21464,23 @@ export const ProjectApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.projectManagementControllerUpdateProjectToken(projectIdentifier, tokenId, updateProjectTokenDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProjectApi.projectManagementControllerUpdateProjectToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get all projects
+         * @param {boolean} [pinned] If true, include only pinned projects
+         * @param {boolean} [includePinned] Include pinned projects along with regular projects
+         * @param {number} [page] The page number to fetch (default: 1)
+         * @param {number} [perPage] Number of projects per page (default: 15)
+         * @param {Array<string>} [projectNames] Filter by specific project names
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async v2ProjectManagementControllerGetProjects(pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, projectNames?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedProjectDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.v2ProjectManagementControllerGetProjects(pinned, includePinned, page, perPage, projectNames, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectApi.v2ProjectManagementControllerGetProjects']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -15001,6 +21524,16 @@ export const ProjectApiFactory = function (configuration?: Configuration, basePa
          */
         projectManagementControllerCreateDoc(projectIdentifier: string, createDocDto: CreateDocDto, options?: RawAxiosRequestConfig): AxiosPromise<DocDto> {
             return localVarFp.projectManagementControllerCreateDoc(projectIdentifier, createDocDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create a new label
+         * @param {LabelNameDto} labelNameDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerCreateLabel(labelNameDto: LabelNameDto, options?: RawAxiosRequestConfig): AxiosPromise<LabelDto> {
+            return localVarFp.projectManagementControllerCreateLabel(labelNameDto, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -15054,6 +21587,16 @@ export const ProjectApiFactory = function (configuration?: Configuration, basePa
          */
         projectManagementControllerDeleteDoc(projectIdentifier: string, id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.projectManagementControllerDeleteDoc(projectIdentifier, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete a label
+         * @param {number} id Label ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerDeleteLabel(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.projectManagementControllerDeleteLabel(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -15195,6 +21738,16 @@ export const ProjectApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Get all labels
+         * @param {string} [name] Filter labels by name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerGetLabels(name?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<LabelDto>> {
+            return localVarFp.projectManagementControllerGetLabels(name, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get member project preferences
          * @param {string} projectIdentifier Project identifier (ID or name)
          * @param {*} [options] Override http request option.
@@ -15269,25 +21822,22 @@ export const ProjectApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Get all projects
-         * @param {boolean} [pinned] If true, include only pinned projects
-         * @param {boolean} [includePinned] Include pinned projects along with regular projects
-         * @param {number} [page] The page number to fetch (default: 1)
-         * @param {number} [perPage] Number of projects per page (default: 10)
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        projectManagementControllerGetProjects(pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedProjectDto> {
-            return localVarFp.projectManagementControllerGetProjects(pinned, includePinned, page, perPage, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary Get all User\'s projects
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         projectManagementControllerGetUserProjects(options?: RawAxiosRequestConfig): AxiosPromise<MemberProjectsResDto> {
             return localVarFp.projectManagementControllerGetUserProjects(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Webhook endpoint for git integration (called by GitHub/GitLab)
+         * @param {string} token Webhook authentication token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerHandleGitWebhook(token: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.projectManagementControllerHandleGitWebhook(token, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -15303,16 +21853,16 @@ export const ProjectApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Search projects
-         * @param {string} query The search term (matches project name or partial match)
+         * @param {string} [query] The search term (matches project name or partial match)
          * @param {string} [status] Filter by project status (active, completed, on-hold)
-         * @param {ProjectManagementControllerSearchProjectsTypeEnum} [type] Filter by project type
+         * @param {boolean} [includeUnassociated] Include projects not owned or associated with the user
          * @param {number} [page] The page number to fetch (default: 1)
-         * @param {number} [perPage] Number of projects per page (default: 10)
+         * @param {number} [perPage] Number of projects per page (default: 15)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        projectManagementControllerSearchProjects(query: string, status?: string, type?: ProjectManagementControllerSearchProjectsTypeEnum, page?: number, perPage?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedBaseProjectDto> {
-            return localVarFp.projectManagementControllerSearchProjects(query, status, type, page, perPage, options).then((request) => request(axios, basePath));
+        projectManagementControllerSearchProjects(query?: string, status?: string, includeUnassociated?: boolean, page?: number, perPage?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedBaseProjectDto> {
+            return localVarFp.projectManagementControllerSearchProjects(query, status, includeUnassociated, page, perPage, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -15325,6 +21875,17 @@ export const ProjectApiFactory = function (configuration?: Configuration, basePa
          */
         projectManagementControllerUpdateDoc(projectIdentifier: string, id: number, updateDocDto: UpdateDocDto, options?: RawAxiosRequestConfig): AxiosPromise<DocDto> {
             return localVarFp.projectManagementControllerUpdateDoc(projectIdentifier, id, updateDocDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update a label
+         * @param {number} id Label ID
+         * @param {LabelNameDto} labelNameDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        projectManagementControllerUpdateLabel(id: number, labelNameDto: LabelNameDto, options?: RawAxiosRequestConfig): AxiosPromise<LabelDto> {
+            return localVarFp.projectManagementControllerUpdateLabel(id, labelNameDto, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -15348,6 +21909,20 @@ export const ProjectApiFactory = function (configuration?: Configuration, basePa
          */
         projectManagementControllerUpdateProjectToken(projectIdentifier: string, tokenId: number, updateProjectTokenDto: UpdateProjectTokenDto, options?: RawAxiosRequestConfig): AxiosPromise<ProjectTokenDto> {
             return localVarFp.projectManagementControllerUpdateProjectToken(projectIdentifier, tokenId, updateProjectTokenDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all projects
+         * @param {boolean} [pinned] If true, include only pinned projects
+         * @param {boolean} [includePinned] Include pinned projects along with regular projects
+         * @param {number} [page] The page number to fetch (default: 1)
+         * @param {number} [perPage] Number of projects per page (default: 15)
+         * @param {Array<string>} [projectNames] Filter by specific project names
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        v2ProjectManagementControllerGetProjects(pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, projectNames?: Array<string>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedProjectDto> {
+            return localVarFp.v2ProjectManagementControllerGetProjects(pinned, includePinned, page, perPage, projectNames, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -15395,6 +21970,18 @@ export class ProjectApi extends BaseAPI {
      */
     public projectManagementControllerCreateDoc(projectIdentifier: string, createDocDto: CreateDocDto, options?: RawAxiosRequestConfig) {
         return ProjectApiFp(this.configuration).projectManagementControllerCreateDoc(projectIdentifier, createDocDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create a new label
+     * @param {LabelNameDto} labelNameDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectApi
+     */
+    public projectManagementControllerCreateLabel(labelNameDto: LabelNameDto, options?: RawAxiosRequestConfig) {
+        return ProjectApiFp(this.configuration).projectManagementControllerCreateLabel(labelNameDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -15458,6 +22045,18 @@ export class ProjectApi extends BaseAPI {
      */
     public projectManagementControllerDeleteDoc(projectIdentifier: string, id: number, options?: RawAxiosRequestConfig) {
         return ProjectApiFp(this.configuration).projectManagementControllerDeleteDoc(projectIdentifier, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete a label
+     * @param {number} id Label ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectApi
+     */
+    public projectManagementControllerDeleteLabel(id: number, options?: RawAxiosRequestConfig) {
+        return ProjectApiFp(this.configuration).projectManagementControllerDeleteLabel(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -15626,6 +22225,18 @@ export class ProjectApi extends BaseAPI {
 
     /**
      * 
+     * @summary Get all labels
+     * @param {string} [name] Filter labels by name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectApi
+     */
+    public projectManagementControllerGetLabels(name?: string, options?: RawAxiosRequestConfig) {
+        return ProjectApiFp(this.configuration).projectManagementControllerGetLabels(name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get member project preferences
      * @param {string} projectIdentifier Project identifier (ID or name)
      * @param {*} [options] Override http request option.
@@ -15714,21 +22325,6 @@ export class ProjectApi extends BaseAPI {
 
     /**
      * 
-     * @summary Get all projects
-     * @param {boolean} [pinned] If true, include only pinned projects
-     * @param {boolean} [includePinned] Include pinned projects along with regular projects
-     * @param {number} [page] The page number to fetch (default: 1)
-     * @param {number} [perPage] Number of projects per page (default: 10)
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ProjectApi
-     */
-    public projectManagementControllerGetProjects(pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, options?: RawAxiosRequestConfig) {
-        return ProjectApiFp(this.configuration).projectManagementControllerGetProjects(pinned, includePinned, page, perPage, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary Get all User\'s projects
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -15736,6 +22332,18 @@ export class ProjectApi extends BaseAPI {
      */
     public projectManagementControllerGetUserProjects(options?: RawAxiosRequestConfig) {
         return ProjectApiFp(this.configuration).projectManagementControllerGetUserProjects(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Webhook endpoint for git integration (called by GitHub/GitLab)
+     * @param {string} token Webhook authentication token
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectApi
+     */
+    public projectManagementControllerHandleGitWebhook(token: string, options?: RawAxiosRequestConfig) {
+        return ProjectApiFp(this.configuration).projectManagementControllerHandleGitWebhook(token, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -15754,17 +22362,17 @@ export class ProjectApi extends BaseAPI {
     /**
      * 
      * @summary Search projects
-     * @param {string} query The search term (matches project name or partial match)
+     * @param {string} [query] The search term (matches project name or partial match)
      * @param {string} [status] Filter by project status (active, completed, on-hold)
-     * @param {ProjectManagementControllerSearchProjectsTypeEnum} [type] Filter by project type
+     * @param {boolean} [includeUnassociated] Include projects not owned or associated with the user
      * @param {number} [page] The page number to fetch (default: 1)
-     * @param {number} [perPage] Number of projects per page (default: 10)
+     * @param {number} [perPage] Number of projects per page (default: 15)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProjectApi
      */
-    public projectManagementControllerSearchProjects(query: string, status?: string, type?: ProjectManagementControllerSearchProjectsTypeEnum, page?: number, perPage?: number, options?: RawAxiosRequestConfig) {
-        return ProjectApiFp(this.configuration).projectManagementControllerSearchProjects(query, status, type, page, perPage, options).then((request) => request(this.axios, this.basePath));
+    public projectManagementControllerSearchProjects(query?: string, status?: string, includeUnassociated?: boolean, page?: number, perPage?: number, options?: RawAxiosRequestConfig) {
+        return ProjectApiFp(this.configuration).projectManagementControllerSearchProjects(query, status, includeUnassociated, page, perPage, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -15779,6 +22387,19 @@ export class ProjectApi extends BaseAPI {
      */
     public projectManagementControllerUpdateDoc(projectIdentifier: string, id: number, updateDocDto: UpdateDocDto, options?: RawAxiosRequestConfig) {
         return ProjectApiFp(this.configuration).projectManagementControllerUpdateDoc(projectIdentifier, id, updateDocDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update a label
+     * @param {number} id Label ID
+     * @param {LabelNameDto} labelNameDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectApi
+     */
+    public projectManagementControllerUpdateLabel(id: number, labelNameDto: LabelNameDto, options?: RawAxiosRequestConfig) {
+        return ProjectApiFp(this.configuration).projectManagementControllerUpdateLabel(id, labelNameDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -15807,16 +22428,1278 @@ export class ProjectApi extends BaseAPI {
     public projectManagementControllerUpdateProjectToken(projectIdentifier: string, tokenId: number, updateProjectTokenDto: UpdateProjectTokenDto, options?: RawAxiosRequestConfig) {
         return ProjectApiFp(this.configuration).projectManagementControllerUpdateProjectToken(projectIdentifier, tokenId, updateProjectTokenDto, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * 
+     * @summary Get all projects
+     * @param {boolean} [pinned] If true, include only pinned projects
+     * @param {boolean} [includePinned] Include pinned projects along with regular projects
+     * @param {number} [page] The page number to fetch (default: 1)
+     * @param {number} [perPage] Number of projects per page (default: 15)
+     * @param {Array<string>} [projectNames] Filter by specific project names
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectApi
+     */
+    public v2ProjectManagementControllerGetProjects(pinned?: boolean, includePinned?: boolean, page?: number, perPage?: number, projectNames?: Array<string>, options?: RawAxiosRequestConfig) {
+        return ProjectApiFp(this.configuration).v2ProjectManagementControllerGetProjects(pinned, includePinned, page, perPage, projectNames, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * RestrictionsApi - axios parameter creator
+ * @export
+ */
+export const RestrictionsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Creates a new restriction (device/os-associated rule) in the discovery service
+         * @summary Create a new restriction
+         * @param {CreateRestrictionDto} createRestrictionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerCreateRestriction: async (createRestrictionDto: CreateRestrictionDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createRestrictionDto' is not null or undefined
+            assertParamExists('restrictionsControllerCreateRestriction', 'createRestrictionDto', createRestrictionDto)
+            const localVarPath = `/api/v1/device/restrictions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createRestrictionDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Deletes an existing restriction
+         * @summary Delete a restriction
+         * @param {string} id Restriction ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerDeleteRestriction: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('restrictionsControllerDeleteRestriction', 'id', id)
+            const localVarPath = `/api/v1/device/restrictions/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetches a specific restriction by its ID
+         * @summary Get restriction by ID
+         * @param {string} id Restriction ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerGetRestriction: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('restrictionsControllerGetRestriction', 'id', id)
+            const localVarPath = `/api/v1/device/restrictions/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetches all restrictions (device/os-associated rules) from the discovery service
+         * @summary Get all restrictions
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [deviceTypeName] Filter by device type name
+         * @param {string} [deviceId] Filter by device ID
+         * @param {string} [osType] Filter by OS type
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerGetRestrictions: async (isActive?: boolean, deviceTypeName?: string, deviceId?: string, osType?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/device/restrictions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (isActive !== undefined) {
+                localVarQueryParameter['isActive'] = isActive;
+            }
+
+            if (deviceTypeName !== undefined) {
+                localVarQueryParameter['deviceTypeName'] = deviceTypeName;
+            }
+
+            if (deviceId !== undefined) {
+                localVarQueryParameter['deviceId'] = deviceId;
+            }
+
+            if (osType !== undefined) {
+                localVarQueryParameter['osType'] = osType;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates an existing restriction. Version is auto-incremented when rule is modified.
+         * @summary Update a restriction
+         * @param {string} id Restriction ID
+         * @param {UpdateRuleDto} updateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerUpdateRestriction: async (id: string, updateRuleDto: UpdateRuleDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('restrictionsControllerUpdateRestriction', 'id', id)
+            // verify required parameter 'updateRuleDto' is not null or undefined
+            assertParamExists('restrictionsControllerUpdateRestriction', 'updateRuleDto', updateRuleDto)
+            const localVarPath = `/api/v1/device/restrictions/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateRuleDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RestrictionsApi - functional programming interface
+ * @export
+ */
+export const RestrictionsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RestrictionsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Creates a new restriction (device/os-associated rule) in the discovery service
+         * @summary Create a new restriction
+         * @param {CreateRestrictionDto} createRestrictionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async restrictionsControllerCreateRestriction(createRestrictionDto: CreateRestrictionDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.restrictionsControllerCreateRestriction(createRestrictionDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RestrictionsApi.restrictionsControllerCreateRestriction']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Deletes an existing restriction
+         * @summary Delete a restriction
+         * @param {string} id Restriction ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async restrictionsControllerDeleteRestriction(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.restrictionsControllerDeleteRestriction(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RestrictionsApi.restrictionsControllerDeleteRestriction']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetches a specific restriction by its ID
+         * @summary Get restriction by ID
+         * @param {string} id Restriction ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async restrictionsControllerGetRestriction(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.restrictionsControllerGetRestriction(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RestrictionsApi.restrictionsControllerGetRestriction']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetches all restrictions (device/os-associated rules) from the discovery service
+         * @summary Get all restrictions
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [deviceTypeName] Filter by device type name
+         * @param {string} [deviceId] Filter by device ID
+         * @param {string} [osType] Filter by OS type
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async restrictionsControllerGetRestrictions(isActive?: boolean, deviceTypeName?: string, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.restrictionsControllerGetRestrictions(isActive, deviceTypeName, deviceId, osType, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RestrictionsApi.restrictionsControllerGetRestrictions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates an existing restriction. Version is auto-incremented when rule is modified.
+         * @summary Update a restriction
+         * @param {string} id Restriction ID
+         * @param {UpdateRuleDto} updateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async restrictionsControllerUpdateRestriction(id: string, updateRuleDto: UpdateRuleDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.restrictionsControllerUpdateRestriction(id, updateRuleDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RestrictionsApi.restrictionsControllerUpdateRestriction']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * RestrictionsApi - factory interface
+ * @export
+ */
+export const RestrictionsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RestrictionsApiFp(configuration)
+    return {
+        /**
+         * Creates a new restriction (device/os-associated rule) in the discovery service
+         * @summary Create a new restriction
+         * @param {CreateRestrictionDto} createRestrictionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerCreateRestriction(createRestrictionDto: CreateRestrictionDto, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.restrictionsControllerCreateRestriction(createRestrictionDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Deletes an existing restriction
+         * @summary Delete a restriction
+         * @param {string} id Restriction ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerDeleteRestriction(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.restrictionsControllerDeleteRestriction(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetches a specific restriction by its ID
+         * @summary Get restriction by ID
+         * @param {string} id Restriction ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerGetRestriction(id: string, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.restrictionsControllerGetRestriction(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetches all restrictions (device/os-associated rules) from the discovery service
+         * @summary Get all restrictions
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [deviceTypeName] Filter by device type name
+         * @param {string} [deviceId] Filter by device ID
+         * @param {string} [osType] Filter by OS type
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerGetRestrictions(isActive?: boolean, deviceTypeName?: string, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<object>> {
+            return localVarFp.restrictionsControllerGetRestrictions(isActive, deviceTypeName, deviceId, osType, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates an existing restriction. Version is auto-incremented when rule is modified.
+         * @summary Update a restriction
+         * @param {string} id Restriction ID
+         * @param {UpdateRuleDto} updateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        restrictionsControllerUpdateRestriction(id: string, updateRuleDto: UpdateRuleDto, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.restrictionsControllerUpdateRestriction(id, updateRuleDto, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RestrictionsApi - object-oriented interface
+ * @export
+ * @class RestrictionsApi
+ * @extends {BaseAPI}
+ */
+export class RestrictionsApi extends BaseAPI {
+    /**
+     * Creates a new restriction (device/os-associated rule) in the discovery service
+     * @summary Create a new restriction
+     * @param {CreateRestrictionDto} createRestrictionDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RestrictionsApi
+     */
+    public restrictionsControllerCreateRestriction(createRestrictionDto: CreateRestrictionDto, options?: RawAxiosRequestConfig) {
+        return RestrictionsApiFp(this.configuration).restrictionsControllerCreateRestriction(createRestrictionDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Deletes an existing restriction
+     * @summary Delete a restriction
+     * @param {string} id Restriction ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RestrictionsApi
+     */
+    public restrictionsControllerDeleteRestriction(id: string, options?: RawAxiosRequestConfig) {
+        return RestrictionsApiFp(this.configuration).restrictionsControllerDeleteRestriction(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetches a specific restriction by its ID
+     * @summary Get restriction by ID
+     * @param {string} id Restriction ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RestrictionsApi
+     */
+    public restrictionsControllerGetRestriction(id: string, options?: RawAxiosRequestConfig) {
+        return RestrictionsApiFp(this.configuration).restrictionsControllerGetRestriction(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetches all restrictions (device/os-associated rules) from the discovery service
+     * @summary Get all restrictions
+     * @param {boolean} [isActive] Filter by active status
+     * @param {string} [deviceTypeName] Filter by device type name
+     * @param {string} [deviceId] Filter by device ID
+     * @param {string} [osType] Filter by OS type
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RestrictionsApi
+     */
+    public restrictionsControllerGetRestrictions(isActive?: boolean, deviceTypeName?: string, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig) {
+        return RestrictionsApiFp(this.configuration).restrictionsControllerGetRestrictions(isActive, deviceTypeName, deviceId, osType, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates an existing restriction. Version is auto-incremented when rule is modified.
+     * @summary Update a restriction
+     * @param {string} id Restriction ID
+     * @param {UpdateRuleDto} updateRuleDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RestrictionsApi
+     */
+    public restrictionsControllerUpdateRestriction(id: string, updateRuleDto: UpdateRuleDto, options?: RawAxiosRequestConfig) {
+        return RestrictionsApiFp(this.configuration).restrictionsControllerUpdateRestriction(id, updateRuleDto, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * RulesApi - axios parameter creator
+ * @export
+ */
+export const RulesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Tests a rule against every device using its latest discovery data. Supply either a saved ruleId or an inline rule JSON. For saved policy rules the response additionally contains the releases the policy is attached to.
+         * @summary Evaluate a rule against all devices
+         * @param {EvaluateRuleDto} evaluateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rulesControllerEvaluateRule: async (evaluateRuleDto: EvaluateRuleDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'evaluateRuleDto' is not null or undefined
+            assertParamExists('rulesControllerEvaluateRule', 'evaluateRuleDto', evaluateRuleDto)
+            const localVarPath = `/api/v1/rules/evaluate`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(evaluateRuleDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetches all rules (both policies and restrictions) from upload and discovery services. Supports filtering by type to query only policies or restrictions.
+         * @summary Get all rules
+         * @param {RulesControllerGetAllRulesTypeEnum} [type] Filter by rule type (policy or restriction)
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [releaseId] Filter by release ID (policies only)
+         * @param {string} [deviceTypeName] Filter by device type name (restrictions only)
+         * @param {number} [deviceTypeId] Filter by device type ID (restrictions only)
+         * @param {string} [deviceId] Filter by device ID (restrictions only)
+         * @param {string} [osType] Filter by OS type (restrictions only)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rulesControllerGetAllRules: async (type?: RulesControllerGetAllRulesTypeEnum, isActive?: boolean, releaseId?: string, deviceTypeName?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/rules`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+            if (isActive !== undefined) {
+                localVarQueryParameter['isActive'] = isActive;
+            }
+
+            if (releaseId !== undefined) {
+                localVarQueryParameter['releaseId'] = releaseId;
+            }
+
+            if (deviceTypeName !== undefined) {
+                localVarQueryParameter['deviceTypeName'] = deviceTypeName;
+            }
+
+            if (deviceTypeId !== undefined) {
+                localVarQueryParameter['deviceTypeId'] = deviceTypeId;
+            }
+
+            if (deviceId !== undefined) {
+                localVarQueryParameter['deviceId'] = deviceId;
+            }
+
+            if (osType !== undefined) {
+                localVarQueryParameter['osType'] = osType;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns the evaluation context built from the latest discovery message for a device. Supply either deviceId (returns the latest message for that device) or discoveryMessageId (returns the context for that exact message, deviceId not required). The context structure is identical to what is used internally during rule evaluation.
+         * @summary Get device evaluation context
+         * @param {string} [deviceId] Device ID to look up. Required when discoveryMessageId is not provided.
+         * @param {string} [discoveryMessageId] ID of a specific discovery message to use. When provided, deviceId is not required.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rulesControllerGetDeviceContext: async (deviceId?: string, discoveryMessageId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/rules/device-context`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (deviceId !== undefined) {
+                localVarQueryParameter['deviceId'] = deviceId;
+            }
+
+            if (discoveryMessageId !== undefined) {
+                localVarQueryParameter['discoveryMessageId'] = discoveryMessageId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RulesApi - functional programming interface
+ * @export
+ */
+export const RulesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RulesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Tests a rule against every device using its latest discovery data. Supply either a saved ruleId or an inline rule JSON. For saved policy rules the response additionally contains the releases the policy is attached to.
+         * @summary Evaluate a rule against all devices
+         * @param {EvaluateRuleDto} evaluateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rulesControllerEvaluateRule(evaluateRuleDto: EvaluateRuleDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EvaluateRuleResultDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rulesControllerEvaluateRule(evaluateRuleDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RulesApi.rulesControllerEvaluateRule']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetches all rules (both policies and restrictions) from upload and discovery services. Supports filtering by type to query only policies or restrictions.
+         * @summary Get all rules
+         * @param {RulesControllerGetAllRulesTypeEnum} [type] Filter by rule type (policy or restriction)
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [releaseId] Filter by release ID (policies only)
+         * @param {string} [deviceTypeName] Filter by device type name (restrictions only)
+         * @param {number} [deviceTypeId] Filter by device type ID (restrictions only)
+         * @param {string} [deviceId] Filter by device ID (restrictions only)
+         * @param {string} [osType] Filter by OS type (restrictions only)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rulesControllerGetAllRules(type?: RulesControllerGetAllRulesTypeEnum, isActive?: boolean, releaseId?: string, deviceTypeName?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rulesControllerGetAllRules(type, isActive, releaseId, deviceTypeName, deviceTypeId, deviceId, osType, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RulesApi.rulesControllerGetAllRules']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Returns the evaluation context built from the latest discovery message for a device. Supply either deviceId (returns the latest message for that device) or discoveryMessageId (returns the context for that exact message, deviceId not required). The context structure is identical to what is used internally during rule evaluation.
+         * @summary Get device evaluation context
+         * @param {string} [deviceId] Device ID to look up. Required when discoveryMessageId is not provided.
+         * @param {string} [discoveryMessageId] ID of a specific discovery message to use. When provided, deviceId is not required.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rulesControllerGetDeviceContext(deviceId?: string, discoveryMessageId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceContextDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rulesControllerGetDeviceContext(deviceId, discoveryMessageId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RulesApi.rulesControllerGetDeviceContext']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * RulesApi - factory interface
+ * @export
+ */
+export const RulesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RulesApiFp(configuration)
+    return {
+        /**
+         * Tests a rule against every device using its latest discovery data. Supply either a saved ruleId or an inline rule JSON. For saved policy rules the response additionally contains the releases the policy is attached to.
+         * @summary Evaluate a rule against all devices
+         * @param {EvaluateRuleDto} evaluateRuleDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rulesControllerEvaluateRule(evaluateRuleDto: EvaluateRuleDto, options?: RawAxiosRequestConfig): AxiosPromise<EvaluateRuleResultDto> {
+            return localVarFp.rulesControllerEvaluateRule(evaluateRuleDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetches all rules (both policies and restrictions) from upload and discovery services. Supports filtering by type to query only policies or restrictions.
+         * @summary Get all rules
+         * @param {RulesControllerGetAllRulesTypeEnum} [type] Filter by rule type (policy or restriction)
+         * @param {boolean} [isActive] Filter by active status
+         * @param {string} [releaseId] Filter by release ID (policies only)
+         * @param {string} [deviceTypeName] Filter by device type name (restrictions only)
+         * @param {number} [deviceTypeId] Filter by device type ID (restrictions only)
+         * @param {string} [deviceId] Filter by device ID (restrictions only)
+         * @param {string} [osType] Filter by OS type (restrictions only)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rulesControllerGetAllRules(type?: RulesControllerGetAllRulesTypeEnum, isActive?: boolean, releaseId?: string, deviceTypeName?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<object>> {
+            return localVarFp.rulesControllerGetAllRules(type, isActive, releaseId, deviceTypeName, deviceTypeId, deviceId, osType, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns the evaluation context built from the latest discovery message for a device. Supply either deviceId (returns the latest message for that device) or discoveryMessageId (returns the context for that exact message, deviceId not required). The context structure is identical to what is used internally during rule evaluation.
+         * @summary Get device evaluation context
+         * @param {string} [deviceId] Device ID to look up. Required when discoveryMessageId is not provided.
+         * @param {string} [discoveryMessageId] ID of a specific discovery message to use. When provided, deviceId is not required.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rulesControllerGetDeviceContext(deviceId?: string, discoveryMessageId?: string, options?: RawAxiosRequestConfig): AxiosPromise<DeviceContextDto> {
+            return localVarFp.rulesControllerGetDeviceContext(deviceId, discoveryMessageId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RulesApi - object-oriented interface
+ * @export
+ * @class RulesApi
+ * @extends {BaseAPI}
+ */
+export class RulesApi extends BaseAPI {
+    /**
+     * Tests a rule against every device using its latest discovery data. Supply either a saved ruleId or an inline rule JSON. For saved policy rules the response additionally contains the releases the policy is attached to.
+     * @summary Evaluate a rule against all devices
+     * @param {EvaluateRuleDto} evaluateRuleDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RulesApi
+     */
+    public rulesControllerEvaluateRule(evaluateRuleDto: EvaluateRuleDto, options?: RawAxiosRequestConfig) {
+        return RulesApiFp(this.configuration).rulesControllerEvaluateRule(evaluateRuleDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetches all rules (both policies and restrictions) from upload and discovery services. Supports filtering by type to query only policies or restrictions.
+     * @summary Get all rules
+     * @param {RulesControllerGetAllRulesTypeEnum} [type] Filter by rule type (policy or restriction)
+     * @param {boolean} [isActive] Filter by active status
+     * @param {string} [releaseId] Filter by release ID (policies only)
+     * @param {string} [deviceTypeName] Filter by device type name (restrictions only)
+     * @param {number} [deviceTypeId] Filter by device type ID (restrictions only)
+     * @param {string} [deviceId] Filter by device ID (restrictions only)
+     * @param {string} [osType] Filter by OS type (restrictions only)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RulesApi
+     */
+    public rulesControllerGetAllRules(type?: RulesControllerGetAllRulesTypeEnum, isActive?: boolean, releaseId?: string, deviceTypeName?: string, deviceTypeId?: number, deviceId?: string, osType?: string, options?: RawAxiosRequestConfig) {
+        return RulesApiFp(this.configuration).rulesControllerGetAllRules(type, isActive, releaseId, deviceTypeName, deviceTypeId, deviceId, osType, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns the evaluation context built from the latest discovery message for a device. Supply either deviceId (returns the latest message for that device) or discoveryMessageId (returns the context for that exact message, deviceId not required). The context structure is identical to what is used internally during rule evaluation.
+     * @summary Get device evaluation context
+     * @param {string} [deviceId] Device ID to look up. Required when discoveryMessageId is not provided.
+     * @param {string} [discoveryMessageId] ID of a specific discovery message to use. When provided, deviceId is not required.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RulesApi
+     */
+    public rulesControllerGetDeviceContext(deviceId?: string, discoveryMessageId?: string, options?: RawAxiosRequestConfig) {
+        return RulesApiFp(this.configuration).rulesControllerGetDeviceContext(deviceId, discoveryMessageId, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 /**
  * @export
  */
-export const ProjectManagementControllerSearchProjectsTypeEnum = {
-    Product: 'product',
-    Formation: 'formation'
+export const RulesControllerGetAllRulesTypeEnum = {
+    Policy: 'policy',
+    Restriction: 'restriction'
 } as const;
-export type ProjectManagementControllerSearchProjectsTypeEnum = typeof ProjectManagementControllerSearchProjectsTypeEnum[keyof typeof ProjectManagementControllerSearchProjectsTypeEnum];
+export type RulesControllerGetAllRulesTypeEnum = typeof RulesControllerGetAllRulesTypeEnum[keyof typeof RulesControllerGetAllRulesTypeEnum];
+
+
+/**
+ * SBOMApi - axios parameter creator
+ * @export
+ */
+export const SBOMApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Delete a scan by ID. Cancels it if still queued.
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerDeleteScan: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('sbomControllerDeleteScan', 'id', id)
+            const localVarPath = `/api/v1/sbom/scans/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get presigned download URL for a completed SBOM report
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerGetScanReportUrl: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('sbomControllerGetScanReportUrl', 'id', id)
+            const localVarPath = `/api/v1/sbom/scans/{id}/report`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get scan status and metadata by ID
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerGetScanStatus: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('sbomControllerGetScanStatus', 'id', id)
+            const localVarPath = `/api/v1/sbom/scans/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary List recent SBOM scan jobs
+         * @param {number} [limit] 
+         * @param {number} [offset] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerListScans: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/sbom/scans`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Queue a new SBOM scan for a docker image, binary file, or directory
+         * @param {CreateScanPayload} createScanPayload 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerRequestScan: async (createScanPayload: CreateScanPayload, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createScanPayload' is not null or undefined
+            assertParamExists('sbomControllerRequestScan', 'createScanPayload', createScanPayload)
+            const localVarPath = `/api/v1/sbom/scans`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createScanPayload, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Re-queues the scan under the same ID. For file-based scans that originated from a MinIO upload, a fresh presigned download URL is automatically regenerated from the stored source object key so expired links are never reused.
+         * @summary Retry a failed or completed SBOM scan
+         * @param {string} id Scan job UUID to retry
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerRetryScan: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('sbomControllerRetryScan', 'id', id)
+            const localVarPath = `/api/v1/sbom/scans/{id}/retry`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * SBOMApi - functional programming interface
+ * @export
+ */
+export const SBOMApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = SBOMApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Delete a scan by ID. Cancels it if still queued.
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sbomControllerDeleteScan(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sbomControllerDeleteScan(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SBOMApi.sbomControllerDeleteScan']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get presigned download URL for a completed SBOM report
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sbomControllerGetScanReportUrl(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sbomControllerGetScanReportUrl(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SBOMApi.sbomControllerGetScanReportUrl']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get scan status and metadata by ID
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sbomControllerGetScanStatus(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScanStatusResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sbomControllerGetScanStatus(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SBOMApi.sbomControllerGetScanStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary List recent SBOM scan jobs
+         * @param {number} [limit] 
+         * @param {number} [offset] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sbomControllerListScans(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScanStatusResponseDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sbomControllerListScans(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SBOMApi.sbomControllerListScans']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Queue a new SBOM scan for a docker image, binary file, or directory
+         * @param {CreateScanPayload} createScanPayload 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sbomControllerRequestScan(createScanPayload: CreateScanPayload, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sbomControllerRequestScan(createScanPayload, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SBOMApi.sbomControllerRequestScan']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Re-queues the scan under the same ID. For file-based scans that originated from a MinIO upload, a fresh presigned download URL is automatically regenerated from the stored source object key so expired links are never reused.
+         * @summary Retry a failed or completed SBOM scan
+         * @param {string} id Scan job UUID to retry
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sbomControllerRetryScan(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sbomControllerRetryScan(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SBOMApi.sbomControllerRetryScan']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * SBOMApi - factory interface
+ * @export
+ */
+export const SBOMApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = SBOMApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Delete a scan by ID. Cancels it if still queued.
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerDeleteScan(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.sbomControllerDeleteScan(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get presigned download URL for a completed SBOM report
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerGetScanReportUrl(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.sbomControllerGetScanReportUrl(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get scan status and metadata by ID
+         * @param {string} id Scan job UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerGetScanStatus(id: string, options?: RawAxiosRequestConfig): AxiosPromise<ScanStatusResponseDto> {
+            return localVarFp.sbomControllerGetScanStatus(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary List recent SBOM scan jobs
+         * @param {number} [limit] 
+         * @param {number} [offset] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerListScans(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ScanStatusResponseDto>> {
+            return localVarFp.sbomControllerListScans(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Queue a new SBOM scan for a docker image, binary file, or directory
+         * @param {CreateScanPayload} createScanPayload 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerRequestScan(createScanPayload: CreateScanPayload, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.sbomControllerRequestScan(createScanPayload, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Re-queues the scan under the same ID. For file-based scans that originated from a MinIO upload, a fresh presigned download URL is automatically regenerated from the stored source object key so expired links are never reused.
+         * @summary Retry a failed or completed SBOM scan
+         * @param {string} id Scan job UUID to retry
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sbomControllerRetryScan(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.sbomControllerRetryScan(id, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * SBOMApi - object-oriented interface
+ * @export
+ * @class SBOMApi
+ * @extends {BaseAPI}
+ */
+export class SBOMApi extends BaseAPI {
+    /**
+     * 
+     * @summary Delete a scan by ID. Cancels it if still queued.
+     * @param {string} id Scan job UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SBOMApi
+     */
+    public sbomControllerDeleteScan(id: string, options?: RawAxiosRequestConfig) {
+        return SBOMApiFp(this.configuration).sbomControllerDeleteScan(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get presigned download URL for a completed SBOM report
+     * @param {string} id Scan job UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SBOMApi
+     */
+    public sbomControllerGetScanReportUrl(id: string, options?: RawAxiosRequestConfig) {
+        return SBOMApiFp(this.configuration).sbomControllerGetScanReportUrl(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get scan status and metadata by ID
+     * @param {string} id Scan job UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SBOMApi
+     */
+    public sbomControllerGetScanStatus(id: string, options?: RawAxiosRequestConfig) {
+        return SBOMApiFp(this.configuration).sbomControllerGetScanStatus(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary List recent SBOM scan jobs
+     * @param {number} [limit] 
+     * @param {number} [offset] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SBOMApi
+     */
+    public sbomControllerListScans(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return SBOMApiFp(this.configuration).sbomControllerListScans(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Queue a new SBOM scan for a docker image, binary file, or directory
+     * @param {CreateScanPayload} createScanPayload 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SBOMApi
+     */
+    public sbomControllerRequestScan(createScanPayload: CreateScanPayload, options?: RawAxiosRequestConfig) {
+        return SBOMApiFp(this.configuration).sbomControllerRequestScan(createScanPayload, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Re-queues the scan under the same ID. For file-based scans that originated from a MinIO upload, a fresh presigned download URL is automatically regenerated from the stored source object key so expired links are never reused.
+     * @summary Retry a failed or completed SBOM scan
+     * @param {string} id Scan job UUID to retry
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SBOMApi
+     */
+    public sbomControllerRetryScan(id: string, options?: RawAxiosRequestConfig) {
+        return SBOMApiFp(this.configuration).sbomControllerRetryScan(id, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
 
 
 /**
@@ -15936,6 +23819,40 @@ export const UploadApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * This service message allows uploading a file
+         * @summary Upload File
+         * @param {string} objectKey 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadControllerUploadFile: async (objectKey: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'objectKey' is not null or undefined
+            assertParamExists('uploadControllerUploadFile', 'objectKey', objectKey)
+            const localVarPath = `/api/v1/upload/{objectKey}`
+                .replace(`{${"objectKey"}}`, encodeURIComponent(String(objectKey)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This service message allows uploading a manifest file and an upload token.
          * @summary Upload Manifest
          * @param {File} file 
@@ -16031,6 +23948,19 @@ export const UploadApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * This service message allows uploading a file
+         * @summary Upload File
+         * @param {string} objectKey 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadControllerUploadFile(objectKey: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadControllerUploadFile(objectKey, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UploadApi.uploadControllerUploadFile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * This service message allows uploading a manifest file and an upload token.
          * @summary Upload Manifest
          * @param {File} file 
@@ -16083,6 +24013,16 @@ export const UploadApiFactory = function (configuration?: Configuration, basePat
          */
         uploadControllerUploadArtifact(uploadArtifactDto: UploadArtifactDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.uploadControllerUploadArtifact(uploadArtifactDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This service message allows uploading a file
+         * @summary Upload File
+         * @param {string} objectKey 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadControllerUploadFile(objectKey: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.uploadControllerUploadFile(objectKey, options).then((request) => request(axios, basePath));
         },
         /**
          * This service message allows uploading a manifest file and an upload token.
@@ -16139,6 +24079,18 @@ export class UploadApi extends BaseAPI {
      */
     public uploadControllerUploadArtifact(uploadArtifactDto: UploadArtifactDto, options?: RawAxiosRequestConfig) {
         return UploadApiFp(this.configuration).uploadControllerUploadArtifact(uploadArtifactDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This service message allows uploading a file
+     * @summary Upload File
+     * @param {string} objectKey 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UploadApi
+     */
+    public uploadControllerUploadFile(objectKey: string, options?: RawAxiosRequestConfig) {
+        return UploadApiFp(this.configuration).uploadControllerUploadFile(objectKey, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

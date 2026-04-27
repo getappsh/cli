@@ -86,7 +86,7 @@ const extractDockerImageName = (dockerImageUrl: string): string | undefined => {
 
 export const handleUploadArt = async (version: string, type: FileType, options?: UploadArtOptions) => {
 
-  validateUploadOptions(type, options)
+  await validateUploadOptions(type, options)
 
   const projToken = await ProjToken.getTokenOrExit(options?.token) ?? ""
 
@@ -124,8 +124,10 @@ export const handleUploadArt = async (version: string, type: FileType, options?:
     artifactName: name,
     type,
     isInstallationFile: !!options?.deployable,
+    isExecutable: !!options?.executable,
     dockerImageUrl: options?.dockerImageUrl,
-    metadata
+    metadata,
+    arguments: options?.args
   }
 
   const res = await uploadArt(data, projToken, projectId, version);

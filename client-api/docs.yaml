@@ -41,86 +41,245 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokensDto'
       tags: *ref_0
-  /api/v1/upload/artifact:
+  /api/v2/login:
     post:
-      operationId: UploadController_uploadArtifact
-      summary: Upload Artifact
-      description: This service message allows uploading an artifact.
+      operationId: v2_LoginController_getToken
+      summary: User Login
+      description: This service message allows a user to log in and receive a token.
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UploadArtifactDto'
+              $ref: '#/components/schemas/UserLoginDto'
       responses:
         '201':
-          description: ''
-      tags: &ref_1
-        - Upload
-  /api/v1/upload/manifest:
-    post:
-      operationId: UploadController_uploadManifest
-      summary: Upload Manifest
-      description: >-
-        This service message allows uploading a manifest file and an upload
-        token.
-      parameters: []
-      requestBody:
-        required: true
-        description: File and upload token
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UploadManifestDto'
-      responses:
-        '201':
-          description: ''
-      tags: *ref_1
-  /api/v1/upload/updateUploadStatus:
-    post:
-      operationId: UploadController_updateUploadStatus
-      summary: Update Upload Status
-      description: This service message allows updating the upload status.
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateUploadStatusDto'
-      responses:
-        '201':
-          description: return 201 with no body
-      tags: *ref_1
-  /api/v1/upload/lastVersion/{projectId}:
-    get:
-      operationId: UploadController_getLastVersion
-      summary: Get Last Version
-      description: This service message allows retrieval of the last version by project ID.
-      parameters:
-        - name: projectId
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        '200':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ComponentDto'
+                $ref: '#/components/schemas/TokensDto'
+      tags: &ref_1
+        - Login
+  /api/v2/login/refresh:
+    post:
+      operationId: v2_LoginController_getRefreshToken
+      summary: Get Refresh Token
+      description: This service message allows a user to get a refresh token.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokensDto'
       tags: *ref_1
-      security:
+  /api/v1/upload/policies:
+    post:
+      operationId: PoliciesController_createPolicy
+      summary: Create a new policy
+      description: Creates a new policy (release-associated rule) in the upload service
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyDto'
+      responses:
+        '201':
+          description: Policy created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: &ref_2
+        - Policies
+      security: &ref_3
         - bearer: []
+    get:
+      operationId: PoliciesController_getPolicies
+      summary: Get all policies
+      description: Fetches all policies (release-associated rules) from the upload service
+      parameters:
+        - name: isActive
+          required: false
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+        - name: releaseId
+          required: false
+          in: query
+          description: Filter by release catalog ID
+          schema:
+            type: string
+        - name: deviceTypeId
+          required: false
+          in: query
+          description: Filter by device type ID
+          schema:
+            type: number
+        - name: deviceId
+          required: false
+          in: query
+          description: Filter by device ID
+          schema:
+            type: string
+        - name: osType
+          required: false
+          in: query
+          description: Filter by OS type
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of policies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+      tags: *ref_2
+      security: *ref_3
+  /api/v1/upload/policies/{id}:
+    get:
+      operationId: PoliciesController_getPolicy
+      summary: Get policy by ID
+      description: Fetches a specific policy by its ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Policy ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policy details
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *ref_2
+      security: *ref_3
+    put:
+      operationId: PoliciesController_updatePolicy
+      summary: Update a policy
+      description: >-
+        Updates an existing policy. Version is auto-incremented when rule is
+        modified.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Policy ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRuleDto'
+      responses:
+        '200':
+          description: Policy updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *ref_2
+      security: *ref_3
+    delete:
+      operationId: PoliciesController_deletePolicy
+      summary: Delete a policy
+      description: Deletes an existing policy
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Policy ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policy deleted successfully
+      tags: *ref_2
+      security: *ref_3
+  /api/v1/upload/policies/fields/available:
+    get:
+      operationId: PoliciesController_getAvailableFields
+      summary: Get available rule fields
+      description: >-
+        Fetches all available fields that can be used in rules from the upload
+        service
+      parameters: []
+      responses:
+        '200':
+          description: List of available fields
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+      tags: *ref_2
+      security: *ref_3
+  /api/v1/upload/policies/fields:
+    post:
+      operationId: PoliciesController_addRuleField
+      summary: Add a new rule field
+      description: Adds a new field that can be used in rules (via upload service)
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRuleFieldDto'
+      responses:
+        '201':
+          description: Field added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *ref_2
+      security: *ref_3
+  /api/v1/upload/policies/fields/{name}:
+    delete:
+      operationId: PoliciesController_removeRuleField
+      summary: Remove a rule field
+      description: Removes a field from the available fields list (via upload service)
+      parameters:
+        - name: name
+          required: true
+          in: path
+          description: Field name (e.g., $.battery.level)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Field removed successfully
+      tags: *ref_2
+      security: *ref_3
   /api/v1/catalog/releases/project/{projectIdentifier}:
     post:
       operationId: ReleasesController_setRelease
       summary: Set a Release
       description: This service message allows creation of a release.
       parameters:
-        - &ref_2
+        - &ref_4
           name: X-Project-Token
           in: header
           required: false
@@ -145,16 +304,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DetailedReleaseDto'
-      tags: &ref_3
+      tags: &ref_5
         - Catalog - Upload
-      security: &ref_4
+      security: &ref_6
         - bearer: []
     get:
       operationId: ReleasesController_getReleases
       summary: Get Releases
       description: This service message allows retrieval of releases.
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -170,15 +329,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReleaseDto'
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
   /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}:
     get:
       operationId: ReleasesController_getRelease
       summary: Get Release
       description: This service message allows retrieval of a release.
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -197,14 +356,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DetailedReleaseDto'
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
     delete:
       operationId: ReleasesController_deleteRelease
       summary: Delete Release
       description: This service message allows deletion of a release.
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -219,15 +378,15 @@ paths:
       responses:
         '200':
           description: Release deleted.
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
   /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/artifact:
     post:
       operationId: ReleasesController_setReleaseArtifact
       summary: Set Release Artifact
       description: This service message allows creation of a release artifact.
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -252,15 +411,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SetReleaseArtifactResDto'
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
   /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/artifact/{artifactId}:
     delete:
       operationId: ReleasesController_deleteReleaseArtifact
       summary: Delete Release Artifact
       description: This service message allows deletion of a release artifact.
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -280,15 +439,50 @@ paths:
       responses:
         '200':
           description: Release artifact deleted.
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
+    patch:
+      operationId: ReleasesController_updateFileMetadata
+      summary: Update file properties
+      description: >-
+        This route enables to change the properties of an artifact, f.e
+        metadata, isExecutable, arguments etc.
+      parameters:
+        - *ref_4
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: version
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: artifactId
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFilePropertiesDto'
+      responses:
+        '200':
+          description: Release artifact metadata update
+      tags: *ref_5
+      security: *ref_6
   /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/artifact/download/{fileName}:
     get:
       operationId: ReleasesController_downloadArtifact
       summary: Download Release Artifact
       description: This service allows downloading a release artifact by file name.
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -308,14 +502,14 @@ paths:
       responses:
         '302':
           description: Redirects to a URL
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
   /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/regulation-status:
     get:
       operationId: ReleasesController_getVersionRegulationStatuses
       summary: Get Version Regulation Statuses by Regulation ID
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -336,14 +530,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RegulationStatusDto'
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
   /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}:
     get:
       operationId: ReleasesController_getRegulationStatus
       summary: Get Regulation Status by Regulation ID and Version ID
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -369,13 +563,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegulationStatusDto'
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
     post:
       operationId: ReleasesController_setRegulationStatus
       summary: Set Regulation Status
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -407,13 +601,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegulationStatusDto'
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
     delete:
       operationId: ReleasesController_deleteRegulationStatus
       summary: Delete Regulation Status
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -435,14 +629,14 @@ paths:
       responses:
         '200':
           description: Regulation status deleted
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
   /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/regulation-status/{regulation}/compliancy:
     post:
       operationId: ReleasesController_setRegulationCompliancy
       summary: Set Regulation Compliancy
       parameters:
-        - *ref_2
+        - *ref_4
         - name: projectIdentifier
           required: true
           in: path
@@ -474,8 +668,207 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegulationStatusDto'
-      tags: *ref_3
-      security: *ref_4
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/export:
+    get:
+      operationId: ReleasesController_exportRelease
+      summary: Export Release
+      description: >-
+        Exports a release configuration and its associated delivery metadata
+        into a JSON format for backup, migration, or integration purposes.
+      parameters:
+        - *ref_4
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: version
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exported release data in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportReleaseDto'
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/catalog/releases/project/{projectIdentifier}/import:
+    post:
+      operationId: ReleasesController_importRelease
+      summary: Import Release
+      description: >-
+        Imports a release from a JSON file, creating or updating the delivery
+        configuration and restoring all associated metadata. The release will be
+        created in draft status.
+      parameters:
+        - *ref_4
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportReleaseDto'
+      responses:
+        '201':
+          description: Import response with warnings if any
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportReleaseResponseDto'
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/catalog/releases/sbom-enabled:
+    get:
+      operationId: ReleasesController_getSbomEnabled
+      summary: Get SBOM Enabled
+      description: >-
+        Returns whether SBOM artifact scanning is enabled, based on server
+        configuration.
+      parameters:
+        - *ref_4
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/catalog/releases/project/{projectIdentifier}/version/{version}/deployment-report:
+    get:
+      operationId: ReleasesController_getDeploymentReport
+      summary: Get Deployment Report
+      description: >-
+        Generates a comprehensive deployment report for a specific release,
+        including download stats, installation counts, active delivery
+        processes, and deployment percentage.
+      parameters:
+        - *ref_4
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: version
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deployment report with analytics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentReportDto'
+      tags: *ref_5
+      security: *ref_6
+  /api/v1/upload/artifact:
+    post:
+      operationId: UploadController_uploadArtifact
+      summary: Upload Artifact
+      description: This service message allows uploading an artifact.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadArtifactDto'
+      responses:
+        '201':
+          description: ''
+      tags: &ref_7
+        - Upload
+  /api/v1/upload/manifest:
+    post:
+      operationId: UploadController_uploadManifest
+      summary: Upload Manifest
+      description: >-
+        This service message allows uploading a manifest file and an upload
+        token.
+      parameters: []
+      requestBody:
+        required: true
+        description: File and upload token
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadManifestDto'
+      responses:
+        '201':
+          description: ''
+      tags: *ref_7
+  /api/v1/upload/updateUploadStatus:
+    post:
+      operationId: UploadController_updateUploadStatus
+      summary: Update Upload Status
+      description: This service message allows updating the upload status.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUploadStatusDto'
+      responses:
+        '201':
+          description: return 201 with no body
+      tags: *ref_7
+  /api/v1/upload/lastVersion/{projectId}:
+    get:
+      operationId: UploadController_getLastVersion
+      summary: Get Last Version
+      description: This service message allows retrieval of the last version by project ID.
+      parameters:
+        - name: projectId
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentDto'
+      tags: *ref_7
+      security:
+        - bearer: []
+  /api/v1/upload/{objectKey}:
+    put:
+      operationId: UploadController_uploadFile
+      summary: Upload File
+      description: This service message allows uploading a file
+      parameters:
+        - name: objectKey
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_7
   /api/v1/catalog/offering/platform/{platformIdentifier}:
     get:
       operationId: OfferingController_getOfferingForPlatform
@@ -490,6 +883,12 @@ paths:
           description: Platform identifier (ID or name)
           schema:
             type: string
+        - name: withDependencies
+          required: false
+          in: query
+          description: Indicates whether to include dependencies in the offering
+          schema:
+            type: boolean
       responses:
         '200':
           description: ''
@@ -497,9 +896,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlatformOfferingDto'
-      tags: &ref_5
+      tags: &ref_8
         - Catalog - Offering
-      security: &ref_6
+      security: &ref_9
         - bearer: []
   /api/v1/catalog/offering/device-type/{deviceTypeIdentifier}:
     get:
@@ -507,7 +906,8 @@ paths:
       summary: Get Offering of Device Type
       description: >-
         This service message allows retrieval of the offering of a specific
-        device type by device type ID.
+        device type by device token and also optionally specify a specific
+        platform.
       parameters:
         - name: deviceTypeIdentifier
           required: true
@@ -515,6 +915,18 @@ paths:
           description: Device type identifier (ID or name)
           schema:
             type: string
+        - name: platformIdentifier
+          required: false
+          in: query
+          description: Platform identifier (ID or name)
+          schema:
+            type: string
+        - name: withDependencies
+          required: false
+          in: query
+          description: Indicates whether to include dependencies in the offering
+          schema:
+            type: boolean
       responses:
         '200':
           description: ''
@@ -522,15 +934,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTypeOfferingDto'
-      tags: *ref_5
-      security: *ref_6
-  /api/v1/catalog/offering/project/{projectIdentifier}:
+      tags: *ref_8
+      security: *ref_9
+  /api/v1/catalog/offering/projects:
+    get:
+      operationId: OfferingController_getOfferingForProjects
+      summary: Get Offering of All Projects
+      description: This service message allows retrieval of the offering of all projects.
+      parameters:
+        - name: query
+          required: false
+          in: query
+          description: The search term (matches project name or partial match)
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: 'The page number to fetch (default: 1)'
+          example: 1
+          schema:
+            type: number
+        - name: perPage
+          required: false
+          in: query
+          description: 'Number of projects per page (default: 20)'
+          example: 20
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: PaginatedProjectRefOfferingDto
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResultDto'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ProjectRefOfferingDto'
+      tags: *ref_8
+      security: *ref_9
+  /api/v1/catalog/offering/projects/{projectIdentifier}:
     get:
       operationId: OfferingController_getOfferingForProject
       summary: Get Offering of Project
       description: >-
         This service message allows retrieval of the offering of a specific
-        project by project identifier.
+        project by project identifier and also optionally specify a specific
+        platform and device-type.
       parameters:
         - name: projectIdentifier
           required: true
@@ -538,6 +993,24 @@ paths:
           description: Project identifier (ID or name)
           schema:
             type: string
+        - name: deviceTypeIdentifier
+          required: false
+          in: query
+          description: Device type identifier (ID or name)
+          schema:
+            type: string
+        - name: platformIdentifier
+          required: false
+          in: query
+          description: Platform identifier (ID or name)
+          schema:
+            type: string
+        - name: withDependencies
+          required: false
+          in: query
+          description: Indicates whether to include dependencies in the offering
+          schema:
+            type: boolean
       responses:
         '200':
           description: ''
@@ -545,8 +1018,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectRefOfferingDto'
-      tags: *ref_5
-      security: *ref_6
+      tags: *ref_8
+      security: *ref_9
   /api/v1/catalog/offering/component/{catalogId}:
     get:
       operationId: OfferingController_getOfferingOfComp
@@ -567,8 +1040,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ComponentV2Dto'
-      tags: *ref_5
-      security: *ref_6
+      tags: *ref_8
+      security: *ref_9
   /api/v1/catalog/offering/push:
     post:
       operationId: OfferingController_pushOffering
@@ -586,8 +1059,192 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_5
-      security: *ref_6
+      tags: *ref_8
+      security: *ref_9
+  /api/v1/catalog/offering/unpush:
+    post:
+      operationId: OfferingController_unpushOffering
+      summary: Unpush software or map offerings
+      description: >-
+        Removes pushed offerings and stops delivery attempts for specified
+        devices and/or groups
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushOfferingDto'
+      responses:
+        '202':
+          description: ''
+      tags: *ref_8
+      security: *ref_9
+  /api/v2/catalog/offering/platform/{platformIdentifier}:
+    get:
+      operationId: v2_OfferingController_getOfferingForPlatform
+      summary: Get Offering of Platform
+      description: >-
+        This service message allows retrieval of the offering of a specific
+        platform by platform ID.
+      parameters:
+        - name: platformIdentifier
+          required: true
+          in: path
+          description: Platform identifier (ID or name)
+          schema:
+            type: string
+        - name: withDependencies
+          required: false
+          in: query
+          description: Indicates whether to include dependencies in the offering
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformOfferingDto'
+      tags: &ref_10
+        - Catalog - Offering
+      security: &ref_11
+        - bearer: []
+  /api/v2/catalog/offering/device-type/{deviceTypeIdentifier}:
+    get:
+      operationId: v2_OfferingController_getOfferingForDeviceType
+      summary: Get Offering of Device Type
+      description: >-
+        This service message allows retrieval of the offering of a specific
+        device type by device token and also optionally specify a specific
+        platform.
+      parameters:
+        - name: deviceTypeIdentifier
+          required: true
+          in: path
+          description: Device type identifier (ID or name)
+          schema:
+            type: string
+        - name: platformIdentifier
+          required: false
+          in: query
+          description: Platform identifier (ID or name)
+          schema:
+            type: string
+        - name: withDependencies
+          required: false
+          in: query
+          description: Indicates whether to include dependencies in the offering
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeOfferingDto'
+      tags: *ref_10
+      security: *ref_11
+  /api/v2/catalog/offering/projects/{projectIdentifier}:
+    get:
+      operationId: v2_OfferingController_getOfferingForProject
+      summary: Get Offering of Project
+      description: >-
+        This service message allows retrieval of the offering of a specific
+        project by project identifier and also optionally specify a specific
+        platform and device-type.
+      parameters:
+        - name: projectIdentifier
+          required: true
+          in: path
+          description: Project identifier (ID or name)
+          schema:
+            type: string
+        - name: deviceTypeIdentifier
+          required: false
+          in: query
+          description: Device type identifier (ID or name)
+          schema:
+            type: string
+        - name: platformIdentifier
+          required: false
+          in: query
+          description: Platform identifier (ID or name)
+          schema:
+            type: string
+        - name: withDependencies
+          required: false
+          in: query
+          description: Indicates whether to include dependencies in the offering
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRefOfferingDto'
+      tags: *ref_10
+      security: *ref_11
+  /api/v1/catalog/offering/policy:
+    put:
+      operationId: OfferingPolicyController_upsert
+      summary: Create/Update/Delete Offering Tree Policy
+      description: Create/Update/Delete policy, for managing offering tree policy.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertOfferingTreePolicyDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferingTreePolicyDto'
+      tags: &ref_12
+        - Catalog - Offering Policy
+      security: &ref_13
+        - bearer: []
+    get:
+      operationId: OfferingPolicyController_findByProject
+      summary: Get Offering tree Policies
+      description: >-
+        Retrieves all offering tree policy. Filter by platform, device-type and
+        project.
+      parameters:
+        - name: platformId
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: deviceTypeId
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: projectId
+          required: false
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfferingTreePolicyDto'
+      tags: *ref_12
+      security: *ref_13
   /api/v1/delivery/updateDownloadStatus:
     post:
       operationId: DeliveryController_updateDownloadStatus
@@ -603,16 +1260,41 @@ paths:
       responses:
         '200':
           description: ''
-      tags: &ref_7
+      tags: &ref_14
         - Delivery
-      security: &ref_8
+      security: &ref_15
         - bearer: []
+  /api/v2/delivery/updateDownloadStatus:
+    post:
+      operationId: v2_DeliveryController_updateDownloadStatus
+      summary: Update Delivery Status
+      description: This service message allows the consumer to report the delivery status
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryStatusDto'
+      responses:
+        '200':
+          description: ''
+      tags: *ref_14
+      security: *ref_15
   /api/v1/delivery/prepareDelivery:
     post:
       operationId: DeliveryController_prepareDelivery
       summary: Prepare Delivery
       description: Prepare delivery
-      parameters: []
+      parameters:
+        - name: source
+          required: false
+          in: query
+          description: >-
+            Delivery source: 'remote' for direct download from artifact, 'cache'
+            for download from delivery server cache
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -626,8 +1308,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrepareDeliveryResDto'
-      tags: *ref_7
-      security: *ref_8
+      tags: *ref_14
+      security: *ref_15
+  /api/v2/delivery/prepareDelivery:
+    post:
+      operationId: v2_DeliveryController_prepareDelivery
+      summary: Prepare Delivery
+      description: Prepare delivery
+      parameters:
+        - name: source
+          required: false
+          in: query
+          description: >-
+            Delivery source: 'remote' for direct download from artifact, 'cache'
+            for download from delivery server cache
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrepareDeliveryReqDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepareDeliveryResDto'
+      tags: *ref_14
+      security: *ref_15
   /api/v1/delivery/preparedDelivery/{catalogId}:
     get:
       operationId: DeliveryController_getPreparedDeliveryStatus
@@ -639,6 +1350,14 @@ paths:
           in: path
           schema:
             type: string
+        - name: source
+          required: false
+          in: query
+          description: >-
+            Delivery source: 'remote' for direct download from artifact, 'cache'
+            for download from delivery server cache
+          schema:
+            type: string
       responses:
         '200':
           description: ''
@@ -646,8 +1365,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrepareDeliveryResDto'
-      tags: *ref_7
-      security: *ref_8
+      tags: *ref_14
+      security: *ref_15
+  /api/v2/delivery/preparedDelivery/{catalogId}:
+    get:
+      operationId: v2_DeliveryController_getPreparedDeliveryStatus
+      summary: Get Prepared Delivery Status
+      description: Get status of prepared delivery
+      parameters:
+        - name: catalogId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: source
+          required: false
+          in: query
+          description: >-
+            Delivery source: 'remote' for direct download from artifact, 'cache'
+            for download from delivery server cache
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepareDeliveryResDto'
+      tags: *ref_14
+      security: *ref_15
   /api/v1/delivery/cache/delete:
     delete:
       operationId: DeliveryController_deleteFromCache
@@ -670,8 +1417,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_7
-      security: *ref_8
+      tags: *ref_14
+      security: *ref_15
   /api/v1/delivery/cache/config:
     get:
       operationId: DeliveryController_getCacheConfig
@@ -685,8 +1432,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CacheConfigResDto'
-      tags: *ref_7
-      security: *ref_8
+      tags: *ref_14
+      security: *ref_15
     put:
       operationId: DeliveryController_setCacheConfig
       summary: Set Delivery Cache Configurations
@@ -701,8 +1448,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_7
-      security: *ref_8
+      tags: *ref_14
+      security: *ref_15
   /api/v1/project:
     post:
       operationId: ProjectManagementController_createProject
@@ -721,9 +1468,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectDto'
-      tags: &ref_9
+      tags: &ref_16
         - Project
-      security: &ref_10
+      security: &ref_17
         - bearer: []
     get:
       operationId: ProjectManagementController_getUserProjects
@@ -736,11 +1483,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MemberProjectsResDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v2/project:
     get:
-      operationId: ProjectManagementController_getProjects
+      operationId: v2_ProjectManagementController_getProjects
       summary: Get all projects
       parameters:
         - name: pinned
@@ -767,10 +1514,21 @@ paths:
         - name: perPage
           required: false
           in: query
-          description: 'Number of projects per page (default: 10)'
-          example: 10
+          description: 'Number of projects per page (default: 15)'
+          example: 15
           schema:
             type: number
+        - name: projectNames
+          required: false
+          in: query
+          description: Filter by specific project names
+          example:
+            - project1
+            - project2
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         '200':
           description: ''
@@ -785,15 +1543,15 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProjectDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/search:
     get:
       operationId: ProjectManagementController_searchProjects
       summary: Search projects
       parameters:
         - name: query
-          required: true
+          required: false
           in: query
           description: The search term (matches project name or partial match)
           schema:
@@ -805,15 +1563,14 @@ paths:
           example: active
           schema:
             type: string
-        - name: type
+        - name: includeUnassociated
           required: false
           in: query
-          description: Filter by project type
+          description: Include projects not owned or associated with the user
+          example: false
           schema:
-            enum:
-              - product
-              - formation
-            type: string
+            default: false
+            type: boolean
         - name: page
           required: false
           in: query
@@ -824,8 +1581,8 @@ paths:
         - name: perPage
           required: false
           in: query
-          description: 'Number of projects per page (default: 10)'
-          example: 10
+          description: 'Number of projects per page (default: 15)'
+          example: 15
           schema:
             type: number
       responses:
@@ -842,8 +1599,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BaseProjectDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/regulation-types:
     get:
       operationId: ProjectManagementController_getAllRegulationTypes
@@ -858,8 +1615,90 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RegulationTypeDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
+  /api/v1/project/labels:
+    get:
+      operationId: ProjectManagementController_getLabels
+      summary: Get all labels
+      parameters:
+        - name: name
+          required: false
+          in: query
+          description: Filter labels by name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabelDto'
+      tags: *ref_16
+      security: *ref_17
+    post:
+      operationId: ProjectManagementController_createLabel
+      summary: Create a new label
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabelNameDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelDto'
+      tags: *ref_16
+      security: *ref_17
+  /api/v1/project/labels/{id}:
+    put:
+      operationId: ProjectManagementController_updateLabel
+      summary: Update a label
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Label ID
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabelNameDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelDto'
+      tags: *ref_16
+      security: *ref_17
+    delete:
+      operationId: ProjectManagementController_deleteLabel
+      summary: Delete a label
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Label ID
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}:
     get:
       operationId: ProjectManagementController_getProject
@@ -878,8 +1717,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DetailedProjectDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     put:
       operationId: ProjectManagementController_editProject
       summary: Edit Project
@@ -903,8 +1742,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     delete:
       operationId: ProjectManagementController_deleteProject
       summary: Delete Project
@@ -918,8 +1757,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/createToken:
     post:
       operationId: ProjectManagementController_createToken
@@ -938,8 +1777,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectTokenDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/confirm:
     post:
       operationId: ProjectManagementController_confirmMemberToProject
@@ -958,8 +1797,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/member/preferences:
     get:
       operationId: ProjectManagementController_getMemberProjectPreferences
@@ -978,8 +1817,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectMemberPreferencesDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     put:
       operationId: ProjectManagementController_updateMemberProjectPreferences
       summary: Update member project preferences
@@ -1003,8 +1842,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectMemberPreferencesDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/member:
     post:
       operationId: ProjectManagementController_addMemberToProject
@@ -1029,8 +1868,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MemberResDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/member/{memberId}:
     delete:
       operationId: ProjectManagementController_removeMemberFromProject
@@ -1050,8 +1889,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     put:
       operationId: ProjectManagementController_editMember
       summary: Edit member details
@@ -1080,8 +1919,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MemberResDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/projectReleases:
     get:
       operationId: ProjectManagementController_getProjectReleases
@@ -1102,8 +1941,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectReleasesDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/devices/catalogId/{catalogId}:
     get:
       operationId: ProjectManagementController_getDevicesByCatalogId
@@ -1123,8 +1962,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceResDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/devices/project/{projectId}:
     get:
       operationId: ProjectManagementController_getDevicesByProject
@@ -1144,8 +1983,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceResDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/devices/platform/{platform}:
     get:
       operationId: ProjectManagementController_getDeviceByPlatform
@@ -1165,8 +2004,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceResDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/regulation:
     get:
       operationId: ProjectManagementController_getProjectRegulations
@@ -1192,8 +2031,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RegulationDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     post:
       operationId: ProjectManagementController_createProjectRegulation
       summary: Create Regulation
@@ -1217,8 +2056,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegulationDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     put:
       operationId: ProjectManagementController_editProjectRegulations
       summary: Edit Regulations
@@ -1246,8 +2085,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RegulationDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/regulation/{regulation}:
     get:
       operationId: ProjectManagementController_getProjectRegulationByName
@@ -1277,8 +2116,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegulationDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     put:
       operationId: ProjectManagementController_editProjectRegulation
       summary: Edit Regulation
@@ -1308,8 +2147,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegulationDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     delete:
       operationId: ProjectManagementController_deleteProjectRegulation
       summary: Delete Regulation by ID
@@ -1329,8 +2168,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/token:
     get:
       operationId: ProjectManagementController_getProjectTokens
@@ -1351,8 +2190,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectTokenDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     post:
       operationId: ProjectManagementController_createProjectToken
       summary: Create a token for a project
@@ -1376,8 +2215,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectTokenDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/token/{tokenId}:
     get:
       operationId: ProjectManagementController_getProjectTokenById
@@ -1401,8 +2240,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectTokenDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     put:
       operationId: ProjectManagementController_updateProjectToken
       summary: Update a token
@@ -1431,8 +2270,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectTokenDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     delete:
       operationId: ProjectManagementController_deleteProjectToken
       summary: Delete a token by ID
@@ -1451,8 +2290,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/docs:
     get:
       operationId: ProjectManagementController_getDocs
@@ -1473,8 +2312,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DocDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     post:
       operationId: ProjectManagementController_createDoc
       summary: Create a document for a project
@@ -1498,8 +2337,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
   /api/v1/project/{projectIdentifier}/docs/{id}:
     get:
       operationId: ProjectManagementController_getDocById
@@ -1525,8 +2364,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     put:
       operationId: ProjectManagementController_updateDoc
       summary: Update a document
@@ -1557,8 +2396,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocDto'
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
     delete:
       operationId: ProjectManagementController_deleteDoc
       summary: Delete a document by ID
@@ -1579,8 +2418,24 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_9
-      security: *ref_10
+      tags: *ref_16
+      security: *ref_17
+  /api/v1/project/git-webhook/{token}:
+    post:
+      operationId: ProjectManagementController_handleGitWebhook
+      summary: Webhook endpoint for git integration (called by GitHub/GitLab)
+      parameters:
+        - name: token
+          required: true
+          in: path
+          description: Webhook authentication token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Git sync triggered successfully
+      tags: *ref_16
+      security: *ref_17
   /api/v1/users:
     post:
       operationId: UsersController_getAllUsers
@@ -1620,9 +2475,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OfferingMapProductsResDto'
-      tags: &ref_11
+      tags: &ref_18
         - Get-Map
-      security: &ref_12
+      security: &ref_19
         - bearer: []
   /api/v1/map/import/create:
     post:
@@ -1645,8 +2500,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateImportResDto'
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
+  /api/v2/map/import/create:
+    post:
+      operationId: v2_GetMapController_createImportV2
+      summary: Create Import
+      description: >-
+        This service message allows the consumer to request the start of
+        exporting a map stamp and tracking the packaging process.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateImportDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateImportResDto'
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/import/status/{importRequestId}:
     get:
       operationId: GetMapController_getImportStatus
@@ -1667,8 +2545,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ImportStatusResDto'
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
+  /api/v2/map/import/status/{importRequestId}:
+    get:
+      operationId: v2_GetMapController_getImportStatusV2
+      summary: Get Import Status
+      description: >-
+        This service message allows the consumer to get status information and
+        tracking of the packaging process.
+      parameters:
+        - name: importRequestId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportStatusResDto'
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/export-notification:
     post:
       operationId: GetMapController_exportNotification
@@ -1686,8 +2586,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/inventory/updates:
     post:
       operationId: GetMapController_getInventoryUpdates
@@ -1709,8 +2609,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InventoryUpdatesResDto'
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
+  /api/v2/map/inventory/updates:
+    post:
+      operationId: v2_GetMapController_getInventoryUpdatesV2
+      summary: Get Inventory Updates (Version 2)
+      description: >-
+        This service message gets a list of map request IDs and responds if
+        there is new data map-product for them.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryUpdatesReqV2Dto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryUpdatesResV2Dto'
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/configs/{deviceId}:
     get:
       operationId: GetMapController_getMapConfig
@@ -1730,8 +2653,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MapConfigDto'
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/configs:
     put:
       operationId: GetMapController_setMapConfig
@@ -1748,8 +2671,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/maps:
     get:
       operationId: GetMapController_getAllMaps
@@ -1765,8 +2688,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MapDto'
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/map/{catalogId}:
     get:
       operationId: GetMapController_getMap
@@ -1787,8 +2710,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MapDevicesDto'
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/{mapId}:
     put:
       operationId: GetMapController_putDeviceName
@@ -1813,8 +2736,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MapPutDto'
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
   /api/v1/map/job/updates/start:
     get:
       operationId: GetMapController_startMapUpdatedCronJob
@@ -1824,8 +2747,8 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_11
-      security: *ref_12
+      tags: *ref_18
+      security: *ref_19
   /api/v1/deploy/updateDeployStatus:
     post:
       operationId: DeployController_updateDeployStatus
@@ -1845,10 +2768,163 @@ paths:
       responses:
         '200':
           description: ''
-      tags:
+      tags: &ref_20
         - Deploy
-      security:
+      security: &ref_21
         - bearer: []
+  /api/v2/deploy/updateDeployStatus:
+    post:
+      operationId: v2_DeployController_updateDeployStatus
+      summary: Update Deploy Status
+      description: >-
+        This service message allows the consumer to report the deploy status.
+        When deploy is done, the device content relevant service will notify.
+        Another option on this service is to update delete content on the
+        device.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployStatusDto'
+      responses:
+        '200':
+          description: ''
+      tags: *ref_20
+      security: *ref_21
+  /api/v1/device/restrictions:
+    post:
+      operationId: RestrictionsController_createRestriction
+      summary: Create a new restriction
+      description: >-
+        Creates a new restriction (device/os-associated rule) in the discovery
+        service
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRestrictionDto'
+      responses:
+        '201':
+          description: Restriction created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: &ref_22
+        - Restrictions
+      security: &ref_23
+        - bearer: []
+    get:
+      operationId: RestrictionsController_getRestrictions
+      summary: Get all restrictions
+      description: >-
+        Fetches all restrictions (device/os-associated rules) from the discovery
+        service
+      parameters:
+        - name: isActive
+          required: false
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+        - name: deviceTypeName
+          required: false
+          in: query
+          description: Filter by device type name
+          schema:
+            type: string
+        - name: deviceId
+          required: false
+          in: query
+          description: Filter by device ID
+          schema:
+            type: string
+        - name: osType
+          required: false
+          in: query
+          description: Filter by OS type
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of restrictions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+      tags: *ref_22
+      security: *ref_23
+  /api/v1/device/restrictions/{id}:
+    get:
+      operationId: RestrictionsController_getRestriction
+      summary: Get restriction by ID
+      description: Fetches a specific restriction by its ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Restriction ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restriction details
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *ref_22
+      security: *ref_23
+    put:
+      operationId: RestrictionsController_updateRestriction
+      summary: Update a restriction
+      description: >-
+        Updates an existing restriction. Version is auto-incremented when rule
+        is modified.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Restriction ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRuleDto'
+      responses:
+        '200':
+          description: Restriction updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *ref_22
+      security: *ref_23
+    delete:
+      operationId: RestrictionsController_deleteRestriction
+      summary: Delete a restriction
+      description: Deletes an existing restriction
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Restriction ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restriction deleted successfully
+      tags: *ref_22
+      security: *ref_23
   /api/v1/device/discover:
     post:
       operationId: DiscoveryController_discoveryCatalog
@@ -1870,33 +2946,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscoveryResDto'
-      tags: &ref_13
+      tags: &ref_24
         - Device - discovery
-      security: &ref_14
+      security: &ref_25
         - bearer: []
-  /api/v2/device/discover/component:
-    post:
-      operationId: DiscoveryController_deviceComponentDiscovery
-      summary: Discover Device Component
-      description: >-
-        This service message allows a device to post the discovery context for
-        getting device software offers.
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DiscoveryMessageV2Dto'
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeviceComponentsOfferingDto'
-      tags: *ref_13
-      security: *ref_14
   /api/v1/device/discover/map:
     post:
       operationId: DiscoveryController_deviceMapDiscovery
@@ -1918,8 +2971,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OfferingMapResDto'
-      tags: *ref_13
-      security: *ref_14
+      tags: *ref_24
+      security: *ref_25
   /api/v1/device/discover/deviceContext:
     post:
       operationId: DiscoveryController_deviceContext
@@ -1933,10 +2986,14 @@ paths:
             schema:
               $ref: '#/components/schemas/DiscoveryMessageV2Dto'
       responses:
-        '201':
+        '200':
           description: ''
-      tags: *ref_13
-      security: *ref_14
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryMessageV2Dto'
+      tags: *ref_24
+      security: *ref_25
   /api/v1/device/im/push/discovery:
     post:
       operationId: DiscoveryController_imPushDiscoveryDevices
@@ -1956,8 +3013,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_13
-      security: *ref_14
+      tags: *ref_24
+      security: *ref_25
   /api/v1/device/im/pull/discovery:
     post:
       operationId: DiscoveryController_imPullDiscoveryDevices
@@ -1983,8 +3040,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceDiscoverResDto'
-      tags: *ref_13
-      security: *ref_14
+      tags: *ref_24
+      security: *ref_25
   /api/v1/device/mTlsStatus:
     post:
       operationId: DiscoveryController_updateMTlsStatus
@@ -1998,12 +3055,37 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_13
-      security: *ref_14
+      tags: *ref_24
+      security: *ref_25
+  /api/v2/device/discover/component:
+    post:
+      operationId: v2_DiscoveryController_deviceComponentDiscovery
+      summary: Discover Device Component
+      description: >-
+        This service message allows a device to post the discovery context for
+        getting device software offers.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoveryMessageV2Dto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceComponentsOfferingDto'
+      tags:
+        - Device - discovery
+      security:
+        - bearer: []
   /api/v1/org/groups:
     post:
       operationId: GroupController_createGroup
-      summary: Create Devices Group
+      summary: Create organization group of devices
       parameters: []
       requestBody:
         required: true
@@ -2018,9 +3100,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChildGroupDto'
-      tags: &ref_15
+      tags: &ref_26
         - Organization Groups
-      security: &ref_16
+      security: &ref_27
         - bearer: []
     get:
       operationId: GroupController_getGroups
@@ -2033,12 +3115,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupResponseDto'
-      tags: *ref_15
-      security: *ref_16
+      tags: *ref_26
+      security: *ref_27
+  /api/v1/org/groups/childs:
+    post:
+      operationId: GroupController_setDevicesInGroup
+      summary: Set groups and devices in group
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetChildInGroupDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildGroupDto'
+      tags: *ref_26
+      security: *ref_27
   /api/v1/org/groups/{groupId}:
+    get:
+      operationId: GroupController_getGroupById
+      summary: >-
+        Retrieve a group by its ID, including all its child groups and
+        associated devices
+      parameters:
+        - name: groupId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildGroupDto'
+      tags: *ref_26
+      security: *ref_27
     put:
       operationId: GroupController_editGroup
-      summary: Edit Devices Group
+      summary: Edit organization group of devices
       parameters:
         - name: groupId
           required: true
@@ -2058,31 +3180,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChildGroupDto'
-      tags: *ref_15
-      security: *ref_16
-    get:
-      operationId: GroupController_getGroupById
-      summary: >-
-        Retrieve a group by its ID, including all its child groups and
-        associated devices
-      parameters:
-        - name: groupId
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ChildGroupDto'
-      tags: *ref_15
-      security: *ref_16
+      tags: *ref_26
+      security: *ref_27
     delete:
       operationId: GroupController_deleteGroup
-      summary: Delete Devices Group by ID
+      summary: Delete organization group of devices by ID
       parameters:
         - name: groupId
           required: true
@@ -2096,12 +3198,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChildGroupDto'
-      tags: *ref_15
-      security: *ref_16
-  /api/v1/org/groups/devices/{deviceId}:
+      tags: *ref_26
+      security: *ref_27
+  /api/v1/org/devices:
+    get:
+      operationId: GroupController_getOrgDevicesData
+      summary: Get org devices data
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceOrgDto'
+      tags: *ref_26
+      security: *ref_27
+  /api/v1/org/devices/{deviceId}:
     get:
       operationId: GroupController_getOrgDeviceData
-      summary: Get device org group data
+      summary: Get organization device data by ID
       parameters:
         - name: deviceId
           required: true
@@ -2115,28 +3233,126 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceOrgDto'
-      tags: *ref_15
-      security: *ref_16
-  /api/v1/org/groups/devices:
+      tags: *ref_26
+      security: *ref_27
+  /api/v1/org/orgIds:
     post:
-      operationId: GroupController_setDevicesInGroup
-      summary: Set Devices in a Group
+      operationId: GroupController_createOrgIds
+      summary: Create Organization ID
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SetChildInGroupDto'
+              $ref: '#/components/schemas/OrgIdDto'
       responses:
         '201':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChildGroupDto'
-      tags: *ref_15
-      security: *ref_16
+                $ref: '#/components/schemas/OrgIdRefDto'
+      tags: *ref_26
+      security: *ref_27
+    get:
+      operationId: GroupController_getOrgIds
+      summary: Get Organization IDs details
+      parameters:
+        - name: group
+          required: false
+          in: query
+          description: Filter by group ID
+          schema:
+            type: number
+        - name: emptyGroup
+          required: false
+          in: query
+          description: >-
+            If true: (with group) also include IDs without group; (without
+            group) only IDs without group
+          schema:
+            type: boolean
+        - name: emptyDevice
+          required: false
+          in: query
+          description: If true, only IDs without device
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: >-
+            Returns a list of organization IDs, according to the specified
+            filters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrgIdRefDto'
+      tags: *ref_26
+      security: *ref_27
+  /api/v1/org/orgIds/{orgId}:
+    get:
+      operationId: GroupController_getOrgId
+      summary: Get Organization IDs details
+      parameters:
+        - name: orgId
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgIdRefDto'
+      tags: *ref_26
+      security: *ref_27
+    put:
+      operationId: GroupController_editOrgIds
+      summary: Edit Organization ID
+      parameters:
+        - name: orgId
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgIdPutDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgIdRefDto'
+      tags: *ref_26
+      security: *ref_27
+    delete:
+      operationId: GroupController_deleteOrgIds
+      summary: Delete Organization ID
+      parameters:
+        - name: orgId
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgIdRefDto'
+      tags: *ref_26
+      security: *ref_27
   /api/v1/device/devices:
     get:
       operationId: DeviceController_getRegisteredDevices
@@ -2160,9 +3376,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceDto'
-      tags: &ref_17
+      tags: &ref_28
         - Device
-      security: &ref_18
+      security: &ref_29
         - bearer: []
   /api/v1/device/devices/software/info:
     get:
@@ -2193,8 +3409,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DevicesStatisticInfo'
-      tags: *ref_17
-      security: *ref_18
+      tags: *ref_28
+      security: *ref_29
   /api/v1/device/devices/map/info:
     get:
       operationId: DeviceController_getDevicesMapStatisticInfo
@@ -2224,52 +3440,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DevicesStatisticInfo'
-      tags: *ref_17
-      security: *ref_18
-  /api/v1/device/{deviceId}/maps:
+      tags: *ref_28
+      security: *ref_29
+  /api/v1/device/os:
     get:
-      operationId: DeviceController_getDeviceMaps
-      summary: Get Device Maps
+      operationId: DeviceController_getOperatingSystems
+      summary: Get Known Operating Systems
       description: >-
-        This service message allows retrieval of all registered maps on the
-        given device.
-      parameters:
-        - name: deviceId
-          required: true
-          in: path
-          schema:
-            type: string
+        This service message allows retrieval of all known operating systems
+        that devices can report during discovery.
+      parameters: []
       responses:
         '200':
-          description: ''
+          description: Array of operating systems
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeviceMapDto'
-      tags: *ref_17
-      security: *ref_18
-  /api/v1/device/{deviceId}/softwares:
-    get:
-      operationId: DeviceController_getDeviceSoftwares
-      summary: Get Device softwares
-      description: >-
-        This service message allows retrieval of all software on a process in a
-        given device.
-      parameters:
-        - name: deviceId
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeviceSoftwareDto'
-      tags: *ref_17
-      security: *ref_18
+                type: array
+                items:
+                  $ref: '#/components/schemas/OSDto'
+      tags: *ref_28
+      security: *ref_29
   /api/v1/device/config/{deviceId}:
     get:
       operationId: DeviceController_getDeviceConfig
@@ -2296,8 +3487,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/AndroidConfigDto'
                   - $ref: '#/components/schemas/WindowsConfigDto'
-      tags: *ref_17
-      security: *ref_18
+      tags: *ref_28
+      security: *ref_29
   /api/v1/device/config:
     put:
       operationId: DeviceController_setDeviceConfig
@@ -2323,53 +3514,8 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/AndroidConfigDto'
                   - $ref: '#/components/schemas/WindowsConfigDto'
-      tags: *ref_17
-      security: *ref_18
-  /api/v1/device/{deviceId}:
-    get:
-      operationId: DeviceController_getDeviceDetails
-      summary: Get Device meta data
-      description: This service message allow to get device meta data and properties
-      parameters:
-        - name: deviceId
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeviceDto'
-      tags: *ref_17
-      security: *ref_18
-    put:
-      operationId: DeviceController_putDeviceName
-      summary: Set Device Name
-      description: This service message allow to update props of device
-      parameters:
-        - name: deviceId
-          required: true
-          in: path
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DevicePutDto'
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DevicePutDto'
-      tags: *ref_17
-      security: *ref_18
+      tags: *ref_28
+      security: *ref_29
   /api/v1/device/register:
     post:
       operationId: DeviceController_register
@@ -2387,8 +3533,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_17
-      security: *ref_18
+      tags: *ref_28
+      security: *ref_29
   /api/v1/device/info/installed/{deviceId}:
     get:
       operationId: DeviceController_getDeviceContentInstalled
@@ -2411,8 +3557,164 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceContentResDto'
-      tags: *ref_17
-      security: *ref_18
+      tags: *ref_28
+      security: *ref_29
+  /api/v1/device/{deviceId}:
+    get:
+      operationId: DeviceController_getDeviceDetails
+      summary: Get Device meta data
+      description: This service message allow to get device meta data and properties
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+      tags: *ref_28
+      security: *ref_29
+    put:
+      operationId: DeviceController_putDeviceProps
+      summary: Set Device Properties
+      description: This service message allow to update props of device
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevicePutDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePutDto'
+      tags: *ref_28
+      security: *ref_29
+    delete:
+      operationId: DeviceController_deleteDevice
+      summary: Delete Device
+      description: This service message allows de  letion of a device
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device deleted successfully
+      tags: *ref_28
+      security: *ref_29
+  /api/v1/device/{deviceId}/maps:
+    get:
+      operationId: DeviceController_getDeviceMaps
+      summary: Get Device Maps
+      description: >-
+        This service message allows retrieval of all registered maps on the
+        given device.
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceMapDto'
+      tags: *ref_28
+      security: *ref_29
+  /api/v1/device/{deviceId}/softwares:
+    get:
+      operationId: DeviceController_getDeviceSoftwares
+      summary: Get Device softwares
+      description: >-
+        This service message allows retrieval of all software on a process in a
+        given device.
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceSoftwareDto'
+      tags: *ref_28
+      security: *ref_29
+  /api/v1/device/{deviceId}/restrictions:
+    get:
+      operationId: DeviceController_getDeviceRestrictions
+      summary: Get Device Restrictions
+      description: >-
+        This service message retrieves all applicable restrictions for a device
+        based on device ID, device type, OS, and other metadata collected during
+        discovery.
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          description: The unique identifier of the device
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of restriction rules applicable to the device
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestrictionDto'
+      tags: *ref_28
+      security: *ref_29
+  /api/v2/device/{deviceId}/restrictions:
+    get:
+      operationId: v2_DeviceController_getDeviceRestrictions
+      summary: Get Device Restrictions
+      description: >-
+        This service message retrieves all applicable restrictions for a device
+        based on device ID, device type, OS, and other metadata collected during
+        discovery.
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          description: The unique identifier of the device
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of restriction rules applicable to the device
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestrictionDto'
+      tags: *ref_28
+      security: *ref_29
   /api/v1/bug-report:
     post:
       operationId: BugReportController_reportNewBug
@@ -2434,9 +3736,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NewBugReportResDto'
-      tags: &ref_19
+      tags: &ref_30
         - Device - Bug Report
-      security: &ref_20
+      security: &ref_31
         - bearer: []
   /api/v1/bug-report/{bugId}:
     get:
@@ -2458,8 +3760,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BugReportDto'
-      tags: *ref_19
-      security: *ref_20
+      tags: *ref_30
+      security: *ref_31
   /api/v1/platforms:
     get:
       operationId: HierarchyController_getPlatforms
@@ -2482,7 +3784,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PlatformDto'
-      security: &ref_21
+      security: &ref_32
         - bearer: []
     post:
       operationId: HierarchyController_createPlatform
@@ -2503,7 +3805,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlatformDto'
-      security: *ref_21
+      security: *ref_32
   /api/v1/platforms/{platformId}:
     get:
       operationId: HierarchyController_getPlatform
@@ -2524,7 +3826,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlatformDto'
-      security: *ref_21
+      security: *ref_32
     put:
       operationId: HierarchyController_updatePlatform
       summary: Update Platform
@@ -2550,7 +3852,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlatformDto'
-      security: *ref_21
+      security: *ref_32
     delete:
       operationId: HierarchyController_deletePlatform
       summary: Delete Platform
@@ -2566,7 +3868,7 @@ paths:
       responses:
         '200':
           description: ''
-      security: *ref_21
+      security: *ref_32
   /api/v1/hierarchy/platforms/{platformId}/tree:
     get:
       operationId: HierarchyController_getPlatformHierarchy
@@ -2587,7 +3889,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlatformHierarchyDto'
-      security: *ref_21
+      security: *ref_32
   /api/v1/hierarchy/platforms/{platformId}/device-types/{deviceTypeId}:
     put:
       operationId: HierarchyController_addDeviceTypeToPlatform
@@ -2614,7 +3916,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlatformHierarchyDto'
-      security: *ref_21
+      security: *ref_32
     delete:
       operationId: HierarchyController_removeDeviceTypeFromPlatform
       summary: Remove Device Type from Platform
@@ -2640,7 +3942,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlatformHierarchyDto'
-      security: *ref_21
+      security: *ref_32
   /api/v1/device-types:
     get:
       operationId: HierarchyController_getDeviceTypes
@@ -2663,7 +3965,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceTypeDto'
-      security: *ref_21
+      security: *ref_32
     post:
       operationId: HierarchyController_createDeviceType
       summary: Create Device Type
@@ -2683,7 +3985,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTypeDto'
-      security: *ref_21
+      security: *ref_32
   /api/v1/device-types/{deviceTypeId}:
     get:
       operationId: HierarchyController_getDeviceType
@@ -2704,7 +4006,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTypeDto'
-      security: *ref_21
+      security: *ref_32
     put:
       operationId: HierarchyController_updateDeviceType
       summary: Update Device Type
@@ -2730,7 +4032,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTypeDto'
-      security: *ref_21
+      security: *ref_32
     delete:
       operationId: HierarchyController_deleteDeviceType
       summary: Delete Device Type
@@ -2746,7 +4048,7 @@ paths:
       responses:
         '200':
           description: ''
-      security: *ref_21
+      security: *ref_32
   /api/v1/hierarchy/device-types/{deviceTypeId}/tree:
     get:
       operationId: HierarchyController_getDeviceTypeHierarchy
@@ -2767,7 +4069,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTypeHierarchyDto'
-      security: *ref_21
+      security: *ref_32
   /api/v1/hierarchy/device-types/{deviceTypeId}/projects/{projectIdentifier}:
     put:
       operationId: HierarchyController_addProjectToDeviceType
@@ -2794,7 +4096,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTypeHierarchyDto'
-      security: *ref_21
+      security: *ref_32
     delete:
       operationId: HierarchyController_removeProjectFromDeviceType
       summary: Remove Project from Device Type
@@ -2820,7 +4122,338 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTypeHierarchyDto'
-      security: *ref_21
+      security: *ref_32
+  /api/v1/catalog/pendingVersions:
+    get:
+      operationId: PendingVersionController_listPendingVersions
+      summary: List all pending versions
+      description: >-
+        Returns a list of project versions that were reported by devices but do
+        not exist in the system
+      parameters:
+        - name: limit
+          required: false
+          in: query
+          description: 'Number of results to return (default: 100)'
+          schema:
+            type: number
+        - name: offset
+          required: false
+          in: query
+          description: 'Offset for pagination (default: 0)'
+          schema:
+            type: number
+        - name: status
+          required: false
+          in: query
+          schema:
+            enum:
+              - PENDING
+              - ACCEPTED
+              - REJECTED
+            type: string
+      responses:
+        '200':
+          description: List of pending versions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingVersionListDto'
+      tags: &ref_33
+        - Catalog - Pending
+      security: &ref_34
+        - bearer: []
+  /api/v1/catalog/pendingVersions/accept:
+    post:
+      operationId: PendingVersionController_acceptPendingVersion
+      summary: Accept a pending version
+      description: >-
+        Accepts a pending version and creates the project/version in the system.
+        If the project does not exist, it will be created.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptPendingVersionDto'
+      responses:
+        '200':
+          description: Version accepted successfully and will be created
+        '400':
+          description: Invalid request or version already processed
+      tags: *ref_33
+      security: *ref_34
+  /api/v1/catalog/pendingVersions/reject:
+    post:
+      operationId: PendingVersionController_rejectPendingVersion
+      summary: Reject a pending version
+      description: >-
+        Rejects a pending version. The version will be marked as rejected and
+        will not be processed.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectPendingVersionDto'
+      responses:
+        '200':
+          description: Version rejected successfully
+        '400':
+          description: Invalid request or version already processed
+      tags: *ref_33
+      security: *ref_34
+  /api/v1/rules:
+    get:
+      operationId: RulesController_getAllRules
+      summary: Get all rules
+      description: >-
+        Fetches all rules (both policies and restrictions) from upload and
+        discovery services. Supports filtering by type to query only policies or
+        restrictions.
+      parameters:
+        - name: type
+          required: false
+          in: query
+          description: Filter by rule type (policy or restriction)
+          schema:
+            enum:
+              - policy
+              - restriction
+            type: string
+        - name: isActive
+          required: false
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+        - name: releaseId
+          required: false
+          in: query
+          description: Filter by release ID (policies only)
+          schema:
+            type: string
+        - name: deviceTypeName
+          required: false
+          in: query
+          description: Filter by device type name (restrictions only)
+          schema:
+            type: string
+        - name: deviceTypeId
+          required: false
+          in: query
+          description: Filter by device type ID (restrictions only)
+          schema:
+            type: number
+        - name: deviceId
+          required: false
+          in: query
+          description: Filter by device ID (restrictions only)
+          schema:
+            type: string
+        - name: osType
+          required: false
+          in: query
+          description: Filter by OS type (restrictions only)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+      tags: &ref_35
+        - Rules
+      security: &ref_36
+        - bearer: []
+  /api/v1/rules/evaluate:
+    post:
+      operationId: RulesController_evaluateRule
+      summary: Evaluate a rule against all devices
+      description: >-
+        Tests a rule against every device using its latest discovery data.
+        Supply either a saved ruleId or an inline rule JSON. For saved policy
+        rules the response additionally contains the releases the policy is
+        attached to.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateRuleDto'
+      responses:
+        '200':
+          description: Devices matching the rule, plus release context for policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluateRuleResultDto'
+      tags: *ref_35
+      security: *ref_36
+  /api/v1/rules/device-context:
+    get:
+      operationId: RulesController_getDeviceContext
+      summary: Get device evaluation context
+      description: >-
+        Returns the evaluation context built from the latest discovery message
+        for a device. Supply either deviceId (returns the latest message for
+        that device) or discoveryMessageId (returns the context for that exact
+        message, deviceId not required). The context structure is identical to
+        what is used internally during rule evaluation.
+      parameters:
+        - name: deviceId
+          required: false
+          in: query
+          description: >-
+            Device ID to look up. Required when discoveryMessageId is not
+            provided.
+          schema:
+            type: string
+        - name: discoveryMessageId
+          required: false
+          in: query
+          description: >-
+            ID of a specific discovery message to use. When provided, deviceId
+            is not required.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device context and the discovery message it was built from
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceContextDto'
+      tags: *ref_35
+      security: *ref_36
+  /api/v1/sbom/scans:
+    post:
+      operationId: SbomController_requestScan
+      summary: Queue a new SBOM scan for a docker image, binary file, or directory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScanPayload'
+      responses:
+        '201':
+          description: Scan queued successfully, returns scanId
+      tags: &ref_37
+        - SBOM
+      security: &ref_38
+        - bearer: []
+    get:
+      operationId: SbomController_listScans
+      summary: List recent SBOM scan jobs
+      parameters:
+        - name: limit
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: offset
+          required: false
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Array of scan status objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScanStatusResponseDto'
+      tags: *ref_37
+      security: *ref_38
+  /api/v1/sbom/scans/{id}:
+    get:
+      operationId: SbomController_getScanStatus
+      summary: Get scan status and metadata by ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Scan job UUID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scan status and metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanStatusResponseDto'
+        '404':
+          description: Scan not found
+      tags: *ref_37
+      security: *ref_38
+    delete:
+      operationId: SbomController_deleteScan
+      summary: Delete a scan by ID. Cancels it if still queued.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Scan job UUID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_37
+      security: *ref_38
+  /api/v1/sbom/scans/{id}/report:
+    get:
+      operationId: SbomController_getScanReportUrl
+      summary: Get presigned download URL for a completed SBOM report
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Scan job UUID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_37
+      security: *ref_38
+  /api/v1/sbom/scans/{id}/retry:
+    post:
+      operationId: SbomController_retryScan
+      summary: Retry a failed or completed SBOM scan
+      description: >-
+        Re-queues the scan under the same ID. For file-based scans that
+        originated from a MinIO upload, a fresh presigned download URL is
+        automatically regenerated from the stored source object key so expired
+        links are never reused.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Scan job UUID to retry
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Scan re-queued successfully, returns scanId and status
+        '404':
+          description: Scan not found
+        '409':
+          description: Scan is already queued or running
+      tags: *ref_37
+      security: *ref_38
 info:
   title: Get-App
   description: The Get-App API swagger
@@ -2863,87 +4496,173 @@ components:
       properties:
         refreshToken:
           type: string
-    UploadArtifactDto:
+    ReleaseIdentifierDto:
       type: object
       properties:
-        platform:
+        projectId:
           type: string
-        component:
+          description: Project ID
+        projectName:
           type: string
-        formation:
-          type: string
-        OS:
-          type: string
+          description: Project name
         version:
           type: string
-        releaseNotes:
-          type: string
-        size:
-          type: string
-        url:
-          type: string
-        artifactType:
-          type: string
-        uploadToken:
-          type: string
-    UploadManifestDto:
-      type: object
-      properties:
-        file:
-          type: string
-          format: binary
-        uploadToken:
-          type: string
+          description: Release version
       required:
-        - file
-    UpdateUploadStatusDto:
+        - projectName
+        - version
+    PolicyAssociationDto:
       type: object
       properties:
-        catalogId:
-          type: string
-        status:
-          type: string
-          enum:
-            - started
-            - downloading-from-url
-            - fail-to-download
-            - uploading-to-s3
-            - fail-to-upload
-            - in-progress
-            - ready
-            - error
-        uploadToken:
-          type: string
-      required:
-        - status
-    ComponentDto:
-      type: object
-      properties:
-        catalogId:
-          type: string
-        name:
-          type: string
-        versionNumber:
-          type: string
-        releaseNotes:
-          type: string
-        virtualSize:
-          type: number
-        category:
-          type: string
-        baseVersion:
-          type: string
-        prevVersion:
-          type: string
-        latest:
-          type: boolean
-        uploadDate:
-          format: date-time
-          type: string
-        subComponents:
+        releases:
+          description: Releases for this policy
           type: array
           items:
-            $ref: '#/components/schemas/ComponentDto'
+            $ref: '#/components/schemas/ReleaseIdentifierDto'
+      required:
+        - releases
+    CreatePolicyDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Policy name
+        description:
+          type: string
+          description: Policy description
+        association:
+          description: Policy associations
+          allOf:
+            - $ref: '#/components/schemas/PolicyAssociationDto'
+        isActive:
+          type: boolean
+          description: Whether the policy is active
+          default: true
+        isPush:
+          type: boolean
+          description: Whether this policy should be pushed to agents
+          default: false
+        rule:
+          type: object
+          description: Rule engine compliant rule object
+      required:
+        - name
+        - association
+        - rule
+    RuleAssociationDto:
+      type: object
+      properties:
+        releases:
+          description: Releases for policies
+          type: array
+          items:
+            $ref: '#/components/schemas/ReleaseIdentifierDto'
+        deviceTypeNames:
+          description: Device type names for restrictions
+          type: array
+          items:
+            type: string
+        osTypes:
+          description: OS types for restrictions
+          type: array
+          items:
+            type: string
+        deviceIds:
+          description: Specific device IDs for restrictions
+          type: array
+          items:
+            type: string
+    UpdateRuleDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Rule name
+        description:
+          type: string
+          description: Rule description
+        type:
+          type: string
+          enum:
+            - policy
+            - restriction
+          description: Rule type (policy or restriction)
+        association:
+          description: Rule associations
+          allOf:
+            - $ref: '#/components/schemas/RuleAssociationDto'
+        isActive:
+          type: boolean
+          description: Whether the rule is active
+          default: true
+        isPush:
+          type: boolean
+          description: Whether this policy should be pushed to agents
+          default: false
+        rule:
+          type: object
+          description: Rule engine compliant rule object
+    CreateRuleFieldDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Field name in JSONPath format (e.g., $.battery.level)
+        type:
+          type: string
+          description: Field data type
+        label:
+          type: string
+          description: Human-readable label
+        description:
+          type: string
+          description: Field description
+      required:
+        - name
+        - type
+        - label
+    PostInstallAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - NONE
+            - WEB
+            - EXE
+          description: >-
+            Action type: NONE (no action), WEB (open URL), or EXE (run
+            executable)
+        url:
+          type: string
+          description: URL to open (required when type is WEB)
+        exePath:
+          type: string
+          description: Executable path to run (required when type is EXE)
+      required:
+        - type
+    ReleaseMetadata:
+      type: object
+      properties:
+        autoDeploy:
+          type: boolean
+          description: Enable automatic deployment of this release
+        postInstallAction:
+          description: Post-installation action configuration
+          allOf:
+            - $ref: '#/components/schemas/PostInstallAction'
+        installationSize:
+          type: integer
+          format: int64
+          description: >-
+            Installation size in bytes - disk space required after installation
+            (user-specified)
+        totalSize:
+          type: integer
+          format: int64
+          description: >-
+            Total size in bytes - automatically calculated as installationSize +
+            artifactsSize
     SetReleaseDto:
       type: object
       properties:
@@ -2954,7 +4673,11 @@ components:
         releaseNotes:
           type: string
         metadata:
-          type: object
+          description: >-
+            Release metadata including autoDeploy and postInstallAction
+            configuration. Additional user-defined properties are supported.
+          allOf:
+            - $ref: '#/components/schemas/ReleaseMetadata'
         isDraft:
           type: boolean
           default: true
@@ -2986,6 +4709,11 @@ components:
           type: boolean
         dockerImageUrl:
           type: string
+        isExecutable:
+          type: boolean
+          default: false
+        arguments:
+          type: object
         uploadId:
           type: number
         status:
@@ -2993,10 +4721,32 @@ components:
           enum:
             - uploaded
             - pending
+            - uploading
             - removed
+            - error
         size:
           type: integer
           format: int64
+        progress:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: >-
+            Upload/download progress percentage (0-100). Check status field for
+            errors.
+        error:
+          type: string
+          description: Error message when status indicates an error
+        sha256:
+          type: string
+          description: SHA256 hash of the file
+        enableSbomScan:
+          type: boolean
+          default: true
+          description: Whether SBOM scan is enabled for this artifact
+        sbomScanId:
+          type: string
+          description: SBOM scan ID associated with this artifact
       required:
         - id
         - artifactName
@@ -3020,15 +4770,34 @@ components:
         releaseNotes:
           type: string
         metadata:
-          type: object
+          description: >-
+            Release metadata including autoDeploy and postInstallAction
+            configuration. Additional user-defined properties are supported.
+          allOf:
+            - $ref: '#/components/schemas/ReleaseMetadata'
         status:
           type: string
-          enum: &ref_22
+          enum: &ref_39
             - draft
             - in_review
             - approved
             - released
             - archived
+            - error
+          description: >-
+            `draft`: Release is still being prepared.
+
+            `in_review`: Submitted for review, not yet approved.
+
+            `approved`: Approved but not yet released.
+
+            `released`: Actively released and deployable.
+
+            `archived`: No longer active.
+
+            `error`: Release was previously released but one or more artifacts
+            are missing from storage. Requires a user with
+            `edit-released-release` permission to resolve.
         createdAt:
           format: date-time
           type: string
@@ -3046,6 +4815,19 @@ components:
         releasedAt:
           format: date-time
           type: string
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        isImported:
+          type: boolean
+          description: Indicates if this release was imported from another system
+        readonly:
+          type: boolean
+          description: >-
+            Indicates if this release is read-only. A release is read-only when
+            its status is `released` or `error` and the current user does not
+            have the `edit-released-release` permission.
       required:
         - id
         - version
@@ -3059,6 +4841,59 @@ components:
         - requiredRegulationsCount
         - compliantRegulationsCount
         - latest
+        - isImported
+        - readonly
+    ReleasePolicyDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Policy rule ID
+        name:
+          type: string
+          description: Policy name
+        description:
+          type: string
+          description: Policy description
+        type:
+          type: string
+          description: Policy type
+          enum:
+            - policy
+            - restriction
+        association:
+          description: Policy associations (releases, device types, OS types, devices)
+          allOf:
+            - $ref: '#/components/schemas/PolicyAssociationDto'
+        version:
+          type: number
+          description: Policy version number
+        createdAt:
+          type: string
+          description: Policy creation timestamp
+        updatedAt:
+          type: string
+          description: Policy last update timestamp
+        isActive:
+          type: boolean
+          description: Whether the policy is active
+        isPush:
+          type: boolean
+          description: Whether this policy should be pushed to agents
+          default: false
+        rule:
+          type: object
+          description: The policy rule definition conforming to rule engine schema
+      required:
+        - id
+        - name
+        - type
+        - association
+        - version
+        - createdAt
+        - updatedAt
+        - isActive
+        - rule
     DetailedReleaseDto:
       type: object
       properties:
@@ -3075,10 +4910,28 @@ components:
         releaseNotes:
           type: string
         metadata:
-          type: object
+          description: >-
+            Release metadata including autoDeploy and postInstallAction
+            configuration. Additional user-defined properties are supported.
+          allOf:
+            - $ref: '#/components/schemas/ReleaseMetadata'
         status:
           type: string
-          enum: *ref_22
+          enum: *ref_39
+          description: >-
+            `draft`: Release is still being prepared.
+
+            `in_review`: Submitted for review, not yet approved.
+
+            `approved`: Approved but not yet released.
+
+            `released`: Actively released and deployable.
+
+            `archived`: No longer active.
+
+            `error`: Release was previously released but one or more artifacts
+            are missing from storage. Requires a user with
+            `edit-released-release` permission to resolve.
         createdAt:
           format: date-time
           type: string
@@ -3096,6 +4949,19 @@ components:
         releasedAt:
           format: date-time
           type: string
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        isImported:
+          type: boolean
+          description: Indicates if this release was imported from another system
+        readonly:
+          type: boolean
+          description: >-
+            Indicates if this release is read-only. A release is read-only when
+            its status is `released` or `error` and the current user does not
+            have the `edit-released-release` permission.
         artifacts:
           type: array
           items:
@@ -3104,6 +4970,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReleaseDto'
+        policies:
+          description: Policies associated with this release
+          type: array
+          items:
+            $ref: '#/components/schemas/ReleasePolicyDto'
       required:
         - id
         - version
@@ -3117,6 +4988,8 @@ components:
         - requiredRegulationsCount
         - compliantRegulationsCount
         - latest
+        - isImported
+        - readonly
     SetReleaseArtifactDto:
       type: object
       properties:
@@ -3134,6 +5007,17 @@ components:
           type: string
         metadata:
           type: object
+        isExecutable:
+          type: boolean
+          default: false
+        arguments:
+          type: string
+        enableSbomScan:
+          type: boolean
+          description: >-
+            Whether to trigger an SBOM scan for this artifact after upload.
+            Defaults to true.
+          default: true
       required:
         - artifactName
     SetReleaseArtifactResDto:
@@ -3146,6 +5030,17 @@ components:
           description: Only present for FILE artifact type
       required:
         - artifactId
+    UpdateFilePropertiesDto:
+      type: object
+      properties:
+        arguments:
+          type: string
+        isExecutable:
+          type: boolean
+        isInstallationFile:
+          type: boolean
+        metadata:
+          type: object
     RegulationSnapshotDto:
       type: object
       properties:
@@ -3222,6 +5117,443 @@ components:
           description: Compliancy of the regulation
       required:
         - isCompliant
+    ExportArtifactDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Artifact file name
+        size:
+          type: integer
+          description: File size in bytes
+          format: int64
+        sha256:
+          type: string
+          description: SHA256 hash for integrity verification
+        downloadUrl:
+          type: string
+          description: Download URL for the artifact
+        metadata:
+          type: object
+          description: Additional metadata
+      required:
+        - name
+        - size
+        - sha256
+        - downloadUrl
+    ExportDockerImageDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Docker image name
+        imageUrl:
+          type: string
+          description: Docker image URL
+        metadata:
+          type: object
+          description: Additional metadata
+      required:
+        - name
+        - imageUrl
+    ExportDependencyDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+          description: Dependency catalog ID
+        name:
+          type: string
+          description: Dependency name
+        version:
+          type: string
+          description: Dependency version
+      required:
+        - catalogId
+        - name
+        - version
+    ExportReleaseDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Release name
+        version:
+          type: string
+          description: Release version
+        tag:
+          type: string
+          description: Release tag
+        createdAt:
+          type: string
+          description: Creation timestamp
+        project:
+          type: string
+          description: Project identifier
+        status:
+          type: string
+          description: Release status
+        releaseNotes:
+          type: string
+          description: Release notes
+        author:
+          type: string
+          description: Author email
+        metadata:
+          type: object
+          description: Release metadata
+        artifacts:
+          description: List of artifacts
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportArtifactDto'
+        dockerImages:
+          description: List of docker images
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportDockerImageDto'
+        dependencies:
+          description: List of dependencies
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportDependencyDto'
+      required:
+        - name
+        - version
+        - createdAt
+        - project
+        - status
+        - author
+        - metadata
+        - artifacts
+    ImportArtifactDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Artifact file name
+        platform:
+          type: string
+          description: Platform for the artifact (e.g., linux, macos, windows)
+        size:
+          type: integer
+          description: File size in bytes
+          format: int64
+        sha256:
+          type: string
+          description: SHA256 hash for integrity verification
+        downloadUrl:
+          type: string
+          description: Download URL for the artifact (can be external or internal)
+        isExecutable:
+          type: boolean
+          description: Whether the artifact is executable
+        arguments:
+          type: string
+          description: Command-line arguments for executable artifacts
+        metadata:
+          type: object
+          description: Additional metadata
+      required:
+        - name
+        - size
+        - sha256
+        - downloadUrl
+    ImportDockerImageDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Docker image name
+        imageUrl:
+          type: string
+          description: Docker image URL
+        platform:
+          type: string
+          description: Platform for the docker image
+        metadata:
+          type: object
+          description: Additional metadata
+      required:
+        - name
+        - imageUrl
+    ImportDependencyDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+          description: Dependency catalog ID
+        name:
+          type: string
+          description: Dependency name
+        version:
+          type: string
+          description: Dependency version
+      required:
+        - catalogId
+        - name
+        - version
+    ImportReleaseDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Release name
+        version:
+          type: string
+          description: Release version
+        tag:
+          type: string
+          description: Release tag
+        createdAt:
+          type: string
+          description: Creation timestamp
+        project:
+          type: string
+          description: Project identifier (name or ID)
+        projectIdentifier:
+          type: object
+          description: Project ID (set by API layer)
+        status:
+          type: string
+          description: Release status
+        releaseNotes:
+          type: string
+          description: Release notes
+        author:
+          type: string
+          description: Author email
+        metadata:
+          type: object
+          description: Release metadata
+        artifacts:
+          description: List of artifacts
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportArtifactDto'
+        dockerImages:
+          description: List of docker images
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportDockerImageDto'
+        dependencies:
+          description: List of dependencies
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportDependencyDto'
+      required:
+        - version
+        - createdAt
+        - project
+        - author
+        - artifacts
+    ArtifactWarningDto:
+      type: object
+      properties:
+        artifactName:
+          type: string
+          description: Artifact name that failed
+        message:
+          type: string
+          description: Warning message
+        expectedSha256:
+          type: string
+          description: Expected SHA256 hash
+        actualSha256:
+          type: string
+          description: Actual SHA256 hash
+      required:
+        - artifactName
+        - message
+        - expectedSha256
+    ImportReleaseResponseDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+          description: Catalog ID of the created release
+        name:
+          type: string
+          description: Release name
+        version:
+          type: string
+          description: Release version
+        status:
+          type: string
+          description: Release status
+        warnings:
+          description: List of warnings for artifacts that failed checksum validation
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtifactWarningDto'
+        message:
+          type: string
+          description: Success message
+      required:
+        - catalogId
+        - name
+        - version
+        - status
+        - message
+    DeviceDeploymentDetailDto:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: Device ID
+        deviceName:
+          type: string
+          description: Device name
+        deliveryStatus:
+          type: string
+          description: Delivery status (e.g., DONE, PENDING, IN_PROGRESS)
+        deployStatus:
+          type: string
+          description: Deploy/Installation status (e.g., DONE, PENDING, IN_PROGRESS)
+        downloadTime:
+          format: date-time
+          type: string
+          description: Download completion timestamp
+        installationTime:
+          format: date-time
+          type: string
+          description: Installation completion timestamp
+      required:
+        - deviceId
+    DeploymentReportDto:
+      type: object
+      properties:
+        projectId:
+          type: number
+          description: Project ID
+        releaseName:
+          type: string
+          description: Release name
+        version:
+          type: string
+          description: Release version
+        downloadedCount:
+          type: number
+          description: Number of devices that have downloaded the release
+        installedCount:
+          type: number
+          description: Number of devices with the release installed
+        total:
+          type: number
+          description: >-
+            Total number of devices with ongoing delivery process (includes
+            devices waiting for download and mid-deployment)
+        pending:
+          type: number
+          description: >-
+            Number of devices that are pending (not downloaded or still
+            downloading)
+        deploymentPercentage:
+          type: number
+          description: >-
+            Deployment percentage calculated as (installedCount /
+            activeDeliveryCount) * 100
+        devices:
+          description: List of devices with their deployment statuses
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDeploymentDetailDto'
+      required:
+        - projectId
+        - releaseName
+        - version
+        - downloadedCount
+        - installedCount
+        - total
+        - pending
+        - deploymentPercentage
+        - devices
+    UploadArtifactDto:
+      type: object
+      properties:
+        platform:
+          type: string
+        component:
+          type: string
+        formation:
+          type: string
+        OS:
+          type: string
+        version:
+          type: string
+        releaseNotes:
+          type: string
+        size:
+          type: string
+        url:
+          type: string
+        artifactType:
+          type: string
+        uploadToken:
+          type: string
+        isExecutable:
+          type: boolean
+          default: false
+        arguments:
+          type: object
+    UploadManifestDto:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+        uploadToken:
+          type: string
+      required:
+        - file
+    UpdateUploadStatusDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+        status:
+          type: string
+          enum:
+            - started
+            - downloading-from-url
+            - fail-to-download
+            - uploading-to-s3
+            - fail-to-upload
+            - in-progress
+            - ready
+            - error
+        uploadToken:
+          type: string
+      required:
+        - status
+    ComponentDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+        name:
+          type: string
+        versionNumber:
+          type: string
+        releaseNotes:
+          type: string
+        virtualSize:
+          type: number
+        category:
+          type: string
+        baseVersion:
+          type: string
+        prevVersion:
+          type: string
+        latest:
+          type: boolean
+        uploadDate:
+          format: date-time
+          type: string
+        subComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentDto'
     ComponentV2Dto:
       type: object
       properties:
@@ -3229,12 +5561,24 @@ components:
           type: string
         version:
           type: string
+        projectId:
+          type: integer
         projectName:
           type: string
+        displayName:
+          type: string
+          description: Human-readable display name of the project
+        label:
+          type: string
+          description: Label associated with the project
         releaseNotes:
           type: string
         metadata:
-          type: object
+          description: >-
+            Component metadata including autoDeploy and postInstallAction
+            configuration. Additional user-defined properties are supported.
+          allOf:
+            - $ref: '#/components/schemas/ReleaseMetadata'
         status:
           type: string
           enum:
@@ -3243,11 +5587,25 @@ components:
             - approved
             - released
             - archived
+            - error
         type:
           type: string
           enum:
             - product
-            - formation
+            - application
+            - lib
+            - bundle
+            - infra
+          deprecated: true
+        projectTypeV2:
+          type: string
+          enum:
+            - product
+            - application
+            - lib
+            - bundle
+            - infra
+          description: The actual project type, regardless of agent compatibility
         size:
           type: integer
           format: int64
@@ -3262,9 +5620,19 @@ components:
         releasedAt:
           format: date-time
           type: string
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentV2Dto'
+        policies:
+          description: Policies associated with this release
+          type: array
+          items:
+            $ref: '#/components/schemas/ReleasePolicyDto'
       required:
         - id
         - version
+        - projectId
         - projectName
         - status
         - type
@@ -3279,6 +5647,12 @@ components:
         projectId:
           type: number
           description: Identifier of the project
+        displayName:
+          type: string
+          description: Display name of the project
+        label:
+          type: string
+          description: Label of the project
         release:
           $ref: '#/components/schemas/ComponentV2Dto'
       required:
@@ -3316,6 +5690,31 @@ components:
       required:
         - platformId
         - platformName
+    PaginatedResultDto:
+      type: object
+      properties:
+        data:
+          description: The data items for the current page
+          type: array
+          items:
+            type: object
+        total:
+          type: number
+          description: The total number of items available
+          example: 100
+        page:
+          type: number
+          description: The current page number
+          example: 1
+        perPage:
+          type: number
+          description: The number of items per page
+          example: 10
+      required:
+        - data
+        - total
+        - page
+        - perPage
     PushOfferingDto:
       type: object
       properties:
@@ -3340,6 +5739,45 @@ components:
         - catalogId
         - devices
         - itemType
+    UpsertOfferingTreePolicyDto:
+      type: object
+      properties:
+        platformId:
+          type: number
+        deviceTypeId:
+          type: number
+        projectId:
+          type: number
+        catalogId:
+          type: string
+          description: Set to null to remove the policy
+      required:
+        - projectId
+    OfferingTreePolicyDto:
+      type: object
+      properties:
+        platformId:
+          type: number
+        deviceTypeId:
+          type: number
+        projectId:
+          type: number
+        catalogId:
+          type: string
+        latest:
+          type: boolean
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - projectId
+        - catalogId
+        - latest
+        - createdAt
+        - updatedAt
     DeliveryStatusDto:
       type: object
       properties:
@@ -3407,6 +5845,11 @@ components:
             - software
             - map
             - cache
+        downloadFolder:
+          type: string
+          description: >-
+            Custom download folder path — used for agent CORE A2A relay, not
+            consumed by the server.
       required:
         - catalogId
         - deviceId
@@ -3443,6 +5886,12 @@ components:
           type: number
         hash:
           $ref: '#/components/schemas/HashDto'
+        signature:
+          type: string
+        isExecutable:
+          type: boolean
+        arguments:
+          type: string
       required:
         - catalogId
         - itemKey
@@ -3463,6 +5912,12 @@ components:
             - DELIVERY.notVerified
             - DELIVERY.packageTooLarge
             - DELIVERY.unableClearCache
+            - PROJECT_MANAGEMENT.unknown
+            - PROJECT_MANAGEMENT.deleteProjectFailed
+            - PROJECT_MANAGEMENT.webhookInvalid
+            - PROJECT_MANAGEMENT.labelNotFound
+            - PROJECT_MANAGEMENT.labelAlreadyExists
+            - PROJECT_MANAGEMENT.labelInUse
             - MAP.unknown
             - MAP.notFound
             - MAP.bBoxIsInvalid
@@ -3472,38 +5927,76 @@ components:
             - MAP.requestInProgress
             - MAP.areaTooLarge
             - MAP.areaTooSmall
-            - PLATFORM.notFound
             - DEVICE.notFound
+            - DEVICE.hasChildren
+            - DEVICE_TYPE.notFound
+            - DEVICE_TYPE.alreadyExists
+            - DEVICE_PLATFORM.notFound
+            - DEVICE_PLATFORM.alreadyExists
             - GROUP.notFound
             - GROUP.notAllowedToAdd
+            - GROUP.orgIdUnknown
+            - GROUP.orgIdNotAllowed
+            - GROUP.orgIdConflict
+            - GROUP.orgIdNotFound
+            - RULE.validationFailed
+            - RULE.fieldNotSupported
+            - RULE.fieldAlreadyExists
+            - RULE.fieldNotFound
+            - RELEASE.hasDependents
           description: >-
-            `APP.unknown`: General Error code not listed in the
-            enum.<br/>`DELIVERY.unknown`: Error code not listed in the
-            enum.<br/>`DELIVERY.notFound`: Delivery with given catalog id not
-            found.<br/>`DELIVERY.download`: Download of delivery item
-            failed.<br/>`DELIVERY.downloadNotAvailable`: Delivery item not yet
-            available for download.<br/>`DELIVERY.notExist`: The package does
-            not exist in storage.<br/>`DELIVERY.invalid`: Package of given
-            catalog id is invalid, maybe expired or
-            otherwise.<br/>`DELIVERY.notVerified`: Package of given catalog id
-            is not verified, the package may be
-            invalid.<br/>`DELIVERY.packageTooLarge`: Package of given catalog id
-            is too large, no space in cache.<br/>`DELIVERY.unableClearCache`:
-            Issue occurred when trying to clear cache.<br/>`MAP.unknown`: Error
-            code not listed in the enum.<br/>`MAP.notFound`: Map with given id
-            not found.<br/>`MAP.bBoxIsInvalid`: BBox is
-            invalid.<br/>`MAP.bBoxNotInAnyPolygon`: The given BBox is not
-            contained in any polygon.<br/>`MAP.getRecordsFailed`: Failed to get
-            records.<br/>`MAP.exportMapFailed`: Error occurred when exporting
-            map.<br/>`MAP.requestInProgress`: Delivery was already requested and
-            is processing.<br/>`MAP.areaTooLarge`: Area too large to distribute,
-            reduce request size and try again.<br/>`MAP.areaTooSmall`: Area too
-            small to distribute, increase request size and try
-            again.<br/>`PLATFORM.notFound`: Platform with given id or name not
-            found.<br/>`DEVICE.notFound`: Device with given id not
-            found.<br/>`GROUP_NOT_FOUND`: Group with the given id was not
-            found.<br/>`GROUP_NOT_ALLOWED_TO_ADD`: Not allowed to add to the
-            group, see message for cause.
+            `APP.unknown`: General Error code not listed in the enum <br />
+            `DELIVERY.unknown`: Error code not listed in the enum <br />
+            `DELIVERY.notFound`: No found the delivery with given catalog id <br
+            /> `DELIVERY.download`: Download of delivery item failed <br />
+            `DELIVERY.downloadNotAvailable`: Delivery item not yet available for
+            download <br /> `DELIVERY.notExist`: The Package not exist in
+            storage <br /> `DELIVERY.invalid`: Package of given catalog id is
+            invalid, maybe expired or some else <br /> `DELIVERY.notVerified`:
+            Package of given catalog id is not verified, the package can be in
+            valid <br /> `DELIVERY.packageTooLarge`:  Package of given catalog
+            id is too large, no space in cache<br />
+            `DELIVERY.unableClearCache`:  Some issue occurs when trying to clear
+            cache <br /> `PROJECT_MANAGEMENT.unknown`: Error code not listed in
+            the enum <br /> `PROJECT_MANAGEMENT.deleteProjectFailed`: Failed to
+            delete the project <br /> `PROJECT_MANAGEMENT.webhookInvalid`:
+            Webhook token is invalid or no matching project found <br />
+            `PROJECT_MANAGEMENT.labelNotFound`: Label with the given id or name
+            was not found <br /> `PROJECT_MANAGEMENT.labelAlreadyExists`: Label
+            with the given name already exists <br />
+            `PROJECT_MANAGEMENT.labelInUse`: Label cannot be deleted as it is
+            being used by projects <br /> `MAP.unknown`: Error code not listed
+            in the enum <br /> `MAP.notFound`: No found the map with given id
+            <br /> `MAP.bBoxIsInvalid`: BBox is probably invalid <br />
+            `MAP.bBoxNotInAnyPolygon`: The given BBox in not contains in any
+            polygon <br /> `MAP.getRecordsFailed`: Failed to get
+            records.<br/>`MAP.exportMapFailed`: Some error occurs when import
+            map <br /> `MAP.requestInProgress`: Delivery was already requested
+            and in processing! <br /> `MAP.areaTooLarge`: Area too large to
+            distribute, reduce request size and try again <br />
+            `MAP.areaTooSmall`: Area too small to distribute, increase request
+            size and try again . `DEVICE.notFound`: Device with given id not
+            found.<br/>`DEVICE.hasChildren`: Device has child devices and cannot
+            be deleted.<br/>`DEVICE.hasChildren`: Cannot delete device because
+            it has child devices.<br/>`DEVICE_DT_NOT_FOUND`: Device type with
+            given id not found.<br/>`DEVICE_DT_ALREADY_EXISTS`: Device type with
+            given name already exists.<br/>`DEVICE_PLATFORM.notFound`: Platform
+            with given id or name not
+            found.<br/>`DEVICE_PLATFORM_ALREADY_EXISTS`: Platform with given
+            name already exists.<br/>`GROUP_NOT_FOUND`: Group with the given id
+            was not found.<br/>`GROUP_NOT_ALLOWED_TO_ADD`: Not allowed to add to
+            the group, see message for cause.<br/>`GROUP.orgIdUnknown`:
+            Organization ID is unknown, see message for
+            cause.<br/>`GROUP.orgIdNotAllowed`: Organization ID is not allowed
+            to be used, see message for cause.<br/>`GROUP.orgIdConflict`:
+            Organization ID conflict occurred.<br/>`GROUP.orgIdNotFound`:
+            Organization ID not found.<br/>`RULE.validationFailed`: Rule
+            validation against rule engine failed.<br/>`RULE.fieldNotSupported`:
+            One or more fields in the rule are not
+            supported.<br/>`RULE.fieldAlreadyExists`: Rule field with the given
+            name already exists.<br/>`RULE.fieldNotFound`: Rule field with the
+            given name was not found.<br/>`RELEASE.hasDependents`: Cannot delete
+            release because other releases depend on it.
         message:
           type: string
     PrepareDeliveryResDto:
@@ -3582,6 +6075,10 @@ components:
       properties:
         name:
           type: string
+          description: Unique identifier for the project (slug)
+        projectName:
+          type: string
+          description: Human-friendly name of the project (not unique)
         description:
           type: string
         platforms:
@@ -3592,8 +6089,39 @@ components:
           type: string
           enum:
             - product
-            - formation
+            - application
+            - lib
+            - bundle
+            - infra
           default: product
+        label:
+          type: string
+          description: Label name to assign to the project
+        gitCloneUrl:
+          type: string
+          description: Git repository clone URL (HTTPS or SSH)
+        gitSshKey:
+          type: string
+          description: SSH private key for git authentication (base64 encoded)
+        gitCloneInterval:
+          type: number
+          description: >-
+            Interval in minutes for periodic git clone (default: 60 if git
+            configured)
+        gitBranch:
+          type: string
+          description: Branch to clone (defaults to repository default branch)
+        gitHttpsUsername:
+          type: string
+          description: Username for HTTPS git authentication
+        gitHttpsPassword:
+          type: string
+          description: Password or personal access token for HTTPS git authentication
+        gitGetappFilePath:
+          type: string
+          description: >-
+            Path to the .getapp file within the repository (defaults to repo
+            root)
       required:
         - name
     ProjectMemberPreferencesDto:
@@ -3652,17 +6180,26 @@ components:
           description: Unique identifier of the project
         name:
           type: string
-          description: Name of the project
+          description: Unique slug name of the project
+        projectName:
+          type: string
+          description: Human-friendly name of the project (not unique)
         description:
           type: string
         projectType:
           type: string
-          enum: &ref_23
+          enum: &ref_40
             - product
-            - formation
+            - application
+            - lib
+            - bundle
+            - infra
         status:
           type: string
           description: Status of the project (active, completed, on-hold)
+        label:
+          type: string
+          description: Label name assigned to the project
         owner:
           type: string
           description: Owner of the project
@@ -3736,31 +6273,6 @@ components:
           type: array
           items:
             type: string
-    PaginatedResultDto:
-      type: object
-      properties:
-        data:
-          description: The data items for the current page
-          type: array
-          items:
-            type: object
-        total:
-          type: number
-          description: The total number of items available
-          example: 100
-        page:
-          type: number
-          description: The current page number
-          example: 1
-        perPage:
-          type: number
-          description: The number of items per page
-          example: 10
-      required:
-        - data
-        - total
-        - page
-        - perPage
     BaseProjectDto:
       type: object
       properties:
@@ -3769,15 +6281,21 @@ components:
           description: Unique identifier of the project
         name:
           type: string
-          description: Name of the project
+          description: Unique slug name of the project
+        projectName:
+          type: string
+          description: Human-friendly name of the project (not unique)
         description:
           type: string
         projectType:
           type: string
-          enum: *ref_23
+          enum: *ref_40
         status:
           type: string
           description: Status of the project (active, completed, on-hold)
+        label:
+          type: string
+          description: Label name assigned to the project
       required:
         - id
         - name
@@ -3798,6 +6316,26 @@ components:
         - id
         - name
         - description
+    LabelDto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Unique identifier of the label
+        name:
+          type: string
+          description: Name of the label
+      required:
+        - id
+        - name
+    LabelNameDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the label
+      required:
+        - name
     ProjectTokenDto:
       type: object
       properties:
@@ -3834,15 +6372,21 @@ components:
           description: Unique identifier of the project
         name:
           type: string
-          description: Name of the project
+          description: Unique slug name of the project
+        projectName:
+          type: string
+          description: Human-friendly name of the project (not unique)
         description:
           type: string
         projectType:
           type: string
-          enum: *ref_23
+          enum: *ref_40
         status:
           type: string
           description: Status of the project (active, completed, on-hold)
+        label:
+          type: string
+          description: Label name assigned to the project
         owner:
           type: string
           description: Owner of the project
@@ -3877,6 +6421,36 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectTokenDto'
+        gitWebhookUrl:
+          type: string
+          description: Generated webhook URL for git integration
+        gitCloneUrl:
+          type: string
+          description: Git repository clone URL (HTTPS or SSH)
+        gitSshKeyConfigured:
+          type: boolean
+          description: Whether an SSH private key is configured for git authentication
+        gitCloneInterval:
+          type: number
+          description: Interval in minutes for periodic git clone
+        gitBranch:
+          type: string
+          description: Branch to clone (defaults to repository default branch)
+        gitHttpsCredentialsConfigured:
+          type: boolean
+          description: Whether HTTPS username/password credentials are configured
+        gitAuthMethod:
+          type: string
+          description: Git authentication method in use
+          enum:
+            - ssh_key
+            - https_credentials
+            - none
+        gitGetappFilePath:
+          type: string
+          description: >-
+            Path to the .getapp file within the repository (defaults to repo
+            root)
       required:
         - id
         - name
@@ -3889,17 +6463,52 @@ components:
       properties:
         name:
           type: string
+          description: Unique identifier for the project (slug)
+        projectName:
+          type: string
+          description: Human-friendly name of the project (not unique)
         description:
           type: string
         platforms:
           type: array
           items:
             type: string
+        label:
+          type: string
+          description: Label name to assign to the project
+        gitCloneUrl:
+          type: string
+          description: Git repository clone URL (HTTPS or SSH)
+        gitSshKey:
+          type: string
+          description: SSH private key for git authentication (base64 encoded)
+        gitCloneInterval:
+          type: number
+          description: >-
+            Interval in minutes for periodic git clone (default: 60 if git
+            configured)
+        gitBranch:
+          type: string
+          description: Branch to clone (defaults to repository default branch)
+        gitHttpsUsername:
+          type: string
+          description: Username for HTTPS git authentication
+        gitHttpsPassword:
+          type: string
+          description: Password or personal access token for HTTPS git authentication
+        gitGetappFilePath:
+          type: string
+          description: >-
+            Path to the .getapp file within the repository (defaults to repo
+            root)
         projectType:
           type: string
           enum:
             - product
-            - formation
+            - application
+            - lib
+            - bundle
+            - infra
     AddMemberToProjectDto:
       type: object
       properties:
@@ -4209,10 +6818,15 @@ components:
       properties:
         id:
           type: string
+          description: >-
+            Unique identifier for the product (at polygon part method, it the
+            specific polygon part id)
         productId:
           type: string
+          description: Unique identifier for the product
         catalogId:
           type: string
+          description: Unique identifier for the product (not the specific polygon part id)
         countries:
           type: string
         cities:
@@ -4260,13 +6874,13 @@ components:
           $ref: '#/components/schemas/mapOfferingConfig'
         method:
           type: string
-          enum: &ref_25
+          enum: &ref_43
             - single
             - polygonParts
           default: polygonParts
         status:
           type: string
-          enum: &ref_26
+          enum: &ref_44
             - Success
             - Error
         error:
@@ -4293,6 +6907,10 @@ components:
           type: number
         lastUpdateAfter:
           type: number
+        catalogId:
+          type: string
+        fileName:
+          type: string
       required:
         - boundingBox
     CreateImportDto:
@@ -4312,14 +6930,16 @@ components:
           type: string
         status:
           type: string
-          enum: &ref_24
+          enum: &ref_41
+            - Draft
+            - Pending
             - Start
             - InProgress
-            - Done
-            - Cancel
             - Pause
+            - Cancel
             - Error
-            - Pending
+            - Done
+            - Discovered
             - Expired
             - Archived
         error:
@@ -4359,6 +6979,12 @@ components:
           type: string
         fileName:
           type: string
+        imagingStart:
+          format: date-time
+          type: string
+        imagingEnd:
+          format: date-time
+          type: string
     ImportStatusResDto:
       type: object
       properties:
@@ -4366,7 +6992,7 @@ components:
           type: string
         status:
           type: string
-          enum: *ref_24
+          enum: *ref_41
         error:
           $ref: '#/components/schemas/ErrorDto'
         metaData:
@@ -4474,6 +7100,137 @@ components:
             mapId_2: false
       required:
         - updates
+    InventoryDetailsDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - offering
+            - push
+            - import
+            - delivery
+            - deleted
+            - installed
+            - uninstalled
+          description: the state of the device for current device
+        src:
+          type: string
+          description: >-
+            Source of the map for this device — how the device obtained the map
+            (e.g., 'generate', 'shared', 'storage', 'update', 'push').
+        footprint:
+          type: string
+          description: The footprint of the map associated with the device.
+        name:
+          type: string
+          description: The name of map (generated from file name)
+        fileName:
+          type: string
+          description: The name of the file associated with the map.
+      required:
+        - status
+    InventoryUpdatesReqV2Dto:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        inventory:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InventoryDetailsDto'
+          example:
+            mapId_1: {}
+            mapId_2: {}
+      required:
+        - deviceId
+        - inventory
+    MapDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+        name:
+          type: string
+        createDate:
+          format: date-time
+          type: string
+        exportEndDate:
+          format: date-time
+          type: string
+        boundingBox:
+          type: string
+        footprint:
+          type: string
+        size:
+          type: number
+        area:
+          type: number
+        status:
+          type: string
+          enum: &ref_42
+            - Draft
+            - Pending
+            - Start
+            - InProgress
+            - Pause
+            - Cancel
+            - Error
+            - Done
+            - Discovered
+            - Expired
+            - Archived
+        fileName:
+          type: string
+        packageUrl:
+          type: string
+        imagingStart:
+          format: date-time
+          type: string
+        imagingEnd:
+          format: date-time
+          type: string
+        isUpdate:
+          type: boolean
+        product:
+          $ref: '#/components/schemas/MapProductResDto'
+    InventoryUpdateStatusResDto:
+      type: object
+      properties:
+        isUpdated:
+          type: boolean
+          description: Indicates whether the map is updated.
+        catalogId:
+          type: string
+          description: >-
+            Catalog ID of the map. a registered catalog ID if the map is
+            unknown.
+        updatedMap:
+          description: The updated map details if available.
+          allOf:
+            - $ref: '#/components/schemas/MapDto'
+      required:
+        - isUpdated
+    InventoryUpdatesResV2Dto:
+      type: object
+      properties:
+        updates:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InventoryUpdateStatusResDto'
+          example:
+            mapId_1:
+              isUpdated: true
+              updatedMap: {}
+            mapId_2:
+              isUpdated: false
+              updatedMap: {}
+            mapId_3_unknown:
+              isUpdated: false
+              catalogId: mapId_3
+              updatedMap: {}
+      required:
+        - updates
     MapConfigDto:
       type: object
       properties:
@@ -4531,37 +7288,6 @@ components:
           type: string
         controlMapPath:
           type: string
-    MapDto:
-      type: object
-      properties:
-        catalogId:
-          type: string
-        name:
-          type: string
-        createDate:
-          format: date-time
-          type: string
-        exportEndDate:
-          format: date-time
-          type: string
-        boundingBox:
-          type: string
-        footprint:
-          type: string
-        size:
-          type: number
-        area:
-          type: number
-        status:
-          type: string
-        fileName:
-          type: string
-        packageUrl:
-          type: string
-        isUpdate:
-          type: boolean
-        product:
-          $ref: '#/components/schemas/MapProductResDto'
     MapDevicesDto:
       type: object
       properties:
@@ -4585,9 +7311,16 @@ components:
           type: number
         status:
           type: string
+          enum: *ref_42
         fileName:
           type: string
         packageUrl:
+          type: string
+        imagingStart:
+          format: date-time
+          type: string
+        imagingEnd:
+          format: date-time
           type: string
         isUpdate:
           type: boolean
@@ -4651,6 +7384,48 @@ components:
         - currentTime
         - deployStatus
         - type
+    RestrictionAssociationDto:
+      type: object
+      properties:
+        deviceTypeNames:
+          description: Device type names for restrictions
+          type: array
+          items:
+            type: string
+        osTypes:
+          description: OS types for restrictions
+          type: array
+          items:
+            type: string
+        deviceIds:
+          description: Specific device IDs for restrictions
+          type: array
+          items:
+            type: string
+    CreateRestrictionDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Restriction name
+        description:
+          type: string
+          description: Restriction description
+        association:
+          description: Restriction associations
+          allOf:
+            - $ref: '#/components/schemas/RestrictionAssociationDto'
+        isActive:
+          type: boolean
+          description: Whether the restriction is active
+          default: true
+        rule:
+          type: object
+          description: Rule engine compliant rule object
+      required:
+        - name
+        - association
+        - rule
     PersonalDiscoveryDto:
       type: object
       properties:
@@ -4706,6 +7481,7 @@ components:
             - android
             - windows
             - linux
+            - macos
         serialNumber:
           type: string
         possibleBandwidth:
@@ -4722,6 +7498,8 @@ components:
           $ref: '#/components/schemas/SituationalDiscoveryDto'
         physicalDevice:
           $ref: '#/components/schemas/PhysicalDiscoveryDto'
+        metaData:
+          type: object
     PlatformDto:
       type: object
       properties:
@@ -4736,13 +7514,14 @@ components:
           type: string
           description: Operating system of the platform
           example: windows
-          enum: &ref_27
+          enum: &ref_45
             - android
             - windows
             - linux
+            - macos
         cpuArchitecture:
           type: string
-          enum: &ref_28
+          enum: &ref_46
             - X86_64
             - ARM64
         cpuCount:
@@ -4756,13 +7535,13 @@ components:
           description: Disk size in GB
         diskType:
           type: string
-          enum: &ref_29
+          enum: &ref_47
             - HDD
             - SSD
             - NVME
         networkType:
           type: string
-          enum: &ref_30
+          enum: &ref_48
             - NAT
             - BRIDGED
             - HOST_ONLY
@@ -4893,6 +7672,7 @@ components:
       type: object
       properties:
         formations:
+          deprecated: true
           type: array
           items:
             type: string
@@ -4905,6 +7685,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ComponentStateDto'
+    DeviceFieldDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Field name in JSONPath format (e.g., $.battery.level)
+        type:
+          type: string
+          description: Field data type (number, string, boolean)
+        label:
+          type: string
+          description: Human-readable label for the field
+        description:
+          type: string
+          description: Field description
+      required:
+        - name
+        - type
     DiscoveryMessageV2Dto:
       type: object
       properties:
@@ -4913,12 +7711,11 @@ components:
         snapshotDate:
           type: string
           description: Timestamp when the discovery snapshot was taken
-          example: 2025-07-08T10:49:16.750Z
-        deviceType:
+        deviceTypeToken:
           type: string
           description: >-
-            Type of the discovered device (e.g., router, switch, server, etc.),
-            used for discovery of devices of type "device"
+            Name or ID (as string) of the deviceType (e.g., router, switch,
+            server, etc.), used for discovery of devices of type "device"
         platform:
           description: >-
             Platform-specific discovery information containing device details
@@ -4936,16 +7733,25 @@ components:
             - mTls
         softwareData:
           $ref: '#/components/schemas/DiscoverySoftwareV2Dto'
-        mapData:
-          $ref: '#/components/schemas/DiscoveryMapDto'
+        supportedFields:
+          description: >-
+            List of fields that the device supports for evaluation, including
+            their types (e.g., number, string, boolean)
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceFieldDto'
       required:
+        - id
         - discoveryType
     PlatformDiscoverDto:
       type: object
       properties:
-        name:
+        token:
           type: string
-          description: Name of the platform or system being discovered
+          description: Name or ID (as string) of the platform **type** being discovered.
+        platformId:
+          type: string
+          description: ID (as string) of system or machine being discovered.
         devices:
           description: >-
             Array of devices discovered within this platform. Each device
@@ -4955,21 +7761,7 @@ components:
           items:
             $ref: '#/components/schemas/DiscoveryMessageV2Dto'
       required:
-        - name
-    DeviceComponentsOfferingDto:
-      type: object
-      properties:
-        offer:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentV2Dto'
-        push:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentV2Dto'
-      required:
-        - offer
-        - push
+        - token
     OfferingMapResDto:
       type: object
       properties:
@@ -4985,11 +7777,11 @@ components:
           $ref: '#/components/schemas/mapOfferingConfig'
         method:
           type: string
-          enum: *ref_25
+          enum: *ref_43
           default: polygonParts
         status:
           type: string
-          enum: *ref_26
+          enum: *ref_44
         error:
           $ref: '#/components/schemas/ErrorDto'
       required:
@@ -5018,6 +7810,146 @@ components:
           type: string
         status:
           type: string
+    DeviceTypeProjectRefDto:
+      type: object
+      properties:
+        deviceTypeId:
+          type: number
+          description: ID of the device type
+        deviceTypeName:
+          type: string
+          description: Name of the device type
+        projectId:
+          type: number
+          description: ID of the project
+        projectName:
+          type: string
+          description: Name of the project
+        projectDisplayName:
+          type: string
+          description: Display name of the project
+        projectLabel:
+          type: string
+          description: Label of the project
+      required:
+        - projectId
+        - projectName
+    PlatformDeviceTypeTreeDto:
+      type: object
+      properties:
+        platformTypeId:
+          type: number
+          description: >-
+            Platform Type ID - present when device types are under a platform
+            type
+        platformTypeName:
+          type: string
+          description: >-
+            Platform Type name - present when device types are under a platform
+            type
+        deviceTypes:
+          description: >-
+            Device types with projects (under platform if platform fields are
+            present, or standalone)
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceTypeProjectRefDto'
+      required:
+        - deviceTypes
+    ReleaseOfferingDto:
+      type: object
+      properties:
+        release:
+          description: Release component data
+          allOf:
+            - $ref: '#/components/schemas/ComponentV2Dto'
+        isPush:
+          type: boolean
+          description: Flag indicating if this is a push action
+          default: false
+        hierarchyTrees:
+          description: Platform and device type hierarchy where this release is offered
+          type: array
+          items:
+            $ref: '#/components/schemas/PlatformDeviceTypeTreeDto'
+        dependedOnBy:
+          description: >-
+            Array of catalog IDs of releases that directly depend on this
+            release
+          type: array
+          items:
+            type: string
+      required:
+        - release
+        - hierarchyTrees
+    RestrictionDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum:
+            - policy
+            - restriction
+        version:
+          type: number
+        isActive:
+          type: boolean
+        rule:
+          type: object
+          description: The restriction rule object
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - type
+        - version
+        - isActive
+        - rule
+        - createdAt
+        - updatedAt
+    DeviceComponentsOfferingDto:
+      type: object
+      properties:
+        offer:
+          deprecated: true
+          description: Use 'releases' field instead
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentV2Dto'
+        push:
+          deprecated: true
+          description: Use 'releases' field instead
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentV2Dto'
+        releases:
+          description: >-
+            Components with all additional data of platform and device type
+            hierarchy, project and actions
+          type: array
+          items:
+            $ref: '#/components/schemas/ReleaseOfferingDto'
+        restrictions:
+          description: >-
+            List of applicable restrictions for the device based on device ID,
+            device type, OS, and other metadata
+          type: array
+          items:
+            $ref: '#/components/schemas/RestrictionDto'
+      required:
+        - offer
+        - push
+        - releases
+        - restrictions
     CreateDevicesGroupDto:
       type: object
       properties:
@@ -5048,13 +7980,6 @@ components:
           type: number
       required:
         - id
-    EditDevicesGroupDto:
-      type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
     GroupResponseDto:
       type: object
       properties:
@@ -5071,6 +7996,34 @@ components:
       required:
         - roots
         - groups
+    SetChildInGroupDto:
+      type: object
+      properties:
+        id:
+          type: number
+        parent:
+          type: number
+          nullable: true
+          description: >-
+            Parent group ID, if set to null then the existing parent will be
+            removed
+        devices:
+          type: array
+          items:
+            type: string
+        groups:
+          type: array
+          items:
+            type: number
+      required:
+        - id
+    EditDevicesGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
     DeviceOrgDto:
       type: object
       properties:
@@ -5094,29 +8047,53 @@ components:
             type: string
         deviceParentId:
           type: string
+        deviceParentName:
+          type: string
+        deviceParentUid:
+          type: number
       required:
         - id
-    SetChildInGroupDto:
+    OrgIdDto:
       type: object
       properties:
-        id:
+        orgId:
           type: number
-        parent:
+      required:
+        - orgId
+    OrgIdRefDto:
+      type: object
+      properties:
+        orgId:
+          type: number
+        device:
+          type: string
+          nullable: true
+          description: >-
+            Device id related to the org id. Set to null to remove the current
+            device.
+        group:
           type: number
           nullable: true
           description: >-
-            Parent group ID, if set to null then the existing parent will be
-            removed
-        devices:
-          type: array
-          items:
-            type: string
-        groups:
-          type: array
-          items:
-            type: number
+            Group parent id for the org id. Set to null to remove the current
+            group parent.
       required:
-        - id
+        - orgId
+    OrgIdPutDto:
+      type: object
+      properties:
+        device:
+          type: string
+          nullable: true
+          description: >-
+            Device id related to the org id. Set to null to remove the current
+            device.
+        group:
+          type: number
+          nullable: true
+          description: >-
+            Group parent id for the org id. Set to null to remove the current
+            group parent.
     DeviceDto:
       type: object
       properties:
@@ -5140,6 +8117,8 @@ components:
           type: number
         operativeState:
           type: boolean
+        metaData:
+          type: object
         groupName:
           type: string
         groupId:
@@ -5160,6 +8139,10 @@ components:
             type: string
         deviceParentId:
           type: string
+        deviceParentName:
+          type: string
+        deviceParentUid:
+          type: number
       required:
         - id
     DevicesStatisticUnit:
@@ -5190,160 +8173,29 @@ components:
         - updated
         - onUpdateProcess
         - updateError
-    MapStateDto:
-      type: object
-      properties:
-        map:
-          $ref: '#/components/schemas/MapDto'
-        state:
-          type: string
-          enum:
-            - offering
-            - push
-            - import
-            - delivery
-            - deleted
-            - installed
-            - uninstalled
-        error:
-          type: string
-        downloadDate:
-          format: date-time
-          type: string
-        deployDate:
-          format: date-time
-          type: string
-    DeviceMapDto:
+    OSDto:
       type: object
       properties:
         id:
           type: string
-        lastUpdatedDate:
-          format: date-time
-          type: string
-        lastConnectionDate:
-          format: date-time
-          type: string
+          example: android
+          description: Operating system identifier
         name:
           type: string
-        OS:
+          example: Android
+          description: Operating system display name
+        description:
           type: string
-        availableStorage:
+          example: Android mobile and tablet operating system
+          description: Operating system description
+        createdAt:
+          format: date-time
           type: string
-        power:
-          type: number
-        bandwidth:
-          type: number
-        operativeState:
-          type: boolean
-        groupName:
-          type: string
-        groupId:
-          type: number
-        uid:
-          type: number
-        formations:
-          type: array
-          items:
-            type: string
-        platformName:
-          type: string
-        deviceTypeName:
-          type: string
-        devices:
-          type: array
-          items:
-            type: string
-        deviceParentId:
-          type: string
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/MapStateDto'
+          description: Creation timestamp
       required:
         - id
-        - maps
-    SoftwareStateDto:
-      type: object
-      properties:
-        software:
-          $ref: '#/components/schemas/ComponentV2Dto'
-        state:
-          type: string
-          enum:
-            - offering
-            - push
-            - delivery
-            - downloaded
-            - deleted
-            - deploy
-            - installed
-            - uninstalled
-        downloadDate:
-          format: date-time
-          type: string
-        deployDate:
-          format: date-time
-          type: string
-        offering:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentV2Dto'
-        error:
-          type: string
-      required:
-        - software
-        - offering
-    DeviceSoftwareDto:
-      type: object
-      properties:
-        id:
-          type: string
-        lastUpdatedDate:
-          format: date-time
-          type: string
-        lastConnectionDate:
-          format: date-time
-          type: string
-        name:
-          type: string
-        OS:
-          type: string
-        availableStorage:
-          type: string
-        power:
-          type: number
-        bandwidth:
-          type: number
-        operativeState:
-          type: boolean
-        groupName:
-          type: string
-        groupId:
-          type: number
-        uid:
-          type: number
-        formations:
-          type: array
-          items:
-            type: string
-        platformName:
-          type: string
-        deviceTypeName:
-          type: string
-        devices:
-          type: array
-          items:
-            type: string
-        deviceParentId:
-          type: string
-        softwares:
-          type: array
-          items:
-            $ref: '#/components/schemas/SoftwareStateDto'
-      required:
-        - id
-        - softwares
+        - name
+        - createdAt
     AndroidConfigDto:
       type: object
       properties:
@@ -5403,6 +8255,12 @@ components:
           type: string
         controlMapPath:
           type: string
+        ortophotoMapPattern:
+          type: string
+          description: Substring to match in ortophoto map filename
+        controlMapPattern:
+          type: string
+          description: Substring to match in control map filename
       required:
         - group
     LayersConfigDto:
@@ -5526,14 +8384,6 @@ components:
           maxLength: 20
       required:
         - group
-    DevicePutDto:
-      type: object
-      properties:
-        name:
-          type: string
-        orgUID:
-          type: number
-          description: Set the unique given id or null to remove the exists uid.
     DeviceRegisterDto:
       type: object
       properties:
@@ -5555,6 +8405,200 @@ components:
       required:
         - maps
         - components
+    DevicePutDto:
+      type: object
+      properties:
+        name:
+          type: string
+        orgUID:
+          type: number
+          description: Set the unique given id or null to remove the exists uid.
+          nullable: true
+        groupId:
+          type: number
+          description: >-
+            Set group ID to associate the device with a specific group. set to
+            null to remove the existing group association.
+          nullable: true
+    MapStateDto:
+      type: object
+      properties:
+        map:
+          $ref: '#/components/schemas/MapDto'
+        state:
+          type: string
+          enum:
+            - offering
+            - push
+            - import
+            - delivery
+            - deleted
+            - installed
+            - uninstalled
+        error:
+          type: string
+        downloadDate:
+          format: date-time
+          type: string
+        deployDate:
+          format: date-time
+          type: string
+    DeviceMapDto:
+      type: object
+      properties:
+        id:
+          type: string
+        lastUpdatedDate:
+          format: date-time
+          type: string
+        lastConnectionDate:
+          format: date-time
+          type: string
+        name:
+          type: string
+        OS:
+          type: string
+        availableStorage:
+          type: string
+        power:
+          type: number
+        bandwidth:
+          type: number
+        operativeState:
+          type: boolean
+        metaData:
+          type: object
+        groupName:
+          type: string
+        groupId:
+          type: number
+        uid:
+          type: number
+        formations:
+          type: array
+          items:
+            type: string
+        platformName:
+          type: string
+        deviceTypeName:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+        deviceParentId:
+          type: string
+        deviceParentName:
+          type: string
+        deviceParentUid:
+          type: number
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/MapStateDto'
+      required:
+        - id
+        - maps
+    SoftwareStateDto:
+      type: object
+      properties:
+        software:
+          $ref: '#/components/schemas/ComponentV2Dto'
+        state:
+          type: string
+          enum:
+            - offering
+            - push
+            - delivery
+            - downloaded
+            - deleted
+            - deploy
+            - installed
+            - uninstalled
+        downloadDate:
+          format: date-time
+          type: string
+        deployDate:
+          format: date-time
+          type: string
+        offering:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentV2Dto'
+        error:
+          type: string
+        isUnknown:
+          type: boolean
+          description: Indicates if this version is unknown (not registered in getapp)
+        action:
+          type: string
+          enum:
+            - offering
+            - push
+          description: >-
+            How this software was offered to the device. "offering" =
+            automatically available, "push" = explicitly pushed by an admin.
+            Undefined if the software was unpushed or was never directly
+            offered/pushed to this device.
+      required:
+        - software
+        - offering
+    DeviceSoftwareDto:
+      type: object
+      properties:
+        id:
+          type: string
+        lastUpdatedDate:
+          format: date-time
+          type: string
+        lastConnectionDate:
+          format: date-time
+          type: string
+        name:
+          type: string
+        OS:
+          type: string
+        availableStorage:
+          type: string
+        power:
+          type: number
+        bandwidth:
+          type: number
+        operativeState:
+          type: boolean
+        metaData:
+          type: object
+        groupName:
+          type: string
+        groupId:
+          type: number
+        uid:
+          type: number
+        formations:
+          type: array
+          items:
+            type: string
+        platformName:
+          type: string
+        deviceTypeName:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+        deviceParentId:
+          type: string
+        deviceParentName:
+          type: string
+        deviceParentUid:
+          type: number
+        softwares:
+          type: array
+          items:
+            $ref: '#/components/schemas/SoftwareStateDto'
+      required:
+        - id
+        - softwares
     NewBugReportDto:
       type: object
       properties:
@@ -5564,6 +8608,14 @@ components:
           type: string
         description:
           type: string
+        startDate:
+          format: date-time
+          type: string
+        endDate:
+          format: date-time
+          type: string
+        logLevel:
+          type: string
       required:
         - deviceId
         - agentVersion
@@ -5572,11 +8624,11 @@ components:
       properties:
         bugId:
           type: number
-        uploadLogsUrl:
+        uploadEndpoint:
           type: string
       required:
         - bugId
-        - uploadLogsUrl
+        - uploadEndpoint
     BugReportDto:
       type: object
       properties:
@@ -5593,12 +8645,23 @@ components:
         reportDate:
           format: date-time
           type: string
+        startDate:
+          format: date-time
+          type: string
+        endDate:
+          format: date-time
+          type: string
+        logLevel:
+          type: string
+        isUploaded:
+          type: boolean
       required:
         - bugId
         - logsUrl
         - agentVersion
         - device
         - reportDate
+        - isUploaded
     CreatePlatformDto:
       type: object
       properties:
@@ -5613,10 +8676,10 @@ components:
           type: string
           description: Operating system of the platform
           example: windows
-          enum: *ref_27
+          enum: *ref_45
         cpuArchitecture:
           type: string
-          enum: *ref_28
+          enum: *ref_46
         cpuCount:
           type: number
           description: Number of vCPUs
@@ -5628,10 +8691,10 @@ components:
           description: Disk size in GB
         diskType:
           type: string
-          enum: *ref_29
+          enum: *ref_47
         networkType:
           type: string
-          enum: *ref_30
+          enum: *ref_48
         imageId:
           type: string
           description: Optional image ID
@@ -5654,10 +8717,10 @@ components:
           type: string
           description: Operating system of the platform
           example: windows
-          enum: *ref_27
+          enum: *ref_45
         cpuArchitecture:
           type: string
-          enum: *ref_28
+          enum: *ref_46
         cpuCount:
           type: number
           description: Number of vCPUs
@@ -5669,10 +8732,10 @@ components:
           description: Disk size in GB
         diskType:
           type: string
-          enum: *ref_29
+          enum: *ref_47
         networkType:
           type: string
-          enum: *ref_30
+          enum: *ref_48
         imageId:
           type: string
           description: Optional image ID
@@ -5684,10 +8747,16 @@ components:
       properties:
         projectName:
           type: string
-          description: Name of the project
+          description: Unique name of the project
         projectId:
           type: number
           description: Identifier of the project
+        displayName:
+          type: string
+          description: Display name of the project
+        label:
+          type: string
+          description: Label of the project
       required:
         - projectName
         - projectId
@@ -5736,13 +8805,14 @@ components:
           type: string
           description: Operating system of the platform
           example: windows
-          enum: &ref_31
+          enum: &ref_49
             - android
             - windows
             - linux
+            - macos
         cpuArchitecture:
           type: string
-          enum: &ref_32
+          enum: &ref_50
             - X86_64
             - ARM64
         cpuCount:
@@ -5756,13 +8826,13 @@ components:
           description: Disk size in GB
         diskType:
           type: string
-          enum: &ref_33
+          enum: &ref_51
             - HDD
             - SSD
             - NVME
         networkType:
           type: string
-          enum: &ref_34
+          enum: &ref_52
             - NAT
             - BRIDGED
             - HOST_ONLY
@@ -5802,10 +8872,10 @@ components:
           type: string
           description: Operating system of the platform
           example: windows
-          enum: *ref_31
+          enum: *ref_49
         cpuArchitecture:
           type: string
-          enum: *ref_32
+          enum: *ref_50
         cpuCount:
           type: number
           description: Number of vCPUs
@@ -5817,10 +8887,10 @@ components:
           description: Disk size in GB
         diskType:
           type: string
-          enum: *ref_33
+          enum: *ref_51
         networkType:
           type: string
-          enum: *ref_34
+          enum: *ref_52
         imageId:
           type: string
           description: Optional image ID
@@ -5842,10 +8912,10 @@ components:
           type: string
           description: Operating system of the platform
           example: windows
-          enum: *ref_31
+          enum: *ref_49
         cpuArchitecture:
           type: string
-          enum: *ref_32
+          enum: *ref_50
         cpuCount:
           type: number
           description: Number of vCPUs
@@ -5857,13 +8927,306 @@ components:
           description: Disk size in GB
         diskType:
           type: string
-          enum: *ref_33
+          enum: *ref_51
         networkType:
           type: string
-          enum: *ref_34
+          enum: *ref_52
         imageId:
           type: string
           description: Optional image ID
         metadata:
           type: object
           description: Optional tags or metadata
+    PendingVersionDto:
+      type: object
+      properties:
+        id:
+          type: number
+        projectName:
+          type: string
+        version:
+          type: string
+        catalogId:
+          type: string
+        status:
+          type: string
+          enum:
+            - PENDING
+            - ACCEPTED
+            - REJECTED
+        reportedCount:
+          type: number
+        firstReportedDate:
+          format: date-time
+          type: string
+        lastReportedDate:
+          format: date-time
+          type: string
+        reportingDeviceIds:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+        reason:
+          type: string
+      required:
+        - id
+        - projectName
+        - version
+        - status
+        - reportedCount
+        - firstReportedDate
+        - lastReportedDate
+        - reportingDeviceIds
+    PendingVersionListDto:
+      type: object
+      properties:
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingVersionDto'
+        total:
+          type: number
+      required:
+        - versions
+        - total
+    AcceptPendingVersionDto:
+      type: object
+      properties:
+        projectName:
+          type: string
+        version:
+          type: string
+        isDraft:
+          type: boolean
+        reason:
+          type: string
+        username:
+          type: string
+          description: >-
+            Username of the user accepting the version. Populated from auth
+            token.
+      required:
+        - projectName
+        - version
+    RejectPendingVersionDto:
+      type: object
+      properties:
+        projectName:
+          type: string
+        version:
+          type: string
+        reason:
+          type: string
+      required:
+        - projectName
+        - version
+    EvaluateRuleDto:
+      type: object
+      properties:
+        ruleId:
+          type: string
+          description: ID of an existing rule to evaluate. Supply either this or `rule`.
+        rule:
+          type: object
+          description: >-
+            Inline rule JSON (rule-engine format). Supply either this or
+            `ruleId`.
+    EvaluatedDeviceDto:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: Unique device identifier
+        deviceName:
+          type: string
+          description: Human-readable device name
+        os:
+          type: string
+          description: Operating system of the device
+        ip:
+          type: string
+          description: IP address of the device
+        mac:
+          type: string
+          description: MAC address of the device
+        serialNumber:
+          type: string
+          description: Serial number of the device
+        platformName:
+          type: string
+          description: Platform name the device belongs to
+        deviceTypeNames:
+          description: Device type names assigned to the device
+          type: array
+          items:
+            type: string
+        groupNames:
+          description: Names of the groups the device belongs to
+          type: array
+          items:
+            type: string
+        discoveryMessageId:
+          type: string
+          description: >-
+            ID of the discovery message used to build the evaluation context for
+            this device
+      required:
+        - deviceId
+    AttachedReleaseDto:
+      type: object
+      properties:
+        catalogId:
+          type: string
+          description: Catalog ID of the release
+        version:
+          type: string
+          description: Version string of the release
+        projectId:
+          type: string
+          description: Project ID the release belongs to
+        projectName:
+          type: string
+          description: Project name the release belongs to
+    EvaluateRuleResultDto:
+      type: object
+      properties:
+        matchingDevices:
+          description: Devices whose latest discovery data matched the rule
+          type: array
+          items:
+            $ref: '#/components/schemas/EvaluatedDeviceDto'
+        totalDevicesEvaluated:
+          type: number
+          description: Total number of devices evaluated
+        matchingCount:
+          type: number
+          description: Number of devices that matched the rule
+        attachedReleases:
+          description: >-
+            Releases the policy is attached to (only present for saved policy
+            rules)
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachedReleaseDto'
+      required:
+        - matchingDevices
+        - totalDevicesEvaluated
+        - matchingCount
+    DeviceContextDto:
+      type: object
+      properties:
+        discoveryMessageId:
+          type: string
+          description: ID of the discovery message used to build this context
+        context:
+          type: object
+          description: The device evaluation context as used during rule evaluation
+      required:
+        - discoveryMessageId
+        - context
+    CreateScanPayload:
+      type: object
+      properties:
+        target:
+          type: string
+          description: Scan target (image name, file path, registry URL, etc.)
+          example: nginx:latest
+        targetType:
+          type: string
+          description: Type of the scan target
+          enum:
+            - docker
+            - registry
+            - file
+            - dir
+            - oci-archive
+          example: docker
+        format:
+          type: string
+          description: SBOM output format
+          enum:
+            - syft-json
+            - spdx-json
+            - cyclonedx-json
+            - table
+            - text
+          default: cyclonedx-json
+        triggeredBy:
+          type: string
+          description: Who or what triggered this scan (user ID, service name, etc.)
+        isStoredInBucket:
+          type: boolean
+          description: >-
+            Set to true when `target` is a raw object key inside the MinIO
+            bucket (e.g. upload/release/1/file.msi). sbom-generator will
+            generate a fresh presigned URL at execution time. Required for file
+            retries to work correctly.
+      required:
+        - target
+        - targetType
+    ScanStatusResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Scan job UUID
+        status:
+          type: string
+          enum:
+            - queued
+            - running
+            - complete
+            - failed
+          description: Current status of the scan
+        target:
+          type: string
+          description: Scan target (image name, file path, registry URL, etc.)
+        targetType:
+          type: string
+          enum:
+            - docker
+            - registry
+            - file
+            - dir
+            - oci-archive
+          description: Type of the scan target
+        format:
+          type: string
+          enum:
+            - syft-json
+            - spdx-json
+            - cyclonedx-json
+            - table
+            - text
+          description: SBOM output format
+        triggeredBy:
+          type: string
+          description: Who or what triggered this scan
+        error:
+          type: string
+          description: Error message if the scan failed
+        failureReason:
+          type: string
+          description: Short reason code for the failure
+        createdAt:
+          format: date-time
+          type: string
+          description: Timestamp when the scan was created
+        updatedAt:
+          format: date-time
+          type: string
+          description: Timestamp of the last status update
+        completedAt:
+          format: date-time
+          type: string
+          description: Timestamp when the scan reached a terminal state
+      required:
+        - id
+        - status
+        - target
+        - targetType
+        - format
+        - createdAt
+        - updatedAt
